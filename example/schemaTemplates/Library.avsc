@@ -1,0 +1,43 @@
+{
+  "type": "record",
+  "namespace": "com.example",
+  "schema_level": "root",
+  "name": "Library",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "foundingYear",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    },
+    {
+      "name": "type",
+      "type": [
+        "null",
+        {
+          "name": "type",
+          "type": "enum",
+          "symbols": [
+            "PUBLIC",
+            "PRIVATE"
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "collection",
+      "type": {
+        "type": "array",
+        "items": "com.example.Collection"
+      },
+      "default": []
+    }
+  ]
+}

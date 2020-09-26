@@ -1,0 +1,9 @@
+{
+    "type": "record",
+    "namespace": "com.example",
+    "name": "CD",
+    "fields": [
+        { "name": "title", "type": "string" },
+        { "name": "artist", "type": "string" }
+    ]
+}

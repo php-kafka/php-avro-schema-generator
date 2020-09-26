@@ -1,0 +1,9 @@
+parameters:
+    level: 8
+    paths: [ src ]
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        - "#Strict comparison using === between array<int, mixed> and ',' will always evaluate to false.#"
+        - "#Strict comparison using === between array<int, mixed> and ';' will always evaluate to false.#"
+        - '#Parameter \#1 \$path of method NickZh\\PhpAvroSchemaGenerator\\Command\\SubSchemaMergeCommand::getPath\(\) expects string, array<string>\|string\|null given.#'
+        - '#Parameter \#1 \$path of method NickZh\\PhpAvroSchemaGenerator\\Command\\SchemaGenerateCommand::getPath\(\) expects string, array<string>\|string\|null given.#'

@@ -1,0 +1,9 @@
+{
+    "type": "record",
+    "namespace": "com.example",
+    "name": "Page",
+    "fields": [
+        { "name": "number", "type": "int" },
+        { "name": "content", "type": "string" }
+    ]
+}

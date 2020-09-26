@@ -1,0 +1,63 @@
+name: CI
+
+on: [push]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name:  Download cc-test-reporter
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/tmp/
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+          chmod +x ./tmp/cc-test-reporter
+      - name: Start docker containers
+        env:
+          USER_ID: 1001
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose up -d
+      - name: Install dependencies
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make update-dependencies
+      - name: Run coverage
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make coverage
+      - name: Upload coverage results to Code Climate
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        run: |
+          ${GITHUB_WORKSPACE}/tmp/cc-test-reporter after-build -p /var/www/html --coverage-input-type clover;
+  infection-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Start docker containers
+        env:
+          USER_ID: 1001
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose up -d
+      - name: Install dependencies
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make update-dependencies
+      - name: Run infection testing
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make infection-testing
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Start docker containers
+        env:
+          USER_ID: 1001
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose up -d
+      - name: Install dependencies
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make update-dependencies
+      - name: Run static analysis
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make static-analysis
+  code-style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Start docker containers
+        env:
+          USER_ID: 1001
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose up -d
+      - name: Install dependencies
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make update-dependencies
+      - name: Check code style
+        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make code-style

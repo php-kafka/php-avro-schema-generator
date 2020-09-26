@@ -1,0 +1,11 @@
+{
+    "type": "record",
+    "namespace": "com.example",
+    "name": "Book",
+    "fields": [
+        { "name": "title", "type": "string" },
+        { "name": "author", "type": "string" },
+        { "name": "binding", "type": ["null", {"name": "binding", "type": "enum", "symbols": ["PAPERBACK", "HARDCOVER"] } ], "default": null },
+        { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
+    ]
+}
