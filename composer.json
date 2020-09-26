@@ -1,5 +1,5 @@
 {
-  "name": "nick-zh/php-avro-schema-generator",
+  "name": "php-kafka/php-avro-schema-generator",
   "description": "PHP avro schema generator for subschema",
   "keywords": [
     "avro",
@@ -25,14 +25,14 @@
   ],
   "autoload": {
     "psr-4": {
-      "NickZh\\PhpAvroSchemaGenerator\\": "src/",
-      "NickZh\\PhpAvroSchemaGenerator\\Example\\": "example/classes/",
-      "NickZh\\PhpAvroSchemaGenerator\\Tests\\": "tests/"
+      "PhpKafka\\PhpAvroSchemaGenerator\\": "src/",
+      "PhpKafka\\PhpAvroSchemaGenerator\\Example\\": "example/classes/",
+      "PhpKafka\\PhpAvroSchemaGenerator\\Tests\\": "tests/"
     }
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "1.0-dev"
+      "dev-master": "2.0-dev"
     }
   }
 }

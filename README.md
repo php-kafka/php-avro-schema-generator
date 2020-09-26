@@ -1,13 +1,13 @@
 # Avro schema generator for PHP
-[![Actions Status](https://github.com/nick-zh/php-avro-schema-generator/workflows/CI/badge.svg)](https://github.com/nick-zh/php-avro-schema-generator/workflows/CI/badge.svg)
-[![Maintainability](https://api.codeclimate.com/v1/badges/937e14c63beb08885c70/maintainability)](https://codeclimate.com/github/nick-zh/php-avro-schema-generator/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/937e14c63beb08885c70/test_coverage)](https://codeclimate.com/github/nick-zh/php-avro-schema-generator/test_coverage)
-[![Latest Stable Version](https://poser.pugx.org/nick-zh/php-avro-schema-generator/v/stable)](https://packagist.org/packages/nick-zh/php-avro-schema-generator)
-[![Latest Unstable Version](https://poser.pugx.org/nick-zh/php-avro-schema-generator/v/unstable)](https://packagist.org/packages/nick-zh/php-avro-schema-generator)
+[![Actions Status](https://github.com/php-kafka/php-avro-schema-generator/workflows/CI/badge.svg)](https://github.com/php-kafka/php-avro-schema-generator/workflows/CI/badge.svg)
+[![Maintainability](https://api.codeclimate.com/v1/badges/937e14c63beb08885c70/maintainability)](https://codeclimate.com/github/php-kafka/php-avro-schema-generator/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/937e14c63beb08885c70/test_coverage)](https://codeclimate.com/github/php-kafka/php-avro-schema-generator/test_coverage)
+[![Latest Stable Version](https://poser.pugx.org/php-kafka/php-avro-schema-generator/v/stable)](https://packagist.org/packages/php-kafka/php-avro-schema-generator)
+[![Latest Unstable Version](https://poser.pugx.org/php-kafka/php-avro-schema-generator/v/unstable)](https://packagist.org/packages/php-kafka/php-avro-schema-generator)
 
 ## Installation
 ```
-composer require nick-zh/php-avro-schema-generator "^0.1.0"
+composer require php-kafka/php-avro-schema-generator "^0.1.0"
 ```
 
 ## Description
@@ -22,8 +22,8 @@ Output directory: output directory for the unified schema files
 ```php
 <?php
 
-use NickZh\PhpAvroSchemaGenerator\Registry\SchemaRegistry;
-use NickZh\PhpAvroSchemaGenerator\Merger\SchemaMerger;
+use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry;
+use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
 
 $registry = (new SchemaRegistry())
     ->addSchemaTemplateDirectory('./schemaTemplates')
@@ -50,8 +50,8 @@ Output directory: output directory for your generated schema templates
 ```php
 <?php
 
-use NickZh\PhpAvroSchemaGenerator\Registry\ClassRegistry;
-use NickZh\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
+use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistry;
+use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
 
 $registry = (new ClassRegistry())
     ->addClassDirectory('./example/classes')

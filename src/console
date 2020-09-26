@@ -10,8 +10,8 @@ if (is_file(__DIR__ . '/../../../autoload.php') === true) {
 }
 
 use Symfony\Component\Console\Application;
-use NickZh\PhpAvroSchemaGenerator\Command\SubSchemaMergeCommand;
-use NickZh\PhpAvroSchemaGenerator\Command\SchemaGenerateCommand;
+use PhpKafka\PhpAvroSchemaGenerator\Command\SubSchemaMergeCommand;
+use PhpKafka\PhpAvroSchemaGenerator\Command\SchemaGenerateCommand;
 
 $application = new Application();
 
