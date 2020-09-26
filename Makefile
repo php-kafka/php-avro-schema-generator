@@ -27,7 +27,7 @@ infection-testing:
 	${INFECTION} --coverage=build/logs/phpunit --min-msi=68 --threads=`nproc`
 
 static-analysis:
-	${PHPSTAN} analyse --no-progress
+	${PHPSTAN} analyse --memory-limit 256m --no-progress
 
 update-dependencies:
 	composer update
