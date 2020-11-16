@@ -24,7 +24,7 @@ fix-code-style:
 
 infection-testing:
 	make coverage
-	${INFECTION} --coverage=build/logs/phpunit --min-msi=68 --threads=`nproc`
+	${INFECTION} --coverage=build/logs/phpunit --min-msi=71 --threads=`nproc`
 
 static-analysis:
 	${PHPSTAN} analyse --memory-limit 256m --no-progress
