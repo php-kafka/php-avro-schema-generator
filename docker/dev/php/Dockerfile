@@ -1,7 +1,5 @@
 FROM php:7.4-cli-alpine3.12
 
-# https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
-ENV COMPOSER_ALLOW_SUPERUSER 1
 ARG HOST_USER_ID
 ARG HOST_USER
 
@@ -24,9 +22,6 @@ RUN mkdir /phpIni && \
 
 # COMPOSER: install binary
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
-
-# COMPOSER: install dependencies
-RUN composer global require hirak/prestissimo
 
 USER $HOST_USER
 
