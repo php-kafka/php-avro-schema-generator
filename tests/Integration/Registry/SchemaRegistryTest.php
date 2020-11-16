@@ -32,7 +32,7 @@ class SchemaRegistryTest extends TestCase
             'com.example.Collection',
             'com.example.Page',
             'com.example.Library',
-            'string'
+            'primitive'
         ];
 
         $schemaDir = __DIR__ . '/../../../example/schemaTemplates';
