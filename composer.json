@@ -9,7 +9,7 @@
   "license": "MIT",
   "require": {
     "ext-json": "*",
-    "symfony/console": "^4.3",
+    "symfony/console": "^4.3|^5.1",
     "flix-tech/avro-php": "^3.0|^4.0"
   },
   "require-dev": {
