@@ -147,7 +147,7 @@ final class SchemaRegistry implements SchemaRegistryInterface
     public function getSchemaId(array $schemaData, SchemaTemplateInterface $template): string
     {
         if (true === $template->isPrimitive()) {
-            return $schemaData['type'];
+            return str_replace('.' . Avro::FILE_EXTENSION, '', $template->getFilename());
         }
 
         return $schemaData['namespace'] . '.' . $schemaData['name'];
