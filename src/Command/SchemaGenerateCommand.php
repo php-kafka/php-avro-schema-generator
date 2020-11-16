@@ -28,8 +28,13 @@ class SchemaGenerateCommand extends Command
     {
         $output->writeln('Generating schema files');
 
-        $classDirectory = $this->getPath($input->getArgument('classDirectory'));
-        $outputDirectory = $this->getPath($input->getArgument('outputDirectory'));
+        /** @var string $classDirectoryArg */
+        $classDirectoryArg = $input->getArgument('classDirectory');
+        /** @var string $outputDirectoryArg */
+        $outputDirectoryArg = $input->getArgument('outputDirectory');
+
+        $classDirectory = $this->getPath($classDirectoryArg);
+        $outputDirectory = $this->getPath($outputDirectoryArg);
 
         $registry = (new ClassRegistry())
             ->addClassDirectory($classDirectory)

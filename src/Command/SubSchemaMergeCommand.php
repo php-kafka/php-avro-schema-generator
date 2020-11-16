@@ -35,8 +35,14 @@ class SubSchemaMergeCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Merging schema files');
-        $templateDirectory = $this->getPath($input->getArgument('templateDirectory'));
-        $outputDirectory = $this->getPath($input->getArgument('outputDirectory'));
+
+        /** @var string $templateDirectoryArg */
+        $templateDirectoryArg = $input->getArgument('templateDirectory');
+        /** @var string $outputDirectoryArg */
+        $outputDirectoryArg = $input->getArgument('outputDirectory');
+
+        $templateDirectory = $this->getPath($templateDirectoryArg);
+        $outputDirectory = $this->getPath($outputDirectoryArg);
 
         $registry = (new SchemaRegistry())
             ->addSchemaTemplateDirectory($templateDirectory)
