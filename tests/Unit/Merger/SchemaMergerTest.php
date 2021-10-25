@@ -91,8 +91,14 @@ class SchemaMergerTest extends TestCase
                 { "name": "number", "type": "int" }
             ]
         }';
-
-        $expectedResult = str_replace('"com.example.Page"', $subschemaDefinition, $rootDefinition);
+        $expectedResult = '{
+            "type": "record",
+            "namespace": "com.example",
+            "name": "Book",
+            "fields": [
+                { "name": "items", "type": {"type": "array", "items": {"type":"record","name":"Page","fields":[{"name":"number","type":"int"}]} }, "default": [] }
+            ]
+        }';
 
         $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $subschemaTemplate
@@ -116,6 +122,55 @@ class SchemaMergerTest extends TestCase
             ->with($expectedResult)
             ->willReturn($rootSchemaTemplate);
 
+        $merger = new SchemaMerger($schemaRegistry);
+
+        $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
+    }
+
+    public function testGetResolvedSchemaTemplateWithDifferentNamespaceForEmbeddedSchema()
+    {
+        $rootDefinition = '{
+            "type": "record",
+            "namespace": "com.example",
+            "name": "Book",
+            "fields": [
+                { "name": "items", "type": {"type": "array", "items": "com.example.other.Page" }, "default": [] }
+            ]
+        }';
+        $subschemaDefinition = '{
+            "type": "record",
+            "namespace": "com.example.other",
+            "name": "Page",
+            "fields": [
+                { "name": "number", "type": "int" }
+            ]
+        }';
+
+        $expectedResult = str_replace('"com.example.other.Page"', $subschemaDefinition, $rootDefinition);
+
+        $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinition);
+
+        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
+        $schemaRegistry
+            ->expects(self::once())
+            ->method('getSchemaById')
+            ->with('com.example.other.Page')
+            ->willReturn($subschemaTemplate);
+
+        $rootSchemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $rootSchemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($rootDefinition);
+        $rootSchemaTemplate
+            ->expects(self::once())
+            ->method('withSchemaDefinition')
+            ->with($expectedResult)
+            ->willReturn($rootSchemaTemplate);
 
         $merger = new SchemaMerger($schemaRegistry);
 
