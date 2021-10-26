@@ -98,11 +98,12 @@ final class SchemaMerger implements SchemaMergerInterface
     ): string {
         $idString = '"' . $schemaId . '"';
 
+        $embeddedDefinition = $this->excludeNamespacesForEmbeddedSchema($definition, $embeddedDefinition);
+
         $pos = strpos($definition, $idString);
 
         return substr_replace($definition, $embeddedDefinition, $pos, strlen($idString));
     }
-
 
     /**
      * @param boolean $prefixWithNamespace
@@ -175,5 +176,27 @@ final class SchemaMerger implements SchemaMergerInterface
         unset($schemaDefinition['schema_level']);
 
         return $schemaDefinition;
+    }
+
+    /**
+     * @param string $definition
+     * @param string $embeddedDefinition
+     * @return string
+     */
+    private function excludeNamespacesForEmbeddedSchema(string $definition, string $embeddedDefinition): string
+    {
+        $decodedRootDefinition = json_decode($definition, true);
+        $decodedEmbeddedDefinition = json_decode($embeddedDefinition, true);
+
+        if (
+            isset($decodedRootDefinition['namespace']) && isset($decodedEmbeddedDefinition['namespace']) &&
+            $decodedRootDefinition['namespace'] === $decodedEmbeddedDefinition['namespace']
+        ) {
+            unset($decodedEmbeddedDefinition['namespace']);
+            /** @var string $embeddedDefinition */
+            $embeddedDefinition = json_encode($decodedEmbeddedDefinition);
+        }
+
+        return $embeddedDefinition;
     }
 }
