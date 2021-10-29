@@ -38,6 +38,14 @@
         "items": "com.example.Collection"
       },
       "default": []
+    },
+    {
+      "name": "archive",
+      "type": {
+        "type": "array",
+        "items": "com.example.Collection"
+      },
+      "default": []
     }
   ]
 }
