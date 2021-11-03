@@ -27,7 +27,7 @@ class SchemaRegistryTest extends TestCase
     public function testLoad()
     {
         $schemaIds = [
-            'com.example.Book',
+            'Book',
             'com.example.CD',
             'com.example.Collection',
             'com.example.Page',

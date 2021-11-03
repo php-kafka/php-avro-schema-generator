@@ -1,6 +1,5 @@
 {
     "type": "record",
-    "namespace": "com.example",
     "name": "Book",
     "fields": [
         { "name": "title", "type": "string" },

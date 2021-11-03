@@ -4,6 +4,6 @@
     "name": "Collection",
     "fields": [
         { "name": "name", "type": "string" },
-        { "name": "items", "type": {"type": "array", "items": ["com.example.Book", "com.example.CD"] }, "default": [] }
+        { "name": "items", "type": {"type": "array", "items": ["Book", "com.example.CD"] }, "default": [] }
     ]
 }

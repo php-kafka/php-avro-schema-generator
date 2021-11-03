@@ -150,7 +150,11 @@ final class SchemaRegistry implements SchemaRegistryInterface
             return str_replace('.' . Avro::FILE_EXTENSION, '', $template->getFilename());
         }
 
-        return $schemaData['namespace'] . '.' . $schemaData['name'];
+        if (true === isset($schemaData['namespace'])) {
+            return $schemaData['namespace'] . '.' . $schemaData['name'];
+        }
+
+        return $schemaData['name'];
     }
 
     /**

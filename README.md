@@ -7,7 +7,7 @@
 
 ## Installation
 ```
-composer require php-kafka/php-avro-schema-generator "^0.1.0"
+composer require php-kafka/php-avro-schema-generator "^1.0"
 ```
 
 ## Description
