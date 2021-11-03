@@ -7,14 +7,11 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Merger;
 use AvroSchemaParseException;
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
-use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaGenerationException;
-use PhpKafka\PhpAvroSchemaGenerator\Exception\UnknownSchemaTypeException;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 
 final class SchemaMerger implements SchemaMergerInterface
 {
-
     /**
      * @var string
      */
@@ -49,12 +46,15 @@ final class SchemaMerger implements SchemaMergerInterface
 
     /**
      * @param SchemaTemplateInterface $schemaTemplate
+     * @param bool $optimizeSubSchemaNamespaces
      * @return SchemaTemplateInterface
      * @throws AvroSchemaParseException
      * @throws SchemaMergerException
      */
-    public function getResolvedSchemaTemplate(SchemaTemplateInterface $schemaTemplate): SchemaTemplateInterface
-    {
+    public function getResolvedSchemaTemplate(
+        SchemaTemplateInterface $schemaTemplate,
+        bool $optimizeSubSchemaNamespaces = false
+    ): SchemaTemplateInterface {
         $definition = $schemaTemplate->getSchemaDefinition();
 
         do {
@@ -78,7 +78,8 @@ final class SchemaMerger implements SchemaMergerInterface
                 $definition =  $this->replaceSchemaIdWithDefinition(
                     $definition,
                     $schemaId,
-                    $embeddedTemplate->getSchemaDefinition()
+                    $embeddedTemplate->getSchemaDefinition(),
+                    $optimizeSubSchemaNamespaces
                 );
             }
         } while (true === $exceptionThrown);
@@ -94,32 +95,40 @@ final class SchemaMerger implements SchemaMergerInterface
     private function replaceSchemaIdWithDefinition(
         string $definition,
         string $schemaId,
-        string $embeddedDefinition
+        string $embeddedDefinition,
+        bool $optimizeSubSchemaNamespaces = false
     ): string {
         $idString = '"' . $schemaId . '"';
+
+        if (true === $optimizeSubSchemaNamespaces) {
+            $embeddedDefinition = $this->excludeNamespacesForEmbeddedSchema($definition, $embeddedDefinition);
+        }
 
         $pos = strpos($definition, $idString);
 
         return substr_replace($definition, $embeddedDefinition, $pos, strlen($idString));
     }
 
-
     /**
-     * @param boolean $prefixWithNamespace
-     * @param boolean $useTemplateName
+     * @param bool $prefixWithNamespace
+     * @param bool $useTemplateName
+     * @param bool $optimizeSubSchemaNamespaces
      * @return integer
      * @throws AvroSchemaParseException
      * @throws SchemaMergerException
      */
-    public function merge(bool $prefixWithNamespace = false, bool $useTemplateName = false): int
-    {
+    public function merge(
+        bool $prefixWithNamespace = false,
+        bool $useTemplateName = false,
+        bool $optimizeSubSchemaNamespaces = false
+    ): int {
         $mergedFiles = 0;
         $registry = $this->getSchemaRegistry();
 
         /** @var SchemaTemplateInterface $schemaTemplate */
         foreach ($registry->getRootSchemas() as $schemaTemplate) {
             try {
-                $resolvedTemplate = $this->getResolvedSchemaTemplate($schemaTemplate);
+                $resolvedTemplate = $this->getResolvedSchemaTemplate($schemaTemplate, $optimizeSubSchemaNamespaces);
             } catch (SchemaMergerException $e) {
                 throw $e;
             }
@@ -175,5 +184,27 @@ final class SchemaMerger implements SchemaMergerInterface
         unset($schemaDefinition['schema_level']);
 
         return $schemaDefinition;
+    }
+
+    /**
+     * @param string $definition
+     * @param string $embeddedDefinition
+     * @return string
+     */
+    private function excludeNamespacesForEmbeddedSchema(string $definition, string $embeddedDefinition): string
+    {
+        $decodedRootDefinition = json_decode($definition, true);
+        $decodedEmbeddedDefinition = json_decode($embeddedDefinition, true);
+
+        if (
+            isset($decodedRootDefinition['namespace']) && isset($decodedEmbeddedDefinition['namespace']) &&
+            $decodedRootDefinition['namespace'] === $decodedEmbeddedDefinition['namespace']
+        ) {
+            unset($decodedEmbeddedDefinition['namespace']);
+            /** @var string $embeddedDefinition */
+            $embeddedDefinition = json_encode($decodedEmbeddedDefinition);
+        }
+
+        return $embeddedDefinition;
     }
 }

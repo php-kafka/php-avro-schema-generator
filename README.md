@@ -42,8 +42,8 @@ $merger->merge();
 
 ### Generating schemas from classes
 Please note, that this feature is highly experimental.  
-You probably still need to adjust the generated templates, but it gives you a basic tempalte to work with.  
-Class direcotries: Directories containing the classes you want to generate schemas from
+You probably still need to adjust the generated templates, but it gives you a basic template to work with.  
+Class directories: Directories containing the classes you want to generate schemas from
 Output directory: output directory for your generated schema templates
 
 #### Generate schemas (code)
