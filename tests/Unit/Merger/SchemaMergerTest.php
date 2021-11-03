@@ -92,6 +92,54 @@ class SchemaMergerTest extends TestCase
             ]
         }';
 
+        $expectedResult = str_replace('"com.example.Page"', $subschemaDefinition, $rootDefinition);
+
+        $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinition);
+        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
+        $schemaRegistry
+            ->expects(self::once())
+            ->method('getSchemaById')
+            ->with('com.example.Page')
+            ->willReturn($subschemaTemplate);
+        $rootSchemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $rootSchemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($rootDefinition);
+        $rootSchemaTemplate
+            ->expects(self::once())
+            ->method('withSchemaDefinition')
+            ->with($expectedResult)
+            ->willReturn($rootSchemaTemplate);
+
+        $merger = new SchemaMerger($schemaRegistry);
+
+        $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
+    }
+
+    public function testGetResolvedSchemaTemplateWithOptimizedSubSchemaNamespaces()
+    {
+        $rootDefinition = '{
+            "type": "record",
+            "namespace": "com.example",
+            "name": "Book",
+            "fields": [
+                { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
+            ]
+        }';
+        $subschemaDefinition = '{
+            "type": "record",
+            "namespace": "com.example",
+            "name": "Page",
+            "fields": [
+                { "name": "number", "type": "int" }
+            ]
+        }';
+
         $expectedResult = '{
             "type": "record",
             "namespace": "com.example",
@@ -125,7 +173,7 @@ class SchemaMergerTest extends TestCase
 
         $merger = new SchemaMerger($schemaRegistry);
 
-        $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
+        $merger->getResolvedSchemaTemplate($rootSchemaTemplate, true);
     }
 
     public function testGetResolvedSchemaTemplateWithDifferentNamespaceForEmbeddedSchema()

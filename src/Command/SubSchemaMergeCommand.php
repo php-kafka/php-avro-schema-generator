@@ -29,6 +29,12 @@ class SubSchemaMergeCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Use template filename as schema filename'
+            )
+            ->addOption(
+                'optimizeSubSchemaNamespaces',
+                null,
+                InputOption::VALUE_NONE,
+                'Exclude namespaces from embedded entities if they are different than root schema namespace'
             );
     }
 
@@ -52,9 +58,9 @@ class SubSchemaMergeCommand extends Command
 
         $result = $merger->merge(
             (bool) $input->getOption('prefixWithNamespace'),
-            (bool) $input->getOption('useFilenameAsSchemaName')
+            (bool) $input->getOption('useFilenameAsSchemaName'),
+            (bool) $input->getOption('optimizeSubSchemaNamespaces')
         );
-
 
         // retrieve the argument value using getArgument()
         $output->writeln(sprintf('Merged %d root schema files', $result));
