@@ -368,11 +368,39 @@ class SchemaMergerTest extends TestCase
             ->willReturn('{"name": "test"}');
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
 
-
         $merger = new SchemaMerger($schemaRegistry);
         $merger->exportSchema($schemaTemplate);
 
         self::assertFileExists('/tmp/test.avsc');
+        unlink('/tmp/test.avsc');
+    }
+
+    public function testExportSchemaWithExcludingNamespaces()
+    {
+        $mergedSchema = '{"type":"record","name":"schema","namespace":"root.level.entity","schema_level":"root","fields":[{"name":"rootField1","type":{"type":"record","name":"embeddedSchema","fields":[{"name":"embeddedField","type":["null","string"],"default":null}]}},{"name":"rootField2","type":["null","root.level.entity.embeddedSchema"],"default":null}]}';
+
+        $expectedSchema = '{"type":"record","name":"schema","namespace":"root.level.entity","fields":[{"name":"rootField1","type":{"type":"record","name":"embeddedSchema","fields":[{"name":"embeddedField","type":["null","string"],"default":null}]}},{"name":"rootField2","type":["null","embeddedSchema"],"default":null}]}';
+
+        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($mergedSchema);
+
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('getFilename')
+            ->willReturn('test.avsc');
+
+        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
+
+        $merger = new SchemaMerger($schemaRegistry);
+        $merger->exportSchema($schemaTemplate, false, true, true);
+        file_put_contents('/tmp/test_expected_schema.avsc', $expectedSchema);
+
+        self::assertFileExists('/tmp/test.avsc');
+        self::assertFileEquals('/tmp/test_expected_schema.avsc', '/tmp/test.avsc');
+        unlink('/tmp/test_expected_schema.avsc');
         unlink('/tmp/test.avsc');
     }
 
