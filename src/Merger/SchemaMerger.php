@@ -132,7 +132,12 @@ final class SchemaMerger implements SchemaMergerInterface
             } catch (SchemaMergerException $e) {
                 throw $e;
             }
-            $this->exportSchema($resolvedTemplate, $prefixWithNamespace, $useTemplateName);
+            $this->exportSchema(
+                $resolvedTemplate,
+                $prefixWithNamespace,
+                $useTemplateName,
+                $optimizeSubSchemaNamespaces
+            );
             ++$mergedFiles;
         }
 
@@ -148,7 +153,8 @@ final class SchemaMerger implements SchemaMergerInterface
     public function exportSchema(
         SchemaTemplateInterface $rootSchemaTemplate,
         bool $prefixWithNamespace = false,
-        bool $useTemplateName = false
+        bool $useTemplateName = false,
+        bool $optimizeSubSchemaNamespaces = false
     ): void {
         $rootSchemaDefinition = $this->transformExportSchemaDefinition(
             json_decode($rootSchemaTemplate->getSchemaDefinition(), true)
@@ -170,7 +176,13 @@ final class SchemaMerger implements SchemaMergerInterface
             mkdir($this->getOutputDirectory());
         }
 
+        /** @var string $fileContents */
         $fileContents = json_encode($rootSchemaDefinition);
+
+        if (true === $optimizeSubSchemaNamespaces) {
+            $embeddedSchemaNamespace = $rootSchemaDefinition['namespace'] . '.';
+            $fileContents = str_replace($embeddedSchemaNamespace, '', $fileContents);
+        }
 
         file_put_contents($this->getOutputDirectory() . '/' . $schemaFilename, $fileContents);
     }
