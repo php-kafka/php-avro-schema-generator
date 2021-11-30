@@ -127,7 +127,7 @@ final class SchemaTemplate implements SchemaTemplateInterface
      */
     public function isPrimitive(): bool
     {
-        $fields = json_decode($this->getSchemaDefinition(), true);
+        $fields = json_decode($this->getSchemaDefinition(), true, JSON_THROW_ON_ERROR);
 
         if (true === isset($fields['type'])) {
             return array_key_exists($fields['type'], self::AVRO_PRIMITIVE_TYPES);
