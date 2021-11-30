@@ -157,7 +157,7 @@ final class SchemaMerger implements SchemaMergerInterface
         bool $optimizeSubSchemaNamespaces = false
     ): void {
         $rootSchemaDefinition = $this->transformExportSchemaDefinition(
-            json_decode($rootSchemaTemplate->getSchemaDefinition(), true)
+            json_decode($rootSchemaTemplate->getSchemaDefinition(), true, JSON_THROW_ON_ERROR)
         );
 
         $prefix = '';
@@ -205,8 +205,8 @@ final class SchemaMerger implements SchemaMergerInterface
      */
     private function excludeNamespacesForEmbeddedSchema(string $definition, string $embeddedDefinition): string
     {
-        $decodedRootDefinition = json_decode($definition, true);
-        $decodedEmbeddedDefinition = json_decode($embeddedDefinition, true);
+        $decodedRootDefinition = json_decode($definition, true, JSON_THROW_ON_ERROR);
+        $decodedEmbeddedDefinition = json_decode($embeddedDefinition, true, JSON_THROW_ON_ERROR);
 
         if (
             isset($decodedRootDefinition['namespace']) && isset($decodedEmbeddedDefinition['namespace']) &&

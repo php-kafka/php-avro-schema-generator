@@ -120,4 +120,27 @@ class SchemaRegistryTest extends TestCase
             unlink('testfile');
         }
     }
+
+    public function testRegisterSchemaWithInvalidContent()
+    {
+        touch('testfile');
+
+        $fileInfo = new SplFileInfo('testfile');
+
+        $registry = new SchemaRegistry();
+
+        self::expectException(SchemaRegistryException::class);
+        self::expectExceptionMessage(
+            sprintf(SchemaRegistryException::FILE_INVALID, $fileInfo->getRealPath())
+        );
+
+        $reflection = new ReflectionClass(SchemaRegistry::class);
+        $method = $reflection->getMethod('registerSchemaFile');
+        $method->setAccessible(true);
+        try {
+            $method->invokeArgs($registry, [$fileInfo]);
+        } finally {
+            unlink('testfile');
+        }
+    }
 }
