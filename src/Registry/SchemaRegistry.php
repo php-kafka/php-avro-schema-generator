@@ -132,12 +132,7 @@ final class SchemaRegistry implements SchemaRegistryInterface
         $schemaData = json_decode($fileContent, true, JSON_THROW_ON_ERROR);
 
         if (null === $schemaData) {
-            throw new SchemaRegistryException(
-                sprintf(
-                    SchemaRegistryException::FILE_INVALID,
-                    $fileName
-                )
-            );
+            throw new SchemaRegistryException(sprintf(SchemaRegistryException::FILE_INVALID, $fileName));
         }
 
         $template = (new SchemaTemplate())
