@@ -21,10 +21,10 @@ interface SchemaMergerInterface
     public function getOutputDirectory(): string;
 
     /**
-     * @param  SchemaTemplateInterface $schemaTemplate
+     * @param  SchemaTemplateInterface $rootSchemaTemplate
      * @return SchemaTemplateInterface
      */
-    public function getResolvedSchemaTemplate(SchemaTemplateInterface $schemaTemplate): SchemaTemplateInterface;
+    public function getResolvedSchemaTemplate(SchemaTemplateInterface $rootSchemaTemplate): SchemaTemplateInterface;
 
     /**
      * @return int

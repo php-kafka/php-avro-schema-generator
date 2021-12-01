@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Merger;
 
+use AvroSchema;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
@@ -83,16 +84,24 @@ class SchemaMergerTest extends TestCase
                 { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
             ]
         }';
-        $subschemaDefinition = '{
-            "type": "record",
-            "namespace": "com.example",
-            "name": "Page",
-            "fields": [
-                { "name": "number", "type": "int" }
-            ]
-        }';
+        $subschemaDefinition = json_encode(
+            json_decode(
+                '{
+                        "type": "record",
+                        "namespace": "com.example",
+                        "name": "Page",
+                        "fields": [
+                            { "name": "number", "type": "int" }
+                        ]
+                    }'
+            )
+        );
 
-        $expectedResult = str_replace('"com.example.Page"', $subschemaDefinition, $rootDefinition);
+        $expectedResult = str_replace(
+            '"com.example.Page"',
+            str_replace('"namespace":"com.example",', '', $subschemaDefinition),
+            $rootDefinition
+        );
 
         $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $subschemaTemplate
@@ -119,6 +128,10 @@ class SchemaMergerTest extends TestCase
         $merger = new SchemaMerger($schemaRegistry);
 
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
+
+        $parsedAvro = (string) (AvroSchema::parse($expectedResult));
+
+        self::assertEquals($parsedAvro, json_encode(json_decode($expectedResult)));
     }
 
     public function testGetResolvedSchemaTemplateWithOptimizedSubSchemaNamespaces()
@@ -195,7 +208,32 @@ class SchemaMergerTest extends TestCase
             ]
         }';
 
-        $expectedResult = str_replace('"com.example.other.Page"', $subschemaDefinition, $rootDefinition);
+        $expectedResult = json_encode(
+            json_decode(
+                '{
+                    "type": "record",
+                    "name": "Book",
+                    "namespace": "com.example",
+                    "fields": [
+                        { 
+                            "name": "items",
+                            "type": {
+                                "type": "array",
+                                "items": {
+                                    "type": "record",
+                                    "name": "Page",
+                                    "namespace": "com.example.other",
+                                    "fields": [
+                                        { "name": "number", "type": "int" }
+                                    ]
+                                }
+                            },
+                            "default": []
+                        }
+                    ]
+                }'
+            )
+        );
 
         $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $subschemaTemplate
@@ -264,6 +302,20 @@ class SchemaMergerTest extends TestCase
                 { "name": "items", "type": {"type": "array", "items": ["string"] }, "default": [] }
             ]
         }';
+
+        $expectedResult = json_encode(
+            json_decode(
+                '{
+                    "type": "record",
+                     "name": "Book",
+                    "namespace": "com.example",
+                    "fields": [
+                        { "name": "items", "type": {"type": "array", "items": ["string"] }, "default": [] }
+                    ]
+                }'
+            )
+        );
+
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
             ->expects(self::exactly(2))
@@ -272,7 +324,7 @@ class SchemaMergerTest extends TestCase
         $schemaTemplate
             ->expects(self::once())
             ->method('withSchemaDefinition')
-            ->with($definition)
+            ->with($expectedResult)
             ->willReturn($schemaTemplate);
 
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
@@ -331,6 +383,20 @@ class SchemaMergerTest extends TestCase
                 { "name": "items", "type": {"type": "array", "items": ["string"] }, "default": [] }
             ]
         }';
+
+        $expectedResult = json_encode(
+            json_decode(
+                '{
+                    "type": "record",
+                    "name": "Book",
+                    "namespace": "com.example",
+                    "fields": [
+                        { "name": "items", "type": {"type": "array", "items": ["string"] }, "default": [] }
+                    ]
+                }'
+            )
+        );
+
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
             ->expects(self::exactly(2))
@@ -339,7 +405,7 @@ class SchemaMergerTest extends TestCase
         $schemaTemplate
             ->expects(self::once())
             ->method('withSchemaDefinition')
-            ->with($definition)
+            ->with($expectedResult)
             ->willReturn($schemaTemplate);
         $schemaTemplate
             ->expects(self::once())
@@ -372,35 +438,6 @@ class SchemaMergerTest extends TestCase
         $merger->exportSchema($schemaTemplate);
 
         self::assertFileExists('/tmp/test.avsc');
-        unlink('/tmp/test.avsc');
-    }
-
-    public function testExportSchemaWithExcludingNamespaces()
-    {
-        $mergedSchema = '{"type":"record","name":"schema","namespace":"root.level.entity","schema_level":"root","fields":[{"name":"rootField1","type":{"type":"record","name":"embeddedSchema","fields":[{"name":"embeddedField","type":["null","string"],"default":null}]}},{"name":"rootField2","type":["null","root.level.entity.embeddedSchema"],"default":null}]}';
-
-        $expectedSchema = '{"type":"record","name":"schema","namespace":"root.level.entity","fields":[{"name":"rootField1","type":{"type":"record","name":"embeddedSchema","fields":[{"name":"embeddedField","type":["null","string"],"default":null}]}},{"name":"rootField2","type":["null","embeddedSchema"],"default":null}]}';
-
-        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
-        $schemaTemplate
-            ->expects(self::once())
-            ->method('getSchemaDefinition')
-            ->willReturn($mergedSchema);
-
-        $schemaTemplate
-            ->expects(self::once())
-            ->method('getFilename')
-            ->willReturn('test.avsc');
-
-        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
-
-        $merger = new SchemaMerger($schemaRegistry);
-        $merger->exportSchema($schemaTemplate, false, true, true);
-        file_put_contents('/tmp/test_expected_schema.avsc', $expectedSchema);
-
-        self::assertFileExists('/tmp/test.avsc');
-        self::assertFileEquals('/tmp/test_expected_schema.avsc', '/tmp/test.avsc');
-        unlink('/tmp/test_expected_schema.avsc');
         unlink('/tmp/test.avsc');
     }
 
