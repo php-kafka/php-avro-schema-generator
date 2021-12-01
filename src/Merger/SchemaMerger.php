@@ -148,7 +148,7 @@ final class SchemaMerger implements SchemaMergerInterface
         bool $optimizeSubSchemaNamespaces = false
     ): void {
         $rootSchemaDefinition = $this->transformExportSchemaDefinition(
-            json_decode($rootSchemaTemplate->getSchemaDefinition(), true)
+            json_decode($rootSchemaTemplate->getSchemaDefinition(), true, JSON_THROW_ON_ERROR)
         );
 
         $prefix = '';
