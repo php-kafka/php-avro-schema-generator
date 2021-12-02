@@ -21,13 +21,7 @@ abstract class AbstractOptimizer
      */
     protected function typeIsRecord($data): bool
     {
-        if (true === isset($data['type']) && true === is_array($data['type'])) {
-            if (true === isset($data['type']['type'])) {
-                return true;
-            }
-        }
-
-        return false;
+        return true === $this->typeIsArray($data) && true === isset($data['type']['type']);
     }
 
     /**
@@ -36,13 +30,16 @@ abstract class AbstractOptimizer
      */
     protected function typeIsTypeArray($data): bool
     {
-        if (true === isset($data['type']) && true === is_array($data['type'])) {
-            if (false === isset($data['type']['type'])) {
-                return true;
-            }
-        }
+        return true === $this->typeIsArray($data) && false === isset($data['type']['type']);
+    }
 
-        return false;
+    /**
+     * @param array|mixed $data
+     * @return bool
+     */
+    private function typeIsArray($data): bool
+    {
+        return true === isset($data['type']) && true === is_array($data['type']);
     }
 
     /**
@@ -51,15 +48,9 @@ abstract class AbstractOptimizer
      */
     protected function typeIsRecordArray($data): bool
     {
-        if (true === isset($data['type']) && 'array' === $data['type']) {
-            if (true === is_array($data['items'])) {
-                if (true === isset($data['items']['type'])) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return true === isset($data['type']) && 'array' === $data['type']
+            && true === is_array($data['items'])
+            && true === isset($data['items']['type']);
     }
 
     /**
@@ -68,15 +59,9 @@ abstract class AbstractOptimizer
      */
     protected function typeIsMultiTypeArray($data): bool
     {
-        if (true=== isset($data['type']) && 'array' === $data['type']) {
-            if (true === is_array($data['items'])) {
-                if (false === isset($data['items']['type'])) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return $this->typeIsAvroArray($data)
+            && true === is_array($data['items'])
+            && false === isset($data['items']['type']);
     }
 
     /**
@@ -85,13 +70,16 @@ abstract class AbstractOptimizer
      */
     protected function typeIsSingleypeArray($data): bool
     {
-        if (true=== isset($data['type']) && 'array' === $data['type']) {
-            if (true === is_string($data['items'])) {
-                return true;
-            }
-        }
+        return true === $this->typeIsAvroArray($data) && true === is_string($data['items']);
+    }
 
-        return false;
+    /**
+     * @param array|mixed $data
+     * @return bool
+     */
+    private function typeIsAvroArray($data): bool
+    {
+        return true === isset($data['type']) && 'array' === $data['type'];
     }
 
     /**
@@ -100,10 +88,6 @@ abstract class AbstractOptimizer
      */
     protected function typeIsString($data): bool
     {
-        if(isset($data['type']) && true === is_string($data['type'])) {
-            return true;
-        }
-
-        return false;
+        return isset($data['type']) && true === is_string($data['type']);
     }
 }
