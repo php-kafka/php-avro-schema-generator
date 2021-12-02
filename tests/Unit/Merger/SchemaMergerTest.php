@@ -97,10 +97,17 @@ class SchemaMergerTest extends TestCase
             )
         );
 
-        $expectedResult = str_replace(
-            '"com.example.Page"',
-            str_replace('"namespace":"com.example",', '', $subschemaDefinition),
-            $rootDefinition
+        $expectedResult = json_encode(
+            json_decode(
+                '{
+                    "type": "record",
+                    "name": "Book",
+                    "namespace": "com.example",
+                    "fields": [
+                        { "name": "items", "type": {"type": "array", "items": {"type":"record","name":"Page","fields":[{"name":"number","type":"int"}]} }, "default": [] }
+                    ]
+                }'
+            )
         );
 
         $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
@@ -153,14 +160,18 @@ class SchemaMergerTest extends TestCase
             ]
         }';
 
-        $expectedResult = '{
-            "type": "record",
-            "namespace": "com.example",
-            "name": "Book",
-            "fields": [
-                { "name": "items", "type": {"type": "array", "items": {"type":"record","name":"Page","fields":[{"name":"number","type":"int"}]} }, "default": [] }
-            ]
-        }';
+        $expectedResult = json_encode(
+            json_decode(
+                '{
+                    "type": "record",
+                    "name": "Book",
+                    "namespace": "com.example",
+                    "fields": [
+                        { "name": "items", "type": {"type": "array", "items": {"type":"record","name":"Page","fields":[{"name":"number","type":"int"}]} }, "default": [] }
+                    ]
+                }'
+            )
+        );
 
         $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $subschemaTemplate
@@ -345,6 +356,9 @@ class SchemaMergerTest extends TestCase
         $definition = '{
             "type": "string"
         }';
+
+        $expectedResult = json_encode(json_decode($definition));
+
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
             ->expects(self::exactly(2))
@@ -353,7 +367,7 @@ class SchemaMergerTest extends TestCase
         $schemaTemplate
             ->expects(self::once())
             ->method('withSchemaDefinition')
-            ->with($definition)
+            ->with($expectedResult)
             ->willReturn($schemaTemplate);
         $schemaTemplate
             ->expects(self::once())

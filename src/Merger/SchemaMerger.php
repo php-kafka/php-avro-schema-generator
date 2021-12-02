@@ -198,25 +198,35 @@ final class SchemaMerger implements SchemaMergerInterface
             $embeddedDefinition = json_encode($decodedEmbeddedDefinition);
         }
 
+        $embeddedDefinition = $this->reformatDefinition($embeddedDefinition);
+
         return $embeddedDefinition;
     }
 
     private function reformatDefinition(string $mergedTemplate): string
     {
+        $newDefinition = [];
         $data = json_decode($mergedTemplate, true, JSON_THROW_ON_ERROR);
 
         // Make sure, order of those fields is correct
-        if (true === isset($data['type']) && true === isset($data['name']) && true === isset($data['namespace'])) {
-            $newDefinition = [
-                'type' => $data['type'],
-                'name' => $data['name'],
-                'namespace' => $data['namespace']
-            ];
-            unset($data['type'], $data['name'], $data['namespace']);
+        if (true === isset($data['type'])) {
+            $newDefinition['type'] = $data['type'];
+            unset($data['type']);
+        }
 
+        if (true === isset($data['name'])) {
+            $newDefinition['name'] = $data['name'];
+            unset($data['name']);
+        }
+
+        if (true === isset($data['namespace'])) {
+            $newDefinition['namespace'] = $data['namespace'];
+            unset($data['namespace']);
+        }
+
+        if ([] !== $newDefinition) {
             $newDefinition = array_merge($newDefinition, $data);
-
-            $mergedTemplate = json_encode($newDefinition);
+            $mergedTemplate = (string) json_encode($newDefinition);
         }
 
         return $mergedTemplate;
