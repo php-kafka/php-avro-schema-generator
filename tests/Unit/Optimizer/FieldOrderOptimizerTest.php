@@ -89,7 +89,17 @@ class FieldOrderOptimizerTest extends TestCase
                             "namespace": "com.example.other",
                             "name": "author",
                             "fields": [
-                                { "name": "name", "type": "string" }
+                                { "name": "name", "type": "string" },
+                                {
+                                    "name": "contact",
+                                    "type": {
+                                        "name": "contact",
+                                        "type": "record",
+                                        "fields": [
+                                            { "name": "address", "type": "string" }
+                                        ]
+                                    }
+                                }
                             ]
                         }
                     ]
@@ -175,7 +185,17 @@ class FieldOrderOptimizerTest extends TestCase
                             "name": "author",
                             "namespace": "com.example.other",
                             "fields": [
-                                { "name": "name", "type": "string" }
+                                { "name": "name", "type": "string" },
+                                {
+                                    "name": "contact",
+                                    "type": {
+                                        "type": "record",
+                                        "name": "contact",
+                                        "fields": [
+                                            { "name": "address", "type": "string" }
+                                        ]
+                                    }
+                                }
                             ]
                         }
                     ]

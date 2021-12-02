@@ -40,7 +40,7 @@ class FieldOrderOptimizer implements OptimizerInterface
             }
         }
 
-        if (true === isset($data['type']) && 'array' === $data['type']) {
+        if (true=== isset($data['type']) && 'array' === $data['type']) {
             if (true === is_array($data['items'])) {
                 if (true === isset($data['items']['type'])) {
                     $data['items'] = $this->processSchema($data['items']);
