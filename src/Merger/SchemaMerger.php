@@ -51,7 +51,8 @@ final class SchemaMerger implements SchemaMergerInterface
      * @throws AvroSchemaParseException
      * @throws SchemaMergerException
      */
-    public function getResolvedSchemaTemplate(SchemaTemplateInterface $rootSchemaTemplate): SchemaTemplateInterface {
+    public function getResolvedSchemaTemplate(SchemaTemplateInterface $rootSchemaTemplate): SchemaTemplateInterface
+    {
         $rootDefinition = $rootSchemaTemplate->getSchemaDefinition();
 
         do {
