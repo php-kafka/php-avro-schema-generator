@@ -47,7 +47,9 @@ class SchemaRegistryTest extends TestCase
             self::assertContains($schema->getSchemaId(), $schemaIds);
         }
 
-        self::assertEquals(['Library', 'CD', 'Collection', 'Page'], $registry->getSchemaNamesPerNamespace('com.example'));
+        $expectedNames = ['CD', 'Collection', 'Page', 'Library'];
+
+        self::assertSame(sort($expectedNames), sort($registry->getSchemaNamesPerNamespace('com.example')));
     }
 
     public function testGetRootSchemas()
