@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Optimizer;
 
-class FullNameOptimizer implements OptimizerInterface
+class FullNameOptimizer extends AbstractOptimizer implements OptimizerInterface
 {
     /**
      * @param string $definition
@@ -29,38 +29,28 @@ class FullNameOptimizer implements OptimizerInterface
      */
     private function processSchema(string $currentNamespace, $data, bool $isRoot = false)
     {
-        if (true === isset($data['type']) && 'record' === $data['type'] && false === $isRoot) {
+        if (true === $this->isRecord($data) && false === $isRoot) {
             $newNamespace = $data['namespace'] ?? '';
             $data = $this->optimizeNamespace($currentNamespace, $data);
             $currentNamespace = $newNamespace;
         }
 
-        if (true === isset($data['type']) && true === is_string($data['type'])) {
+        if (true === $this->typeIsRecord($data)) {
+            $data['type'] = $this->processSchema($currentNamespace, $data['type']);
+        } elseif (true === $this->typeIsTypeArray($data)) {
+            foreach ($data['type'] as $index => $type) {
+                $data['type'][$index] = $this->processSchema($currentNamespace, $type);
+            }
+        } elseif (true === $this->typeIsRecordArray($data)) {
+            $data['items'] = $this->processSchema($currentNamespace, $data['items']);
+        } elseif (true === $this->typeIsMultiTypeArray($data)) {
+            foreach ($data['items'] as $index => $item) {
+                $data['items'][$index] = $this->processSchema($currentNamespace, $item);
+            }
+        } elseif (true === $this->typeIsSingleypeArray($data)) {
+            $data['items'] = $this->optimizeNamespace($currentNamespace, $data['items']);
+        } elseif (true === $this->typeIsString($data)) {
             $data['type'] = $this->optimizeNamespace($currentNamespace, $data['type']);
-        }
-
-        if (true === isset($data['type']) && true === is_array($data['type'])) {
-            if (true === isset($data['type']['type'])) {
-                $data['type'] = $this->processSchema($currentNamespace, $data['type']);
-            } else {
-                foreach ($data['type'] as $index => $type) {
-                    $data['type'][$index] = $this->processSchema($currentNamespace, $type);
-                }
-            }
-        }
-
-        if (true === isset($data['type']) && 'array' === $data['type']) {
-            if (true === is_array($data['items'])) {
-                if (true === isset($data['items']['type'])) {
-                    $data['items'] = $this->processSchema($currentNamespace, $data['items']);
-                } else {
-                    foreach ($data['items'] as $index => $item) {
-                        $data['items'][$index] = $this->processSchema($currentNamespace, $item);
-                    }
-                }
-            } else {
-                $data['items'] = $this->optimizeNamespace($currentNamespace, $data['items']);
-            }
         }
 
         if (true === isset($data['fields'])) {

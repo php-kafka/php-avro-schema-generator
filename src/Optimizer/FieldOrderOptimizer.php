@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Optimizer;
 
-class FieldOrderOptimizer implements OptimizerInterface
+class FieldOrderOptimizer extends AbstractOptimizer implements OptimizerInterface
 {
     /**
      * @param string $definition
@@ -26,29 +26,19 @@ class FieldOrderOptimizer implements OptimizerInterface
      */
     private function processSchema($data)
     {
-        if (true === isset($data['type']) && 'record' === $data['type']) {
+        if (true === $this->isRecord($data)) {
             $data = $this->reorderFields($data);
-        }
-
-        if (true === isset($data['type']) && true === is_array($data['type'])) {
-            if (true === isset($data['type']['type'])) {
-                $data['type'] = $this->processSchema($data['type']);
-            } else {
-                foreach ($data['type'] as $index => $type) {
-                    $data['type'][$index] = $this->processSchema($type);
-                }
+        } elseif (true === $this->typeIsRecord($data)) {
+            $data['type'] = $this->processSchema($data['type']);
+        } elseif (true === $this->typeIsTypeArray($data)) {
+            foreach ($data['type'] as $index => $type) {
+                $data['type'][$index] = $this->processSchema($type);
             }
-        }
-
-        if (true=== isset($data['type']) && 'array' === $data['type']) {
-            if (true === is_array($data['items'])) {
-                if (true === isset($data['items']['type'])) {
-                    $data['items'] = $this->processSchema($data['items']);
-                } else {
-                    foreach ($data['items'] as $index => $item) {
-                        $data['items'][$index] = $this->processSchema($item);
-                    }
-                }
+        } elseif (true === $this->typeIsRecordArray($data)) {
+            $data['items'] = $this->processSchema($data['items']);
+        } elseif (true === $this->typeIsMultiTypeArray($data)) {
+            foreach ($data['items'] as $index => $item) {
+                $data['items'][$index] = $this->processSchema($item);
             }
         }
 
