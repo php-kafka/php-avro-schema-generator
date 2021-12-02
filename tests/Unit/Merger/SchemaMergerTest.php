@@ -7,6 +7,7 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Merger;
 use AvroSchema;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 use PHPUnit\Framework\TestCase;
@@ -383,11 +384,11 @@ class SchemaMergerTest extends TestCase
 
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
-            ->expects(self::exactly(2))
+            ->expects(self::exactly(3))
             ->method('getSchemaDefinition')
             ->willReturn($definition);
         $schemaTemplate
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('withSchemaDefinition')
             ->with($definition)
             ->willReturn($schemaTemplate);
@@ -397,7 +398,10 @@ class SchemaMergerTest extends TestCase
             ->expects(self::once())
             ->method('getRootSchemas')
             ->willReturn([$schemaTemplate]);
+        $optimizer = $this->getMockForAbstractClass(OptimizerInterface::class);
+        $optimizer->expects(self::once())->method('optimize')->with($definition)->willReturn($definition);
         $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
+        $merger->addOptimizer($optimizer);
         $merger->merge(true);
 
         self::assertFileExists('/tmp/foobar/com.example.Book.avsc');

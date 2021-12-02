@@ -17,7 +17,7 @@ class FieldOrderOptimizerTest extends TestCase
             "name": "Book",
             "fields": [
                 { 
-                    "name": "items",
+                    "name": "content",
                     "type": {
                         "type": "array",
                         "items": {
@@ -45,6 +45,11 @@ class FieldOrderOptimizerTest extends TestCase
                         }
                     },
                     "default": []
+                },
+                {
+                    "name": "foreword",
+                    "type": "array",
+                    "items": ["null", "com.example.Page"]
                 },
                 {
                     "name": "defaultFont",
@@ -83,7 +88,7 @@ class FieldOrderOptimizerTest extends TestCase
             "namespace": "com.example",
             "fields": [
                 { 
-                    "name": "items",
+                    "name": "content",
                     "type": {
                         "type": "array",
                         "items": {
@@ -111,6 +116,11 @@ class FieldOrderOptimizerTest extends TestCase
                         }
                     },
                     "default": []
+                },
+                {
+                    "name": "foreword",
+                    "type": "array",
+                    "items": ["null", "com.example.Page"]
                 },
                 {
                     "name": "defaultFont",

@@ -126,7 +126,9 @@ final class SchemaMerger implements SchemaMergerInterface
             try {
                 $resolvedTemplate = $this->getResolvedSchemaTemplate($rootSchemaTemplate);
                 foreach ($this->optimizers as $optimizer) {
-                    $resolvedTemplate = $optimizer->optimize($resolvedTemplate);
+                    $resolvedTemplate = $resolvedTemplate->withSchemaDefinition(
+                        $optimizer->optimize($resolvedTemplate->getSchemaDefinition())
+                    );
                 }
             } catch (SchemaMergerException $e) {
                 throw $e;
