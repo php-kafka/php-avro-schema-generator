@@ -247,7 +247,6 @@ class SchemaMergerTest extends TestCase
                                            {
                                                 "type": "record",
                                                 "name": "cover_media",
-                                                "namespace": "com.example.other",
                                                 "fields": [
                                                     { "name": "filePath", "type": "string" }
                                                 ]

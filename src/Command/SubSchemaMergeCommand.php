@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Command;
 
 use http\Exception\RuntimeException;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FieldOrderOptimizer;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FullNameOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
 use Symfony\Component\Console\Command\Command;
@@ -15,6 +17,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SubSchemaMergeCommand extends Command
 {
+    protected $optimizerOptionMapping = [
+        'optimizeFieldOrder' => FieldOrderOptimizer::class,
+        'optimizeFullNames' => FullNameOptimizer::class,
+    ];
     protected function configure(): void
     {
         $this
@@ -29,6 +35,18 @@ class SubSchemaMergeCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Use template filename as schema filename'
+            )
+            ->addOption(
+                'optimizeFullNames',
+                null,
+                InputOption::VALUE_NONE,
+                'Remove namespaces if they are enclosed in the same namespace'
+            )
+            ->addOption(
+                'optimizeFieldOrder',
+                null,
+                InputOption::VALUE_NONE,
+                'Remove namespaces if they are enclosed in the same namespace'
             );
     }
 
@@ -40,6 +58,7 @@ class SubSchemaMergeCommand extends Command
         $templateDirectoryArg = $input->getArgument('templateDirectory');
         /** @var string $outputDirectoryArg */
         $outputDirectoryArg = $input->getArgument('outputDirectory');
+        $optimizeFullNames = (bool)$input->getOption('optimizeFullNames');
 
         $templateDirectory = $this->getPath($templateDirectoryArg);
         $outputDirectory = $this->getPath($outputDirectoryArg);
@@ -50,9 +69,15 @@ class SubSchemaMergeCommand extends Command
 
         $merger = new SchemaMerger($registry, $outputDirectory);
 
+        foreach ($this->optimizerOptionMapping as $optionName => $optimizerClass) {
+            if (true === (bool)$input->getOption($optionName)) {
+                $merger->addOptimizer(new $optimizerClass());
+            }
+        }
+
         $result = $merger->merge(
             (bool) $input->getOption('prefixWithNamespace'),
-            (bool) $input->getOption('useFilenameAsSchemaName'),
+            (bool) $input->getOption('useFilenameAsSchemaName')
         );
 
         // retrieve the argument value using getArgument()
