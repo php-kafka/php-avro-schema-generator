@@ -59,19 +59,29 @@ class FullNameOptimizer extends AbstractOptimizer implements OptimizerInterface
     {
         if (true === $this->typeIsRecord($data)) {
             $data['type'] = $this->processSchema($currentNamespace, $data['type']);
-        } elseif (true === $this->typeIsTypeArray($data)) {
+        }
+
+        if (true === $this->typeIsTypeArray($data)) {
             foreach ($data['type'] as $index => $type) {
                 $data['type'][$index] = $this->processSchema($currentNamespace, $type);
             }
-        } elseif (true === $this->typeIsRecordArray($data)) {
+        }
+
+        if (true === $this->typeIsRecordArray($data)) {
             $data['items'] = $this->processSchema($currentNamespace, $data['items']);
-        } elseif (true === $this->typeIsMultiTypeArray($data)) {
+        }
+
+        if (true === $this->typeIsMultiTypeArray($data)) {
             foreach ($data['items'] as $index => $item) {
                 $data['items'][$index] = $this->processSchema($currentNamespace, $item);
             }
-        } elseif (true === $this->typeIsSingleypeArray($data)) {
+        }
+
+        if (true === $this->typeIsSingleypeArray($data)) {
             $data['items'] = $this->optimizeNamespace($currentNamespace, $data['items']);
-        } elseif (true === $this->typeIsString($data)) {
+        }
+
+        if (true === $this->typeIsString($data)) {
             $data['type'] = $this->optimizeNamespace($currentNamespace, $data['type']);
         }
 
