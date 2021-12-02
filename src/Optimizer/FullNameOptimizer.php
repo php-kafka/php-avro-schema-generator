@@ -73,27 +73,54 @@ class FullNameOptimizer extends AbstractOptimizer implements OptimizerInterface
      */
     private function optimizeNamespace(string $currentNamespace, $data)
     {
-        if (true === is_array($data)) {
-            $namespace = $data['namespace'] ?? '';
+        $data = $this->removeNamespaceFromArray($currentNamespace, $data);
+        return $this->removeNamespaceFromString($currentNamespace, $data);
+    }
 
-            if ($currentNamespace === $namespace) {
-                unset($data['namespace']);
-            }
-        } elseif (true === is_string($data)) {
-            $currentNameSpacePaths = explode('.', $currentNamespace);
-            $dataNameSpacePaths = explode('.', $data);
+    /**
+     * @param string $currentNamespace
+     * @param array|mixed $data
+     * @return array|mixed|string|null
+     */
+    private function removeNamespaceFromArray(string $currentNamespace, $data)
+    {
+        if (false === is_array($data)) {
+            return $data;
+        }
 
-            foreach ($dataNameSpacePaths as $idx => $dataNameSpacePath) {
-                if ($currentNameSpacePaths[$idx] === $dataNameSpacePath) {
-                    unset($dataNameSpacePaths[$idx]);
-                } else {
-                    break;
-                }
-            }
+        $namespace = $data['namespace'] ?? '';
 
-            if (1 === sizeof($dataNameSpacePaths)) {
-                $data = array_pop($dataNameSpacePaths);
+        if ($currentNamespace === $namespace) {
+            unset($data['namespace']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $currentNamespace
+     * @param array|mixed $data
+     * @return array|mixed|string|null
+     */
+    private function removeNamespaceFromString(string $currentNamespace, $data)
+    {
+        if (false === is_string($data)) {
+            return $data;
+        }
+
+        $currentNameSpacePaths = explode('.', $currentNamespace);
+        $dataNameSpacePaths = explode('.', $data);
+
+        foreach ($dataNameSpacePaths as $idx => $dataNameSpacePath) {
+            if ($currentNameSpacePaths[$idx] === $dataNameSpacePath) {
+                unset($dataNameSpacePaths[$idx]);
+            } else {
+                break;
             }
+        }
+
+        if (1 === sizeof($dataNameSpacePaths)) {
+            $data = array_pop($dataNameSpacePaths);
         }
 
         return $data;
