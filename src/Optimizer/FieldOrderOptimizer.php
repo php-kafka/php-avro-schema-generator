@@ -6,7 +6,6 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Optimizer;
 
 class FieldOrderOptimizer implements OptimizerInterface
 {
-
     /**
      * @param string $definition
      * @return string
@@ -21,15 +20,19 @@ class FieldOrderOptimizer implements OptimizerInterface
         return json_encode($data, JSON_THROW_ON_ERROR);
     }
 
-    private function processSchema(array $data): array
+    private function processSchema($data)
     {
         if (true === isset($data['type']) && 'record' === $data['type']) {
             $data = $this->reorderFields($data);
         }
 
         if (true === isset($data['type']) && true === is_array($data['type'])) {
-            if (true === isset($data['type'])) {
+            if (true === isset($data['type']['type'])) {
                 $data['type'] = $this->processSchema($data['type']);
+            } else {
+                foreach($data['type'] as $index => $type) {
+                    $data['type'][$index] = $this->processSchema($type);
+                }
             }
         }
 
@@ -59,23 +62,23 @@ class FieldOrderOptimizer implements OptimizerInterface
         $newDefinition = [];
 
         // Make sure, order of those fields is correct
-        if (true === isset($data['type'])) {
-            $newDefinition['type'] = $data['type'];
-            unset($data['type']);
+        if (true === isset($definition['type'])) {
+            $newDefinition['type'] = $definition['type'];
+            unset($definition['type']);
         }
 
-        if (true === isset($data['name'])) {
-            $newDefinition['name'] = $data['name'];
-            unset($data['name']);
+        if (true === isset($definition['name'])) {
+            $newDefinition['name'] = $definition['name'];
+            unset($definition['name']);
         }
 
-        if (true === isset($data['namespace'])) {
-            $newDefinition['namespace'] = $data['namespace'];
-            unset($data['namespace']);
+        if (true === isset($definition['namespace'])) {
+            $newDefinition['namespace'] = $definition['namespace'];
+            unset($definition['namespace']);
         }
 
         if ([] !== $newDefinition) {
-            $definition = array_merge($newDefinition, $data);
+            $definition = array_merge($newDefinition, $definition);
         }
 
         return $definition;
