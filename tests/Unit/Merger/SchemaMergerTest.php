@@ -141,22 +141,57 @@ class SchemaMergerTest extends TestCase
         self::assertEquals($parsedAvro, json_encode(json_decode($expectedResult)));
     }
 
-    public function testGetResolvedSchemaTemplateWithOptimizedSubSchemaNamespaces()
+    public function testGetResolvedSchemaTemplateWithMultiEmbedd()
     {
         $rootDefinition = '{
             "type": "record",
             "namespace": "com.example",
             "name": "Book",
             "fields": [
-                { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
+                { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] },
+                { "name": "defaultFont", "type": "com.example.Font" },
+                { "name": "frontSide", "type": "com.example.other.Cover"},
+                { "name": "backSide", "type": "com.example.other.Cover"}
             ]
         }';
-        $subschemaDefinition = '{
+        $subschemaDefinitionPage = '{
             "type": "record",
             "namespace": "com.example",
             "name": "Page",
             "fields": [
-                { "name": "number", "type": "int" }
+                { "name": "number", "type": "int" },
+                { "name": "font", "type": "com.example.Font" }
+            ]
+        }';
+
+
+        $subschemaDefinitionFont = '{
+            "type": "record",
+            "namespace": "com.example",
+            "name": "Font",
+            "fields": [
+                { "name": "fontSize", "type": "int" },
+                { "name": "fontType", "type": "string" }
+            ]
+        }';
+
+
+        $subschemaDefinitionCover = '{
+            "type": "record",
+            "namespace": "com.example.other",
+            "name": "Cover",
+            "fields": [
+                { "name": "title", "type": "string" },
+                { "name": "image", "type": ["null", "com.example.other.cover_media"] }
+            ]
+        }';
+
+        $subschemaDefinitionCoverMedia = '{
+            "type": "record",
+            "namespace": "com.example.other",
+            "name": "cover_media",
+            "fields": [
+                { "name": "filePath", "type": "string" }
             ]
         }';
 
@@ -167,23 +202,104 @@ class SchemaMergerTest extends TestCase
                     "name": "Book",
                     "namespace": "com.example",
                     "fields": [
-                        { "name": "items", "type": {"type": "array", "items": {"type":"record","name":"Page","fields":[{"name":"number","type":"int"}]} }, "default": [] }
+                        { 
+                            "name": "items",
+                            "type": {
+                                "type": "array",
+                                "items": {
+                                    "type":"record",
+                                    "name":"Page",
+                                    "fields":[
+                                        {
+                                            "name":"number",
+                                            "type":"int"
+                                        },
+                                        {
+                                            "name": "font",
+                                            "type": {
+                                                "type": "record",
+                                                "namespace": "com.example",
+                                                "name": "Font",
+                                                "fields": [
+                                                    { "name": "fontSize", "type": "int" },
+                                                    { "name": "fontType", "type": "string" }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "default": []
+                        },
+                        {
+                            "name": "defaultFont",
+                            "type": "Font"
+                        },
+                        {
+                            "name": "frontSide",
+                            "type": {
+                                "type": "record",
+                                "namespace": "com.example.other",
+                                "name": "Cover",
+                                "fields": [
+                                    { "name": "title", "type": "string" },
+                                    { "name": "image", "type": [
+                                           "null",
+                                           {
+                                                "type": "record",
+                                                "namespace": "com.example.other",
+                                                "name": "cover_media",
+                                                "fields": [
+                                                    { "name": "filePath", "type": "string" }
+                                                ]
+                                            }
+                                       ]
+                                    }
+                                ]
+                            }
+                        },
+                        { "name": "backSide", "type": "com.example.other.Cover"}
                     ]
                 }'
             )
         );
 
-        $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
-        $subschemaTemplate
+        $subschemaTemplatePage = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplatePage
             ->expects(self::once())
             ->method('getSchemaDefinition')
-            ->willReturn($subschemaDefinition);
+            ->willReturn($subschemaDefinitionPage);
+        $subschemaTemplateFont = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplateFont
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinitionFont);
+        $subschemaTemplateCover = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplateCover
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinitionCover);
+        $subschemaTemplateCoverMedia = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplateCoverMedia
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinitionCoverMedia);
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
         $schemaRegistry
-            ->expects(self::once())
+            ->expects(self::exactly(4))
             ->method('getSchemaById')
-            ->with('com.example.Page')
-            ->willReturn($subschemaTemplate);
+            ->withConsecutive(
+                ['com.example.Page'],
+                ['com.example.Font'],
+                ['com.example.other.Cover'],
+                ['com.example.other.cover_media']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $subschemaTemplatePage,
+                $subschemaTemplateFont,
+                $subschemaTemplateCover,
+                $subschemaTemplateCoverMedia
+            );
         $rootSchemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $rootSchemaTemplate
             ->expects(self::once())
@@ -197,7 +313,7 @@ class SchemaMergerTest extends TestCase
 
         $merger = new SchemaMerger($schemaRegistry);
 
-        $merger->getResolvedSchemaTemplate($rootSchemaTemplate, true);
+        $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
 
     public function testGetResolvedSchemaTemplateWithDifferentNamespaceForEmbeddedSchema()
