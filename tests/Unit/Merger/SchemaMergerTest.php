@@ -55,14 +55,14 @@ class SchemaMergerTest extends TestCase
         self::expectException(SchemaMergerException::class);
         self::expectExceptionMessage(sprintf(SchemaMergerException::UNKNOWN_SCHEMA_TYPE_EXCEPTION_MESSAGE, 'com.example.Page'));
 
-        $definitionWithType = '{
+        $definitionWithType = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example",
             "name": "Book",
             "fields": [
                 { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
             ]
-        }';
+        }');
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
@@ -84,31 +84,16 @@ class SchemaMergerTest extends TestCase
                 { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
             ]
         }';
-        $subschemaDefinition = json_encode(
-            json_decode(
-                '{
-                        "type": "record",
-                        "namespace": "com.example",
-                        "name": "Page",
-                        "fields": [
-                            { "name": "number", "type": "int" }
-                        ]
-                    }'
-            )
-        );
+        $subschemaDefinition = '{
+            "type": "record",
+            "namespace": "com.example",
+            "name": "Page",
+            "fields": [
+                { "name": "number", "type": "int" }
+            ]
+        }';
 
-        $expectedResult = json_encode(
-            json_decode(
-                '{
-                    "type": "record",
-                    "name": "Book",
-                    "namespace": "com.example",
-                    "fields": [
-                        { "name": "items", "type": {"type": "array", "items": {"type":"record","name":"Page","fields":[{"name":"number","type":"int"}]} }, "default": [] }
-                    ]
-                }'
-            )
-        );
+        $expectedResult = str_replace('"com.example.Page"', $subschemaDefinition, $rootDefinition);
 
         $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $subschemaTemplate
@@ -135,15 +120,11 @@ class SchemaMergerTest extends TestCase
         $merger = new SchemaMerger($schemaRegistry);
 
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
-
-        $parsedAvro = (string) (AvroSchema::parse($expectedResult));
-
-        self::assertEquals($parsedAvro, json_encode(json_decode($expectedResult)));
     }
 
     public function testGetResolvedSchemaTemplateWithMultiEmbedd()
     {
-        $rootDefinition = '{
+        $rootDefinition = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example",
             "name": "Book",
@@ -153,8 +134,8 @@ class SchemaMergerTest extends TestCase
                 { "name": "frontSide", "type": "com.example.other.Cover"},
                 { "name": "backSide", "type": "com.example.other.Cover"}
             ]
-        }';
-        $subschemaDefinitionPage = '{
+        }');
+        $subschemaDefinitionPage = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example",
             "name": "Page",
@@ -162,10 +143,9 @@ class SchemaMergerTest extends TestCase
                 { "name": "number", "type": "int" },
                 { "name": "font", "type": "com.example.Font" }
             ]
-        }';
+        }');
 
-
-        $subschemaDefinitionFont = '{
+        $subschemaDefinitionFont = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example",
             "name": "Font",
@@ -173,10 +153,9 @@ class SchemaMergerTest extends TestCase
                 { "name": "fontSize", "type": "int" },
                 { "name": "fontType", "type": "string" }
             ]
-        }';
+        }');
 
-
-        $subschemaDefinitionCover = '{
+        $subschemaDefinitionCover = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example.other",
             "name": "Cover",
@@ -184,83 +163,82 @@ class SchemaMergerTest extends TestCase
                 { "name": "title", "type": "string" },
                 { "name": "image", "type": ["null", "com.example.other.cover_media"] }
             ]
-        }';
+        }');
 
-        $subschemaDefinitionCoverMedia = '{
+        $subschemaDefinitionCoverMedia = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example.other",
             "name": "cover_media",
             "fields": [
                 { "name": "filePath", "type": "string" }
             ]
-        }';
+        }');
 
-        $expectedResult = json_encode(
-            json_decode(
-                '{
-                    "type": "record",
-                    "name": "Book",
-                    "namespace": "com.example",
-                    "fields": [
-                        { 
-                            "name": "items",
-                            "type": {
-                                "type": "array",
-                                "items": {
-                                    "type":"record",
-                                    "name":"Page",
-                                    "fields":[
-                                        {
-                                            "name":"number",
-                                            "type":"int"
-                                        },
-                                        {
-                                            "name": "font",
-                                            "type": {
-                                                "type": "record",
-                                                "name": "Font",
-                                                "fields": [
-                                                    { "name": "fontSize", "type": "int" },
-                                                    { "name": "fontType", "type": "string" }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            "default": []
-                        },
-                        {
-                            "name": "defaultFont",
-                            "type": "Font"
-                        },
-                        {
-                            "name": "frontSide",
-                            "type": {
-                                "type": "record",
-                                "name": "Cover",
-                                "namespace": "com.example.other",
-                                "fields": [
-                                    { "name": "title", "type": "string" },
-                                    { "name": "image", "type": [
-                                           "null",
-                                           {
-                                                "type": "record",
-                                                "name": "cover_media",
-                                                "fields": [
-                                                    { "name": "filePath", "type": "string" }
-                                                ]
-                                            }
-                                       ]
+        $expectedResult = $this->reformatJsonString('{
+            "type": "record",
+            "namespace": "com.example",
+            "name": "Book",
+            "fields": [
+                { 
+                    "name": "items",
+                    "type": {
+                        "type": "array",
+                        "items": {
+                            "type":"record",
+                            "namespace": "com.example",
+                            "name":"Page",
+                            "fields":[
+                                {
+                                    "name":"number",
+                                    "type":"int"
+                                },
+                                {
+                                    "name": "font",
+                                    "type": {
+                                        "type": "record",
+                                        "namespace": "com.example",
+                                        "name": "Font",
+                                        "fields": [
+                                            { "name": "fontSize", "type": "int" },
+                                            { "name": "fontType", "type": "string" }
+                                        ]
                                     }
-                                ]
+                                }
+                            ]
+                        }
+                    },
+                    "default": []
+                },
+                {
+                    "name": "defaultFont",
+                    "type": "com.example.Font"
+                },
+                {
+                    "name": "frontSide",
+                    "type": {
+                        "type": "record",
+                        "namespace": "com.example.other",
+                        "name": "Cover",
+                        "fields": [
+                            { "name": "title", "type": "string" },
+                            { "name": "image", "type": [
+                                   "null",
+                                   {
+                                        "type": "record",
+                                        "namespace": "com.example.other",
+                                        "name": "cover_media",
+                                        "fields": [
+                                            { "name": "filePath", "type": "string" }
+                                        ]
+                                    }
+                               ]
                             }
-                        },
-                        { "name": "backSide", "type": "com.example.other.Cover"}
-                    ]
-                }'
-            )
-        );
+                        ]
+                    }
+                },
+                { "name": "backSide", "type": "com.example.other.Cover"}
+            ]
+        }');
 
         $subschemaTemplatePage = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $subschemaTemplatePage
@@ -298,11 +276,6 @@ class SchemaMergerTest extends TestCase
                 $subschemaTemplateCover,
                 $subschemaTemplateCoverMedia
             );
-        $schemaRegistry
-            ->expects(self::once())
-            ->method('getSchemaNamesPerNamespace')
-            ->with('com.example')
-            ->willReturn(['Font']);
         $rootSchemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $rootSchemaTemplate
             ->expects(self::once())
@@ -338,32 +311,7 @@ class SchemaMergerTest extends TestCase
             ]
         }';
 
-        $expectedResult = json_encode(
-            json_decode(
-                '{
-                    "type": "record",
-                    "name": "Book",
-                    "namespace": "com.example",
-                    "fields": [
-                        { 
-                            "name": "items",
-                            "type": {
-                                "type": "array",
-                                "items": {
-                                    "type": "record",
-                                    "name": "Page",
-                                    "namespace": "com.example.other",
-                                    "fields": [
-                                        { "name": "number", "type": "int" }
-                                    ]
-                                }
-                            },
-                            "default": []
-                        }
-                    ]
-                }'
-            )
-        );
+        $expectedResult = str_replace('"com.example.other.Page"', $subschemaDefinition, $rootDefinition);
 
         $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $subschemaTemplate
@@ -433,19 +381,6 @@ class SchemaMergerTest extends TestCase
             ]
         }';
 
-        $expectedResult = json_encode(
-            json_decode(
-                '{
-                    "type": "record",
-                     "name": "Book",
-                    "namespace": "com.example",
-                    "fields": [
-                        { "name": "items", "type": {"type": "array", "items": ["string"] }, "default": [] }
-                    ]
-                }'
-            )
-        );
-
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
             ->expects(self::exactly(2))
@@ -454,7 +389,7 @@ class SchemaMergerTest extends TestCase
         $schemaTemplate
             ->expects(self::once())
             ->method('withSchemaDefinition')
-            ->with($expectedResult)
+            ->with($definition)
             ->willReturn($schemaTemplate);
 
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
@@ -476,8 +411,6 @@ class SchemaMergerTest extends TestCase
             "type": "string"
         }';
 
-        $expectedResult = json_encode(json_decode($definition));
-
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
             ->expects(self::exactly(2))
@@ -486,7 +419,7 @@ class SchemaMergerTest extends TestCase
         $schemaTemplate
             ->expects(self::once())
             ->method('withSchemaDefinition')
-            ->with($expectedResult)
+            ->with($definition)
             ->willReturn($schemaTemplate);
         $schemaTemplate
             ->expects(self::once())
@@ -517,19 +450,6 @@ class SchemaMergerTest extends TestCase
             ]
         }';
 
-        $expectedResult = json_encode(
-            json_decode(
-                '{
-                    "type": "record",
-                    "name": "Book",
-                    "namespace": "com.example",
-                    "fields": [
-                        { "name": "items", "type": {"type": "array", "items": ["string"] }, "default": [] }
-                    ]
-                }'
-            )
-        );
-
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
             ->expects(self::exactly(2))
@@ -538,7 +458,7 @@ class SchemaMergerTest extends TestCase
         $schemaTemplate
             ->expects(self::once())
             ->method('withSchemaDefinition')
-            ->with($expectedResult)
+            ->with($definition)
             ->willReturn($schemaTemplate);
         $schemaTemplate
             ->expects(self::once())
@@ -597,5 +517,10 @@ class SchemaMergerTest extends TestCase
 
         self::assertFileExists('/tmp/test.avsc');
         unlink('/tmp/test.avsc');
+    }
+
+    private function reformatJsonString(string $jsonString): string
+    {
+        return json_encode(json_decode($jsonString, false, JSON_THROW_ON_ERROR), JSON_THROW_ON_ERROR);
     }
 }

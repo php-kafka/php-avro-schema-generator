@@ -86,8 +86,6 @@ final class SchemaMerger implements SchemaMergerInterface
             }
         } while (true === $exceptionThrown);
 
-        $rootDefinition = $this->reformatDefinition($rootDefinition);
-
         return $rootSchemaTemplate->withSchemaDefinition($rootDefinition);
     }
 
@@ -102,8 +100,6 @@ final class SchemaMerger implements SchemaMergerInterface
         string $embeddedDefinition
     ): string {
         $idString = '"' . $schemaId . '"';
-        $embeddedDefinition = $this->reformatDefinition($embeddedDefinition);
-
         $pos = strpos($rootDefinition, $idString);
 
         return substr_replace($rootDefinition, $embeddedDefinition, $pos, strlen($idString));
