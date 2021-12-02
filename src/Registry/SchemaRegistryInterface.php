@@ -36,6 +36,12 @@ interface SchemaRegistryInterface
     public function getSchemas(): array;
 
     /**
+     * @param string $namespace
+     * @return array<string>
+     */
+    public function getSchemaNamesPerNamespace(string $namespace): array;
+
+    /**
      * @param  string $schemaId
      * @return SchemaTemplateInterface|null
      */

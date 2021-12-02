@@ -218,7 +218,6 @@ class SchemaMergerTest extends TestCase
                                             "name": "font",
                                             "type": {
                                                 "type": "record",
-                                                "namespace": "com.example",
                                                 "name": "Font",
                                                 "fields": [
                                                     { "name": "fontSize", "type": "int" },
@@ -239,16 +238,16 @@ class SchemaMergerTest extends TestCase
                             "name": "frontSide",
                             "type": {
                                 "type": "record",
-                                "namespace": "com.example.other",
                                 "name": "Cover",
+                                "namespace": "com.example.other",
                                 "fields": [
                                     { "name": "title", "type": "string" },
                                     { "name": "image", "type": [
                                            "null",
                                            {
                                                 "type": "record",
-                                                "namespace": "com.example.other",
                                                 "name": "cover_media",
+                                                "namespace": "com.example.other",
                                                 "fields": [
                                                     { "name": "filePath", "type": "string" }
                                                 ]
@@ -300,6 +299,11 @@ class SchemaMergerTest extends TestCase
                 $subschemaTemplateCover,
                 $subschemaTemplateCoverMedia
             );
+        $schemaRegistry
+            ->expects(self::once())
+            ->method('getSchemaNamesPerNamespace')
+            ->with('com.example')
+            ->willReturn(['Font']);
         $rootSchemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $rootSchemaTemplate
             ->expects(self::once())

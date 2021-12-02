@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Merger;
 
-use AvroSchema;
 use AvroSchemaParseException;
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
@@ -82,6 +81,7 @@ final class SchemaMerger implements SchemaMergerInterface
         } while (true === $exceptionThrown);
 
         $rootDefinition = $this->reformatDefinition($rootDefinition);
+        $rootDefinition = $this->cleanRemainingNamespaces($rootDefinition);
 
         return $rootSchemaTemplate->withSchemaDefinition($rootDefinition);
     }
@@ -231,5 +231,24 @@ final class SchemaMerger implements SchemaMergerInterface
         }
 
         return $mergedTemplate;
+    }
+
+    public function cleanRemainingNamespaces(string $rootDefinition): string
+    {
+        $data = json_decode($rootDefinition, true, JSON_THROW_ON_ERROR);
+        $namespace = $data['namespace'] ?? '';
+
+        if ('' === $namespace) {
+            return $rootDefinition;
+        }
+
+        $schemaNames = $this->schemaRegistry->getSchemaNamesPerNamespace($namespace);
+
+        foreach ($schemaNames as $schemaName) {
+            $fullSchemaName = sprintf('%s.%s', $namespace, $schemaName);
+            $rootDefinition = str_replace($fullSchemaName, $schemaName, $rootDefinition);
+        }
+
+        return $rootDefinition;
     }
 }

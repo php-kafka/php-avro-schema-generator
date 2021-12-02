@@ -24,6 +24,11 @@ final class SchemaRegistry implements SchemaRegistryInterface
      */
     private $schemas = [];
 
+    /**
+     * @var array<string, string[]>
+     */
+    private $schemaNamesPerNamespace = [];
+
 
     /**
      * @param  string $schemaTemplateDirectory
@@ -130,6 +135,7 @@ final class SchemaRegistry implements SchemaRegistryInterface
         }
 
         $schemaData = json_decode($fileContent, true, JSON_THROW_ON_ERROR);
+        $namespace = $schemaData['namespace'] ?? '';
 
         if (null === $schemaData) {
             throw new SchemaRegistryException(sprintf(SchemaRegistryException::FILE_INVALID, $fileName));
@@ -142,6 +148,16 @@ final class SchemaRegistry implements SchemaRegistryInterface
 
         $schemaId = $this->getSchemaId($schemaData, $template);
         $this->schemas[$schemaId] = $template->withSchemaId($schemaId);
+        $this->schemaNamesPerNamespace[$namespace][] = $schemaData['name'];
+    }
+
+    /**
+     * @param string $namespace
+     * @return array<string>
+     */
+    public function getSchemaNamesPerNamespace(string $namespace): array
+    {
+        return $this->schemaNamesPerNamespace[$namespace] ?? [];
     }
 
     /**
