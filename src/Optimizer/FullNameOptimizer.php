@@ -35,6 +35,28 @@ class FullNameOptimizer extends AbstractOptimizer implements OptimizerInterface
             $currentNamespace = $newNamespace;
         }
 
+        $data = $this->handleTypes($currentNamespace, $data);
+
+        if (true === isset($data['fields'])) {
+            foreach ($data['fields'] as $index => $field) {
+                $data['fields'][$index] = $this->processSchema($currentNamespace, $field);
+            }
+        }
+
+        if (true === is_string($data)) {
+            $data = $this->optimizeNamespace($currentNamespace, $data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $currentNamespace
+     * @param array|mixed $data
+     * @return array|mixed|string|null
+     */
+    private function handleTypes(string $currentNamespace, $data)
+    {
         if (true === $this->typeIsRecord($data)) {
             $data['type'] = $this->processSchema($currentNamespace, $data['type']);
         } elseif (true === $this->typeIsTypeArray($data)) {
@@ -51,16 +73,6 @@ class FullNameOptimizer extends AbstractOptimizer implements OptimizerInterface
             $data['items'] = $this->optimizeNamespace($currentNamespace, $data['items']);
         } elseif (true === $this->typeIsString($data)) {
             $data['type'] = $this->optimizeNamespace($currentNamespace, $data['type']);
-        }
-
-        if (true === isset($data['fields'])) {
-            foreach ($data['fields'] as $index => $field) {
-                $data['fields'][$index] = $this->processSchema($currentNamespace, $field);
-            }
-        }
-
-        if (true === is_string($data)) {
-            $data = $this->optimizeNamespace($currentNamespace, $data);
         }
 
         return $data;

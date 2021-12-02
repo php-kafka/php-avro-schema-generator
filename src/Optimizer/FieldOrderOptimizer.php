@@ -28,7 +28,26 @@ class FieldOrderOptimizer extends AbstractOptimizer implements OptimizerInterfac
     {
         if (true === $this->isRecord($data)) {
             $data = $this->reorderFields($data);
-        } elseif (true === $this->typeIsRecord($data)) {
+        }
+
+        $data = $this->handleTypes($data);
+
+        if (true === isset($data['fields'])) {
+            foreach ($data['fields'] as $index => $field) {
+                $data['fields'][$index] = $this->processSchema($field);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param array|mixed $data
+     * @return array|mixed
+     */
+    private function handleTypes($data)
+    {
+        if (true === $this->typeIsRecord($data)) {
             $data['type'] = $this->processSchema($data['type']);
         } elseif (true === $this->typeIsTypeArray($data)) {
             foreach ($data['type'] as $index => $type) {
@@ -39,12 +58,6 @@ class FieldOrderOptimizer extends AbstractOptimizer implements OptimizerInterfac
         } elseif (true === $this->typeIsMultiTypeArray($data)) {
             foreach ($data['items'] as $index => $item) {
                 $data['items'][$index] = $this->processSchema($item);
-            }
-        }
-
-        if (true === isset($data['fields'])) {
-            foreach ($data['fields'] as $index => $field) {
-                $data['fields'][$index] = $this->processSchema($field);
             }
         }
 
