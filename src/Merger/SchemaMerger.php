@@ -100,7 +100,7 @@ final class SchemaMerger implements SchemaMergerInterface
         string $embeddedDefinition
     ): string {
         $idString = '"' . $schemaId . '"';
-        $pos = strpos($rootDefinition, $idString);
+        $pos = (int) strpos($rootDefinition, $idString);
 
         return substr_replace($rootDefinition, $embeddedDefinition, $pos, strlen($idString));
     }

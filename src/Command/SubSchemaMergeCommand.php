@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SubSchemaMergeCommand extends Command
 {
+    /** @var string[] */
     protected $optimizerOptionMapping = [
         'optimizeFieldOrder' => FieldOrderOptimizer::class,
         'optimizeFullNames' => FullNameOptimizer::class,

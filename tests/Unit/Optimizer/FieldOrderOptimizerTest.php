@@ -78,7 +78,22 @@ class FieldOrderOptimizerTest extends TestCase
                         ]
                     }
                 },
-                { "name": "backSide", "type": "com.example.other.Cover"}
+                { "name": "backSide", "type": "com.example.other.Cover"},
+                                {
+                    "name": "authors",
+                    "type": "array",
+                    "items": [
+                        "null",
+                        {
+                            "type": "record",
+                            "namespace": "com.example.other",
+                            "name": "author",
+                            "fields": [
+                                { "name": "name", "type": "string" }
+                            ]
+                        }
+                    ]
+                }
             ]
         }';
 
@@ -149,7 +164,22 @@ class FieldOrderOptimizerTest extends TestCase
                         ]
                     }
                 },
-                { "name": "backSide", "type": "com.example.other.Cover"}
+                { "name": "backSide", "type": "com.example.other.Cover"},
+                                {
+                    "name": "authors",
+                    "type": "array",
+                    "items": [
+                        "null",
+                        {
+                            "type": "record",
+                            "name": "author",
+                            "namespace": "com.example.other",
+                            "fields": [
+                                { "name": "name", "type": "string" }
+                            ]
+                        }
+                    ]
+                }
             ]
         }'));
 

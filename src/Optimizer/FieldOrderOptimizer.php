@@ -20,6 +20,10 @@ class FieldOrderOptimizer implements OptimizerInterface
         return json_encode($data, JSON_THROW_ON_ERROR);
     }
 
+    /**
+     * @param array|mixed $data
+     * @return array|mixed
+     */
     private function processSchema($data)
     {
         if (true === isset($data['type']) && 'record' === $data['type']) {
@@ -30,7 +34,7 @@ class FieldOrderOptimizer implements OptimizerInterface
             if (true === isset($data['type']['type'])) {
                 $data['type'] = $this->processSchema($data['type']);
             } else {
-                foreach($data['type'] as $index => $type) {
+                foreach ($data['type'] as $index => $type) {
                     $data['type'][$index] = $this->processSchema($type);
                 }
             }
@@ -38,10 +42,10 @@ class FieldOrderOptimizer implements OptimizerInterface
 
         if (true === isset($data['type']) && 'array' === $data['type']) {
             if (true === is_array($data['items'])) {
-                if(true === isset($data['items']['type'])) {
+                if (true === isset($data['items']['type'])) {
                     $data['items'] = $this->processSchema($data['items']);
                 } else {
-                    foreach($data['items'] as $index => $item) {
+                    foreach ($data['items'] as $index => $item) {
                         $data['items'][$index] = $this->processSchema($item);
                     }
                 }
@@ -49,7 +53,7 @@ class FieldOrderOptimizer implements OptimizerInterface
         }
 
         if (true === isset($data['fields'])) {
-            foreach($data['fields'] as $index => $field) {
+            foreach ($data['fields'] as $index => $field) {
                 $data['fields'][$index] = $this->processSchema($field);
             }
         }
@@ -57,6 +61,10 @@ class FieldOrderOptimizer implements OptimizerInterface
         return $data;
     }
 
+    /**
+     * @param array<mixed> $definition
+     * @return array<mixed>
+     */
     private function reorderFields(array $definition): array
     {
         $newDefinition = [];
