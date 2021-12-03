@@ -1,9 +1,8 @@
 # Avro schema generator for PHP
 [![Actions Status](https://github.com/php-kafka/php-avro-schema-generator/workflows/CI/badge.svg)](https://github.com/php-kafka/php-avro-schema-generator/workflows/CI/badge.svg)
-[![Maintainability](https://api.codeclimate.com/v1/badges/937e14c63beb08885c70/maintainability)](https://codeclimate.com/github/php-kafka/php-avro-schema-generator/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/937e14c63beb08885c70/test_coverage)](https://codeclimate.com/github/php-kafka/php-avro-schema-generator/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/41aecf21566d7e9bfb69/maintainability)](https://codeclimate.com/github/php-kafka/php-avro-schema-generator/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/41aecf21566d7e9bfb69/test_coverage)](https://codeclimate.com/github/php-kafka/php-avro-schema-generator/test_coverage) 
 [![Latest Stable Version](https://poser.pugx.org/php-kafka/php-avro-schema-generator/v/stable)](https://packagist.org/packages/php-kafka/php-avro-schema-generator)
-[![Latest Unstable Version](https://poser.pugx.org/php-kafka/php-avro-schema-generator/v/unstable)](https://packagist.org/packages/php-kafka/php-avro-schema-generator)
 
 ## Installation
 ```
