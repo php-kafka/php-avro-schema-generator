@@ -17,7 +17,7 @@
     "phpstan/phpstan": "^0.12",
     "squizlabs/php_codesniffer": "^3.4.2",
     "friendsofphp/php-cs-fixer": "^2.15",
-    "infection/infection": "^0.20",
+    "infection/infection": "^0.20.2",
     "rregeer/phpunit-coverage-check": "^0.3"
   },
   "bin": [

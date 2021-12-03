@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Merger;
 
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 
@@ -21,10 +22,10 @@ interface SchemaMergerInterface
     public function getOutputDirectory(): string;
 
     /**
-     * @param  SchemaTemplateInterface $schemaTemplate
+     * @param  SchemaTemplateInterface $rootSchemaTemplate
      * @return SchemaTemplateInterface
      */
-    public function getResolvedSchemaTemplate(SchemaTemplateInterface $schemaTemplate): SchemaTemplateInterface;
+    public function getResolvedSchemaTemplate(SchemaTemplateInterface $rootSchemaTemplate): SchemaTemplateInterface;
 
     /**
      * @return int
@@ -42,4 +43,9 @@ interface SchemaMergerInterface
      * @return array<string,mixed>
      */
     public function transformExportSchemaDefinition(array $schemaDefinition): array;
+
+    /**
+     * @param OptimizerInterface $optimizer
+     */
+    public function addOptimizer(OptimizerInterface $optimizer): void;
 }

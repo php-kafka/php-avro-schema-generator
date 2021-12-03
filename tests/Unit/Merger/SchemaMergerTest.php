@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Merger;
 
+use AvroSchema;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 use PHPUnit\Framework\TestCase;
@@ -54,14 +56,14 @@ class SchemaMergerTest extends TestCase
         self::expectException(SchemaMergerException::class);
         self::expectExceptionMessage(sprintf(SchemaMergerException::UNKNOWN_SCHEMA_TYPE_EXCEPTION_MESSAGE, 'com.example.Page'));
 
-        $definitionWithType = '{
+        $definitionWithType = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example",
             "name": "Book",
             "fields": [
                 { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
             ]
-        }';
+        }');
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
@@ -121,45 +123,160 @@ class SchemaMergerTest extends TestCase
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
 
-    public function testGetResolvedSchemaTemplateWithOptimizedSubSchemaNamespaces()
+    public function testGetResolvedSchemaTemplateWithMultiEmbedd()
     {
-        $rootDefinition = '{
+        $rootDefinition = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example",
             "name": "Book",
             "fields": [
-                { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
+                { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] },
+                { "name": "defaultFont", "type": "com.example.Font" },
+                { "name": "frontSide", "type": "com.example.other.Cover"},
+                { "name": "backSide", "type": "com.example.other.Cover"}
             ]
-        }';
-        $subschemaDefinition = '{
+        }');
+        $subschemaDefinitionPage = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example",
             "name": "Page",
             "fields": [
-                { "name": "number", "type": "int" }
+                { "name": "number", "type": "int" },
+                { "name": "font", "type": "com.example.Font" }
             ]
-        }';
+        }');
 
-        $expectedResult = '{
+        $subschemaDefinitionFont = $this->reformatJsonString('{
+            "type": "record",
+            "namespace": "com.example",
+            "name": "Font",
+            "fields": [
+                { "name": "fontSize", "type": "int" },
+                { "name": "fontType", "type": "string" }
+            ]
+        }');
+
+        $subschemaDefinitionCover = $this->reformatJsonString('{
+            "type": "record",
+            "namespace": "com.example.other",
+            "name": "Cover",
+            "fields": [
+                { "name": "title", "type": "string" },
+                { "name": "image", "type": ["null", "com.example.other.cover_media"] }
+            ]
+        }');
+
+        $subschemaDefinitionCoverMedia = $this->reformatJsonString('{
+            "type": "record",
+            "namespace": "com.example.other",
+            "name": "cover_media",
+            "fields": [
+                { "name": "filePath", "type": "string" }
+            ]
+        }');
+
+        $expectedResult = $this->reformatJsonString('{
             "type": "record",
             "namespace": "com.example",
             "name": "Book",
             "fields": [
-                { "name": "items", "type": {"type": "array", "items": {"type":"record","name":"Page","fields":[{"name":"number","type":"int"}]} }, "default": [] }
+                { 
+                    "name": "items",
+                    "type": {
+                        "type": "array",
+                        "items": {
+                            "type":"record",
+                            "namespace": "com.example",
+                            "name":"Page",
+                            "fields":[
+                                {
+                                    "name":"number",
+                                    "type":"int"
+                                },
+                                {
+                                    "name": "font",
+                                    "type": {
+                                        "type": "record",
+                                        "namespace": "com.example",
+                                        "name": "Font",
+                                        "fields": [
+                                            { "name": "fontSize", "type": "int" },
+                                            { "name": "fontType", "type": "string" }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "default": []
+                },
+                {
+                    "name": "defaultFont",
+                    "type": "com.example.Font"
+                },
+                {
+                    "name": "frontSide",
+                    "type": {
+                        "type": "record",
+                        "namespace": "com.example.other",
+                        "name": "Cover",
+                        "fields": [
+                            { "name": "title", "type": "string" },
+                            { "name": "image", "type": [
+                                   "null",
+                                   {
+                                        "type": "record",
+                                        "namespace": "com.example.other",
+                                        "name": "cover_media",
+                                        "fields": [
+                                            { "name": "filePath", "type": "string" }
+                                        ]
+                                    }
+                               ]
+                            }
+                        ]
+                    }
+                },
+                { "name": "backSide", "type": "com.example.other.Cover"}
             ]
-        }';
+        }');
 
-        $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
-        $subschemaTemplate
+        $subschemaTemplatePage = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplatePage
             ->expects(self::once())
             ->method('getSchemaDefinition')
-            ->willReturn($subschemaDefinition);
+            ->willReturn($subschemaDefinitionPage);
+        $subschemaTemplateFont = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplateFont
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinitionFont);
+        $subschemaTemplateCover = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplateCover
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinitionCover);
+        $subschemaTemplateCoverMedia = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplateCoverMedia
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinitionCoverMedia);
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
         $schemaRegistry
-            ->expects(self::once())
+            ->expects(self::exactly(4))
             ->method('getSchemaById')
-            ->with('com.example.Page')
-            ->willReturn($subschemaTemplate);
+            ->withConsecutive(
+                ['com.example.Page'],
+                ['com.example.Font'],
+                ['com.example.other.Cover'],
+                ['com.example.other.cover_media']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $subschemaTemplatePage,
+                $subschemaTemplateFont,
+                $subschemaTemplateCover,
+                $subschemaTemplateCoverMedia
+            );
         $rootSchemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $rootSchemaTemplate
             ->expects(self::once())
@@ -173,7 +290,7 @@ class SchemaMergerTest extends TestCase
 
         $merger = new SchemaMerger($schemaRegistry);
 
-        $merger->getResolvedSchemaTemplate($rootSchemaTemplate, true);
+        $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
 
     public function testGetResolvedSchemaTemplateWithDifferentNamespaceForEmbeddedSchema()
@@ -264,13 +381,14 @@ class SchemaMergerTest extends TestCase
                 { "name": "items", "type": {"type": "array", "items": ["string"] }, "default": [] }
             ]
         }';
+
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
-            ->expects(self::exactly(2))
+            ->expects(self::exactly(3))
             ->method('getSchemaDefinition')
             ->willReturn($definition);
         $schemaTemplate
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('withSchemaDefinition')
             ->with($definition)
             ->willReturn($schemaTemplate);
@@ -280,7 +398,10 @@ class SchemaMergerTest extends TestCase
             ->expects(self::once())
             ->method('getRootSchemas')
             ->willReturn([$schemaTemplate]);
+        $optimizer = $this->getMockForAbstractClass(OptimizerInterface::class);
+        $optimizer->expects(self::once())->method('optimize')->with($definition)->willReturn($definition);
         $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
+        $merger->addOptimizer($optimizer);
         $merger->merge(true);
 
         self::assertFileExists('/tmp/foobar/com.example.Book.avsc');
@@ -293,6 +414,7 @@ class SchemaMergerTest extends TestCase
         $definition = '{
             "type": "string"
         }';
+
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
             ->expects(self::exactly(2))
@@ -331,6 +453,7 @@ class SchemaMergerTest extends TestCase
                 { "name": "items", "type": {"type": "array", "items": ["string"] }, "default": [] }
             ]
         }';
+
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
             ->expects(self::exactly(2))
@@ -375,35 +498,6 @@ class SchemaMergerTest extends TestCase
         unlink('/tmp/test.avsc');
     }
 
-    public function testExportSchemaWithExcludingNamespaces()
-    {
-        $mergedSchema = '{"type":"record","name":"schema","namespace":"root.level.entity","schema_level":"root","fields":[{"name":"rootField1","type":{"type":"record","name":"embeddedSchema","fields":[{"name":"embeddedField","type":["null","string"],"default":null}]}},{"name":"rootField2","type":["null","root.level.entity.embeddedSchema"],"default":null}]}';
-
-        $expectedSchema = '{"type":"record","name":"schema","namespace":"root.level.entity","fields":[{"name":"rootField1","type":{"type":"record","name":"embeddedSchema","fields":[{"name":"embeddedField","type":["null","string"],"default":null}]}},{"name":"rootField2","type":["null","embeddedSchema"],"default":null}]}';
-
-        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
-        $schemaTemplate
-            ->expects(self::once())
-            ->method('getSchemaDefinition')
-            ->willReturn($mergedSchema);
-
-        $schemaTemplate
-            ->expects(self::once())
-            ->method('getFilename')
-            ->willReturn('test.avsc');
-
-        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
-
-        $merger = new SchemaMerger($schemaRegistry);
-        $merger->exportSchema($schemaTemplate, false, true, true);
-        file_put_contents('/tmp/test_expected_schema.avsc', $expectedSchema);
-
-        self::assertFileExists('/tmp/test.avsc');
-        self::assertFileEquals('/tmp/test_expected_schema.avsc', '/tmp/test.avsc');
-        unlink('/tmp/test_expected_schema.avsc');
-        unlink('/tmp/test.avsc');
-    }
-
     public function testExportSchemaPrimitiveWithWrongOptions()
     {
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
@@ -427,5 +521,10 @@ class SchemaMergerTest extends TestCase
 
         self::assertFileExists('/tmp/test.avsc');
         unlink('/tmp/test.avsc');
+    }
+
+    private function reformatJsonString(string $jsonString): string
+    {
+        return json_encode(json_decode($jsonString, false, JSON_THROW_ON_ERROR), JSON_THROW_ON_ERROR);
     }
 }
