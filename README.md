@@ -16,8 +16,8 @@ This library enables you to:
 - The library is able to generate avsc schema from PHP classes
 
 ### Merging subschemas / schemas
-Schema template directories: directories containing avsc template files (with subschema)
-Output directory: output directory for the merged schema files
+Schema template directories: directories containing avsc template files (with subschema)  
+Output directory: output directory for the merged schema files  
 
 **Console example**
 ```bash
@@ -42,7 +42,7 @@ $merger->merge();
 ```
 
 ### Merge optimizers
-There are optimizers that you can enable for merging schema:
+There are optimizers that you can enable for merging schema:  
 - FullNameOptimizer: removes unneeded namespaces
 - FieldOrderOptimizer: the first fields of a record schema will be: type, name, namespace (if present)  
 
@@ -75,8 +75,8 @@ $merger->merge();
 
 ### Generating schemas from classes
 You will need to adjust the generated templates, but it gives you a good starting point to work with.  
-Class directories: Directories containing the classes you want to generate schemas from
-Output directory: output directory for your generated schema templates
+Class directories: Directories containing the classes you want to generate schemas from  
+Output directory: output directory for your generated schema templates  
 
 **Console example**
 ```bash
