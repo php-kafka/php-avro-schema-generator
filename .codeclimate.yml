@@ -43,8 +43,10 @@ checks:
             threshold: #language-specific defaults. overrides affect all languages.
 exclude_patterns:
     - "src/Parser/TokenParser.php"
+    - "src/Command"
     - "tests/"
     - "**/vendor/"
+    - "example/"
     - "**/*.avsc"
     - "**/*.yml"
     - "**/*.md"
@@ -56,3 +58,5 @@ exclude_patterns:
     - "**/*.xml"
     - "**/docker/"
     - "src/console"
+    - ".github"
+    - ".codeclimate.yml"
