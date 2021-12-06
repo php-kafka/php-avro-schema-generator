@@ -108,15 +108,13 @@ final class SchemaMerger implements SchemaMergerInterface
     /**
      * @param bool $prefixWithNamespace
      * @param bool $useTemplateName
-     * @param bool $optimizeFullNames
      * @return integer
      * @throws AvroSchemaParseException
      * @throws SchemaMergerException
      */
     public function merge(
         bool $prefixWithNamespace = false,
-        bool $useTemplateName = false,
-        bool $optimizeFullNames = false
+        bool $useTemplateName = false
     ): int {
         $mergedFiles = 0;
         $registry = $this->getSchemaRegistry();
