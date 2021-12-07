@@ -16,8 +16,8 @@ This library enables you to:
 - The library is able to generate avsc schema from PHP classes
 
 ### Merging subschemas / schemas
-Schema template directories: directories containing avsc template files (with subschema)  
-Output directory: output directory for the merged schema files  
+Schema template directories: directories containing avsc template files (with subschema)
+Output directory: output directory for the merged schema files
 
 **Console example**
 ```bash
@@ -44,13 +44,14 @@ $merger->merge();
 ### Merge optimizers
 There are optimizers that you can enable for merging schema:  
 - FullNameOptimizer: removes unneeded namespaces
-- FieldOrderOptimizer: the first fields of a record schema will be: type, name, namespace (if present)  
+- FieldOrderOptimizer: the first fields of a record schema will be: type, name, namespace (if present)
+- PrimitiveSchemaOptimizer: Optimizes primitive schema e.g. `{"type": "string"}` to `"string"`
 
-How to enable optimizer:  
+How to enable optimizer:
 
 **Console example**
 ```bash
-./vendor/bin/avro-cli --optimizeFullNames --optimizeFieldOrder avro:subschema:merge ./example/schemaTemplates ./example/schema
+./vendor/bin/avro-cli --optimizeFullNames --optimizeFieldOrder --optimizePrimitiveSchemas avro:subschema:merge ./example/schemaTemplates ./example/schema
 ```
 **PHP Example**
 ```php
@@ -60,6 +61,7 @@ use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FieldOrderOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FullNameOptimizer;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\PrimitiveSchemaOptimizer;
 
 $registry = (new SchemaRegistry())
     ->addSchemaTemplateDirectory('./schemaTemplates')
@@ -68,6 +70,7 @@ $registry = (new SchemaRegistry())
 $merger = new SchemaMerger($registry, './schema');
 $merger->addOptimizer(new FieldOrderOptimizer());
 $merger->addOptimizer(new FullNameOptimizer());
+$merger->addOptimizer(new PrimitiveSchemaOptimizer());
 
 $merger->merge();
 
@@ -104,6 +107,6 @@ $generator->exportSchemas($schemas);
 
 ## Disclaimer
 In `v1.3.0` the option `--optimizeSubSchemaNamespaces` was added. It was not working fully  
-in the `1.x` version and we had some discussions (#13) about it.  
+in the `1.x` version and we had some discussions ([#13](https://github.com/php-kafka/php-avro-schema-generator/issues/13)) about it.  
 Ultimately the decision was to adapt this behaviour fully in `v2.0.0` so you might want to  
 upgrade if you rely on that behaviour.
