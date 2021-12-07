@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Command;
 
-use http\Exception\RuntimeException;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FieldOrderOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FullNameOptimizer;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\PrimitiveSchemaOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
 use Symfony\Component\Console\Command\Command;
@@ -21,6 +21,7 @@ class SubSchemaMergeCommand extends Command
     protected $optimizerOptionMapping = [
         'optimizeFieldOrder' => FieldOrderOptimizer::class,
         'optimizeFullNames' => FullNameOptimizer::class,
+        'optimizePrimitiveSchemas' => PrimitiveSchemaOptimizer::class,
     ];
     protected function configure(): void
     {
@@ -76,15 +77,14 @@ class SubSchemaMergeCommand extends Command
         $merger = new SchemaMerger($registry, $outputDirectory);
 
         foreach ($this->optimizerOptionMapping as $optionName => $optimizerClass) {
-            if (true === (bool)$input->getOption($optionName)) {
+            if (true === (bool) $input->getOption($optionName)) {
                 $merger->addOptimizer(new $optimizerClass());
             }
         }
 
         $result = $merger->merge(
             (bool) $input->getOption('prefixWithNamespace'),
-            (bool) $input->getOption('useFilenameAsSchemaName'),
-            (bool) $input->getOption('optimizePrimitiveSchemas')
+            (bool) $input->getOption('useFilenameAsSchemaName')
         );
 
         // retrieve the argument value using getArgument()
