@@ -108,15 +108,13 @@ final class SchemaMerger implements SchemaMergerInterface
     /**
      * @param bool $prefixWithNamespace
      * @param bool $useTemplateName
-     * @param bool $optimizePrimitiveSchemas
      * @return integer
      * @throws AvroSchemaParseException
      * @throws SchemaMergerException
      */
     public function merge(
         bool $prefixWithNamespace = false,
-        bool $useTemplateName = false,
-        bool $optimizePrimitiveSchemas = false
+        bool $useTemplateName = false
     ): int {
         $mergedFiles = 0;
         $registry = $this->getSchemaRegistry();
@@ -133,7 +131,7 @@ final class SchemaMerger implements SchemaMergerInterface
             } catch (SchemaMergerException $e) {
                 throw $e;
             }
-            $this->exportSchema($resolvedTemplate, $prefixWithNamespace, $useTemplateName, $optimizePrimitiveSchemas);
+            $this->exportSchema($resolvedTemplate, $prefixWithNamespace, $useTemplateName);
 
             ++$mergedFiles;
         }
@@ -145,14 +143,12 @@ final class SchemaMerger implements SchemaMergerInterface
      * @param SchemaTemplateInterface $rootSchemaTemplate
      * @param boolean                 $prefixWithNamespace
      * @param boolean                 $useTemplateName
-     * @param boolean                 $optimizePrimitiveSchemas
      * @return void
      */
     public function exportSchema(
         SchemaTemplateInterface $rootSchemaTemplate,
         bool $prefixWithNamespace = false,
-        bool $useTemplateName = false,
-        bool $optimizePrimitiveSchemas = false
+        bool $useTemplateName = false
     ): void {
         $rootSchemaDefinition = $this->transformExportSchemaDefinition(
             json_decode($rootSchemaTemplate->getSchemaDefinition(), true, JSON_THROW_ON_ERROR)
@@ -172,10 +168,6 @@ final class SchemaMerger implements SchemaMergerInterface
 
         if (false === file_exists($this->getOutputDirectory())) {
             mkdir($this->getOutputDirectory());
-        }
-
-        if (true === $optimizePrimitiveSchemas && true === $rootSchemaTemplate->isPrimitive()) {
-            $rootSchemaDefinition = $rootSchemaDefinition['type'];
         }
 
         /** @var string $fileContents */

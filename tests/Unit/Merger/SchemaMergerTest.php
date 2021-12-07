@@ -498,36 +498,6 @@ class SchemaMergerTest extends TestCase
         unlink('/tmp/test.avsc');
     }
 
-    public function testExportSchemaWithOptimizePrimitiveSchemasOption()
-    {
-        $expectedSchema = '"string"';
-
-        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
-        $schemaTemplate
-            ->expects(self::once())
-            ->method('getSchemaDefinition')
-            ->willReturn('{"type": "string"}');
-        $schemaTemplate
-            ->expects(self::exactly(2))
-            ->method('isPrimitive')
-            ->willReturn(true);
-        $schemaTemplate
-            ->expects(self::once())
-            ->method('getFilename')
-            ->willReturn('test.avsc');
-        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
-
-        $merger = new SchemaMerger($schemaRegistry);
-        $merger->exportSchema($schemaTemplate, false, false, true);
-
-        file_put_contents('/tmp/test_optimized_primitive_schema.avsc', $expectedSchema);
-
-        self::assertFileExists('/tmp/test.avsc');
-        self::assertFileEquals('/tmp/test_optimized_primitive_schema.avsc', '/tmp/test.avsc');
-        unlink('/tmp/test_optimized_primitive_schema.avsc');
-        unlink('/tmp/test.avsc');
-    }
-
     public function testExportSchemaPrimitiveWithWrongOptions()
     {
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
