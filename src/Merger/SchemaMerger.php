@@ -156,7 +156,8 @@ final class SchemaMerger implements SchemaMergerInterface
 
         $prefix = '';
 
-        if (true === $prefixWithNamespace
+        if (
+            true === $prefixWithNamespace
             && false === $rootSchemaTemplate->isPrimitive()
             && is_array($rootSchemaDefinition)
         ) {
@@ -165,7 +166,8 @@ final class SchemaMerger implements SchemaMergerInterface
 
         $schemaFilename = $rootSchemaTemplate->getFilename();
 
-        if (false === $useTemplateName
+        if (
+            false === $useTemplateName
             && false === $rootSchemaTemplate->isPrimitive()
             && is_array($rootSchemaDefinition)
         ) {
