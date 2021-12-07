@@ -48,6 +48,12 @@ class SubSchemaMergeCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Remove namespaces if they are enclosed in the same namespace'
+            )
+            ->addOption(
+                'optimizePrimitiveSchemas',
+                null,
+                InputOption::VALUE_NONE,
+                'Optimize primitive schemas with using just type as a schema'
             );
     }
 
@@ -59,7 +65,6 @@ class SubSchemaMergeCommand extends Command
         $templateDirectoryArg = $input->getArgument('templateDirectory');
         /** @var string $outputDirectoryArg */
         $outputDirectoryArg = $input->getArgument('outputDirectory');
-        $optimizeFullNames = (bool)$input->getOption('optimizeFullNames');
 
         $templateDirectory = $this->getPath($templateDirectoryArg);
         $outputDirectory = $this->getPath($outputDirectoryArg);
@@ -78,7 +83,8 @@ class SubSchemaMergeCommand extends Command
 
         $result = $merger->merge(
             (bool) $input->getOption('prefixWithNamespace'),
-            (bool) $input->getOption('useFilenameAsSchemaName')
+            (bool) $input->getOption('useFilenameAsSchemaName'),
+            (bool) $input->getOption('optimizePrimitiveSchemas')
         );
 
         // retrieve the argument value using getArgument()
