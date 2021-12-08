@@ -129,7 +129,7 @@ final class SchemaTemplate implements SchemaTemplateInterface
     {
         $fields = json_decode($this->getSchemaDefinition(), true, JSON_THROW_ON_ERROR);
 
-        if (is_string($fields) && array_key_exists($fields, self::AVRO_PRIMITIVE_TYPES)) {
+        if (is_string($fields) && true === isset(self::AVRO_PRIMITIVE_TYPES[$fields])) {
             return true;
         }
 
