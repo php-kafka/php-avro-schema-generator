@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Merger;
 
+use AvroSchema;
 use AvroSchemaParseException;
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
-use PhpKafka\PhpAvroSchemaGenerator\Optimizer\PrimitiveSchemaOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 
@@ -65,7 +65,7 @@ final class SchemaMerger implements SchemaMergerInterface
             $exceptionThrown = false;
 
             try {
-                \AvroSchema::parse($rootDefinition);
+                AvroSchema::parse($rootDefinition);
             } catch (AvroSchemaParseException $e) {
                 if (false === strpos($e->getMessage(), ' is not a schema we know about.')) {
                     throw $e;
@@ -124,14 +124,13 @@ final class SchemaMerger implements SchemaMergerInterface
         foreach ($registry->getRootSchemas() as $rootSchemaTemplate) {
             try {
                 $resolvedTemplate = $this->getResolvedSchemaTemplate($rootSchemaTemplate);
+
                 foreach ($this->optimizers as $optimizer) {
                     $resolvedTemplate = $resolvedTemplate->withSchemaDefinition(
-                        $optimizer instanceof PrimitiveSchemaOptimizer ?
-                            $optimizer->optimize(
-                                $resolvedTemplate->getSchemaDefinition(),
-                                $resolvedTemplate->isPrimitive()
-                            ) :
-                            $optimizer->optimize($resolvedTemplate->getSchemaDefinition())
+                        $optimizer->optimize(
+                            $resolvedTemplate->getSchemaDefinition(),
+                            $resolvedTemplate->isPrimitive()
+                        )
                     );
                 }
             } catch (SchemaMergerException $e) {
