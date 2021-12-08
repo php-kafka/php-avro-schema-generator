@@ -199,11 +199,23 @@ class TokenParser
      */
     public function getPropertyClass(ReflectionProperty $property, bool $ignorePrimitive = true)
     {
-        // Get the content of the @var annotation
-        if (preg_match('/@var\s+([^\s]+)/', (string) $property->getDocComment(), $matches)) {
-            list(, $type) = $matches;
-        } else {
-            return null;
+        $type = null;
+        $phpVersion = false === phpversion() ? '7.0.0' : phpversion();
+        // Get is explicit type decralation if possible
+        if (version_compare($phpVersion, '7.4.0', '>=') && null !== $property->getType()) {
+            $reflectionType = $property->getType();
+
+            if ($reflectionType instanceof \ReflectionNamedType) {
+                $type = $reflectionType->getName();
+            }
+        }
+
+        if (is_null($type)) { // Try get the content of the @var annotation
+            if (preg_match('/@var\s+([^\s]+)/', (string) $property->getDocComment(), $matches)) {
+                list(, $type) = $matches;
+            } else {
+                return null;
+            }
         }
 
         $types = explode('|', $this->replaceTypeStrings($type));
