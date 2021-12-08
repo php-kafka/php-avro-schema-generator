@@ -11,8 +11,12 @@ class PrimitiveSchemaOptimizer extends AbstractOptimizer implements OptimizerInt
      * @return string
      * @throws \JsonException
      */
-    public function optimize(string $definition): string
+    public function optimize(string $definition, bool $isPrimitive = false): string
     {
+        if (false === $isPrimitive) {
+            return $definition;
+        }
+
         $data = json_decode($definition, true, JSON_THROW_ON_ERROR);
 
         $data = $this->processSchema($data);
@@ -21,12 +25,12 @@ class PrimitiveSchemaOptimizer extends AbstractOptimizer implements OptimizerInt
     }
 
     /**
-     * @param array|mixed $data
-     * @return array|mixed
+     * @param mixed $data
+     * @return mixed
      */
     private function processSchema($data)
     {
-        if (true === $this->isPrimitive($data)) {
+        if (true === isset($data['type'])) {
             $data = $data['type'];
         }
 

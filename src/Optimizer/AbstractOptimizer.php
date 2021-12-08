@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Optimizer;
 
-use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplate;
-
 abstract class AbstractOptimizer
 {
     /**
@@ -91,16 +89,5 @@ abstract class AbstractOptimizer
     protected function typeIsString($data): bool
     {
         return isset($data['type']) && true === is_string($data['type']);
-    }
-
-    /**
-     * @param array|mixed $data
-     * @return bool
-     */
-    protected function isPrimitive($data): bool
-    {
-        return 1 === count($data)
-            && true === isset($data['type'])
-            && array_key_exists($data['type'], SchemaTemplate::AVRO_PRIMITIVE_TYPES);
     }
 }

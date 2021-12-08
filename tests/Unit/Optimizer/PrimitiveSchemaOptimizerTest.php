@@ -17,6 +17,28 @@ class PrimitiveSchemaOptimizerTest extends TestCase
 
         $optimizer = new PrimitiveSchemaOptimizer();
 
-        self::assertEquals($expectedResult, $optimizer->optimize($schema));
+        self::assertEquals($expectedResult, $optimizer->optimize($schema, true));
+    }
+
+    public function testOptimizeForStringSchema(): void
+    {
+        $schema = '"string"';
+
+        $expectedResult = json_encode(json_decode('"string"'));
+
+        $optimizer = new PrimitiveSchemaOptimizer();
+
+        self::assertEquals($expectedResult, $optimizer->optimize($schema, true));
+    }
+
+    public function testOptimizeForRecordSchema(): void
+    {
+        $schema = '{"type":"record","namespace":"com.example","name":"Book","fields":[{"name":"isbn","type":"string"}]}';
+
+        $expectedResult = json_encode(json_decode($schema));
+
+        $optimizer = new PrimitiveSchemaOptimizer();
+
+        self::assertEquals($expectedResult, $optimizer->optimize($schema, false));
     }
 }
