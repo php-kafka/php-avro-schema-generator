@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
+use ReflectionUnionType;
+use ReflectionNamedType;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use ReflectionClass;
 use ReflectionProperty;
@@ -200,9 +202,14 @@ class TokenParser
     public function getPropertyClass(ReflectionProperty $property, bool $ignorePrimitive = true)
     {
         $type = null;
+        $phpVersion = false === phpversion() ? '7.0.0' : phpversion();
         // Get is explicit type decralation if possible
-        if (version_compare(phpversion(), '7.4.0', '>=') && null !== $property->getType()) {
-            $type = $property->getType()->getName();
+        if (version_compare($phpVersion, '7.4.0', '>=') && null !== $property->getType()) {
+            $reflectionType = $property->getType();
+
+            if ($reflectionType instanceof ReflectionNamedType) {
+                $type = $reflectionType->getName();
+            }
         }
 
         if (is_null($type)) { // Try get the content of the @var annotation
