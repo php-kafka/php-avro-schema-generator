@@ -6,3 +6,4 @@ parameters:
         - "#Call to function token_get_all\\(\\) on a separate line has no effect.#"
         - "#Strict comparison using === between array<int, mixed>&nonEmpty and ',' will always evaluate to false.#"
         - "#Strict comparison using === between array<int, mixed>&nonEmpty and ';' will always evaluate to false.#"
+        - "#Method PhpKafka\\\\\\PhpAvroSchemaGenerator\\\\\\Optimizer\\\\\\OptimizerInterface::optimize\\(\\) invoked with 2 parameters, 1 required.#"

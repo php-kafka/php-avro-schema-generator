@@ -8,6 +8,7 @@ class PrimitiveSchemaOptimizer extends AbstractOptimizer implements OptimizerInt
 {
     /**
      * @param string $definition
+     * @param bool $isPrimitive
      * @return string
      * @throws \JsonException
      */
