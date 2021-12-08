@@ -16,8 +16,8 @@ This library enables you to:
 - The library is able to generate avsc schema from PHP classes
 
 ### Merging subschemas / schemas
-Schema template directories: directories containing avsc template files (with subschema)
-Output directory: output directory for the merged schema files
+Schema template directories: directories containing avsc template files (with subschema)  
+Output directory: output directory for the merged schema files  
 
 **Console example**
 ```bash
@@ -47,7 +47,7 @@ There are optimizers that you can enable for merging schema:
 - FieldOrderOptimizer: the first fields of a record schema will be: type, name, namespace (if present)
 - PrimitiveSchemaOptimizer: Optimizes primitive schema e.g. `{"type": "string"}` to `"string"`
 
-How to enable optimizer:
+How to enable optimizer:  
 
 **Console example**
 ```bash
