@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Merger;
 
+use AvroSchema;
 use AvroSchemaParseException;
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
@@ -64,7 +65,7 @@ final class SchemaMerger implements SchemaMergerInterface
             $exceptionThrown = false;
 
             try {
-                \AvroSchema::parse($rootDefinition);
+                AvroSchema::parse($rootDefinition);
             } catch (AvroSchemaParseException $e) {
                 if (false === strpos($e->getMessage(), ' is not a schema we know about.')) {
                     throw $e;
@@ -108,15 +109,13 @@ final class SchemaMerger implements SchemaMergerInterface
     /**
      * @param bool $prefixWithNamespace
      * @param bool $useTemplateName
-     * @param bool $optimizeFullNames
      * @return integer
      * @throws AvroSchemaParseException
      * @throws SchemaMergerException
      */
     public function merge(
         bool $prefixWithNamespace = false,
-        bool $useTemplateName = false,
-        bool $optimizeFullNames = false
+        bool $useTemplateName = false
     ): int {
         $mergedFiles = 0;
         $registry = $this->getSchemaRegistry();
@@ -125,9 +124,13 @@ final class SchemaMerger implements SchemaMergerInterface
         foreach ($registry->getRootSchemas() as $rootSchemaTemplate) {
             try {
                 $resolvedTemplate = $this->getResolvedSchemaTemplate($rootSchemaTemplate);
+
                 foreach ($this->optimizers as $optimizer) {
                     $resolvedTemplate = $resolvedTemplate->withSchemaDefinition(
-                        $optimizer->optimize($resolvedTemplate->getSchemaDefinition())
+                        $optimizer->optimize(
+                            $resolvedTemplate->getSchemaDefinition(),
+                            $resolvedTemplate->isPrimitive()
+                        )
                     );
                 }
             } catch (SchemaMergerException $e) {
@@ -179,12 +182,14 @@ final class SchemaMerger implements SchemaMergerInterface
     }
 
     /**
-     * @param  array<string,mixed> $schemaDefinition
-     * @return array<string,mixed>
+     * @param mixed $schemaDefinition
+     * @return mixed
      */
-    public function transformExportSchemaDefinition(array $schemaDefinition): array
+    private function transformExportSchemaDefinition($schemaDefinition)
     {
-        unset($schemaDefinition['schema_level']);
+        if (is_array($schemaDefinition)) {
+            unset($schemaDefinition['schema_level']);
+        }
 
         return $schemaDefinition;
     }

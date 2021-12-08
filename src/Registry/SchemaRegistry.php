@@ -148,7 +148,10 @@ final class SchemaRegistry implements SchemaRegistryInterface
 
         $schemaId = $this->getSchemaId($schemaData, $template);
         $this->schemas[$schemaId] = $template->withSchemaId($schemaId);
-        $this->schemaNamesPerNamespace[$namespace][] = $schemaData['name'];
+
+        if (true === isset($schemaData['name'])) {
+            $this->schemaNamesPerNamespace[$namespace][] = $schemaData['name'];
+        }
     }
 
     /**

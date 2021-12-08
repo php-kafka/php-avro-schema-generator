@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Command;
 
-use http\Exception\RuntimeException;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FieldOrderOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FullNameOptimizer;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\PrimitiveSchemaOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
 use Symfony\Component\Console\Command\Command;
@@ -21,6 +21,7 @@ class SubSchemaMergeCommand extends Command
     protected $optimizerOptionMapping = [
         'optimizeFieldOrder' => FieldOrderOptimizer::class,
         'optimizeFullNames' => FullNameOptimizer::class,
+        'optimizePrimitiveSchemas' => PrimitiveSchemaOptimizer::class,
     ];
     protected function configure(): void
     {
@@ -48,6 +49,12 @@ class SubSchemaMergeCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Remove namespaces if they are enclosed in the same namespace'
+            )
+            ->addOption(
+                'optimizePrimitiveSchemas',
+                null,
+                InputOption::VALUE_NONE,
+                'Optimize primitive schemas with using just type as a schema'
             );
     }
 
@@ -59,7 +66,6 @@ class SubSchemaMergeCommand extends Command
         $templateDirectoryArg = $input->getArgument('templateDirectory');
         /** @var string $outputDirectoryArg */
         $outputDirectoryArg = $input->getArgument('outputDirectory');
-        $optimizeFullNames = (bool)$input->getOption('optimizeFullNames');
 
         $templateDirectory = $this->getPath($templateDirectoryArg);
         $outputDirectory = $this->getPath($outputDirectoryArg);
@@ -71,7 +77,7 @@ class SubSchemaMergeCommand extends Command
         $merger = new SchemaMerger($registry, $outputDirectory);
 
         foreach ($this->optimizerOptionMapping as $optionName => $optimizerClass) {
-            if (true === (bool)$input->getOption($optionName)) {
+            if (true === (bool) $input->getOption($optionName)) {
                 $merger->addOptimizer(new $optimizerClass());
             }
         }

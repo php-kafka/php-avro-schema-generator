@@ -3,7 +3,7 @@ FROM php:7.4-cli-alpine3.15
 ARG HOST_USER_ID
 ARG HOST_USER
 
-COPY dev/php/files/bin/ /usr/local/bin/
+COPY php/files/bin/ /usr/local/bin/
 
 # SYS: Install required packages
 RUN apk --no-cache upgrade && \

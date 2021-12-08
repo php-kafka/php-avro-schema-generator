@@ -8,6 +8,7 @@ use AvroSchema;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\PrimitiveSchemaOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 use PHPUnit\Framework\TestCase;
@@ -437,6 +438,47 @@ class SchemaMergerTest extends TestCase
             ->willReturn([$schemaTemplate]);
         $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
         $merger->merge(false, true);
+
+        self::assertFileExists('/tmp/foobar/primitive-type.avsc');
+        unlink('/tmp/foobar/primitive-type.avsc');
+        rmdir('/tmp/foobar');
+    }
+
+    public function testMergePrimitiveWithOptimizerEnabled()
+    {
+        $definition = '{
+            "type": "string"
+        }';
+
+        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $schemaTemplate
+            ->expects(self::exactly(3))
+            ->method('getSchemaDefinition')
+            ->willReturn($definition);
+        $schemaTemplate
+            ->expects(self::exactly(2))
+            ->method('withSchemaDefinition')
+            ->with($definition)
+            ->willReturn($schemaTemplate);
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('getFilename')
+            ->willReturn('primitive-type.avsc');
+        $schemaTemplate
+            ->expects(self::exactly(3))
+            ->method('isPrimitive')
+            ->willReturn(true);
+
+        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
+        $schemaRegistry
+            ->expects(self::once())
+            ->method('getRootSchemas')
+            ->willReturn([$schemaTemplate]);
+        $optimizer = $this->getMockBuilder(PrimitiveSchemaOptimizer::class)->getMock();
+        $optimizer->expects(self::once())->method('optimize')->with($definition, true)->willReturn($definition);
+        $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
+        $merger->addOptimizer($optimizer);
+        $merger->merge(true);
 
         self::assertFileExists('/tmp/foobar/primitive-type.avsc');
         unlink('/tmp/foobar/primitive-type.avsc');
