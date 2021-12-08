@@ -49,20 +49,34 @@ class SchemaTemplateTest extends TestCase
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('{"type":"string"}');
 
-        self::assertTrue($template->isPrimitive($template));
+        self::assertTrue($template->isPrimitive());
     }
 
     public function testIsPrimitiveFalse()
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('{"type":"record"}');
 
-        self::assertFalse($template->isPrimitive($template));
+        self::assertFalse($template->isPrimitive());
+    }
+
+    public function testIsPrimitiveTrueForOptimizedSchema()
+    {
+        $template = (new SchemaTemplate())->withSchemaDefinition('"string"');
+
+        self::assertTrue($template->isPrimitive());
+    }
+
+    public function testIsPrimitiveFalseForOptimizedSchema()
+    {
+        $template = (new SchemaTemplate())->withSchemaDefinition('"foo"');
+
+        self::assertFalse($template->isPrimitive());
     }
 
     public function testIsPrimitiveFalseOnMissingType()
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('{"foo":"bar"}');
 
-        self::assertFalse($template->isPrimitive($template));
+        self::assertFalse($template->isPrimitive());
     }
 }
