@@ -177,7 +177,7 @@ final class SchemaMerger implements SchemaMergerInterface
     }
 
     /**
-     * @param  mixed $schemaDefinition
+     * @param mixed $schemaDefinition
      * @return mixed
      */
     private function transformExportSchemaDefinition($schemaDefinition)
