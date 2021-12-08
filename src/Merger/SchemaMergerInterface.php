@@ -39,12 +39,6 @@ interface SchemaMergerInterface
     public function exportSchema(SchemaTemplateInterface $rootRootSchemaTemplate): void;
 
     /**
-     * @param  string|array<string,mixed> $schemaDefinition
-     * @return string|array<string,mixed>
-     */
-    public function transformExportSchemaDefinition($schemaDefinition);
-
-    /**
      * @param OptimizerInterface $optimizer
      */
     public function addOptimizer(OptimizerInterface $optimizer): void;

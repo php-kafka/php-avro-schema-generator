@@ -156,21 +156,13 @@ final class SchemaMerger implements SchemaMergerInterface
 
         $prefix = '';
 
-        if (
-            true === $prefixWithNamespace
-            && false === $rootSchemaTemplate->isPrimitive()
-            && is_array($rootSchemaDefinition)
-        ) {
+        if (true === $prefixWithNamespace && false === $rootSchemaTemplate->isPrimitive()) {
             $prefix = $rootSchemaDefinition['namespace'] . '.';
         }
 
         $schemaFilename = $rootSchemaTemplate->getFilename();
 
-        if (
-            false === $useTemplateName
-            && false === $rootSchemaTemplate->isPrimitive()
-            && is_array($rootSchemaDefinition)
-        ) {
+        if (false === $useTemplateName && false === $rootSchemaTemplate->isPrimitive()) {
             $schemaFilename = $prefix . $rootSchemaDefinition['name'] . '.' . Avro::FILE_EXTENSION;
         }
 
@@ -185,10 +177,10 @@ final class SchemaMerger implements SchemaMergerInterface
     }
 
     /**
-     * @param  string|array<string,mixed> $schemaDefinition
-     * @return string|array<string,mixed>
+     * @param  mixed $schemaDefinition
+     * @return mixed
      */
-    public function transformExportSchemaDefinition($schemaDefinition)
+    private function transformExportSchemaDefinition($schemaDefinition)
     {
         if (is_array($schemaDefinition)) {
             unset($schemaDefinition['schema_level']);
