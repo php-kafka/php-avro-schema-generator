@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Optimizer;
 
+use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
+
 class PrimitiveSchemaOptimizer extends AbstractOptimizer implements OptimizerInterface
 {
     /**
-     * @param string $definition
-     * @param bool $isPrimitive
-     * @return string
+     * @param SchemaTemplateInterface $schemaTemplate
+     * @return SchemaTemplateInterface
      * @throws \JsonException
      */
-    public function optimize(string $definition, bool $isPrimitive = false): string
+    public function optimize(SchemaTemplateInterface $schemaTemplate): SchemaTemplateInterface
     {
-        if (false === $isPrimitive) {
-            return $definition;
+        if (false === $schemaTemplate->isPrimitive()) {
+            return $schemaTemplate;
         }
 
-        $data = json_decode($definition, true, JSON_THROW_ON_ERROR);
+        $data = json_decode($schemaTemplate->getSchemaDefinition(), true, JSON_THROW_ON_ERROR);
 
         $data = $this->processSchema($data);
 
-        return json_encode($data, JSON_THROW_ON_ERROR);
+        return $schemaTemplate->withSchemaDefinition(json_encode($data, JSON_THROW_ON_ERROR));
     }
 
     /**

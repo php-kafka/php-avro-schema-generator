@@ -385,11 +385,11 @@ class SchemaMergerTest extends TestCase
 
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
-            ->expects(self::exactly(3))
+            ->expects(self::exactly(2))
             ->method('getSchemaDefinition')
             ->willReturn($definition);
         $schemaTemplate
-            ->expects(self::exactly(2))
+            ->expects(self::exactly(1))
             ->method('withSchemaDefinition')
             ->with($definition)
             ->willReturn($schemaTemplate);
@@ -400,7 +400,7 @@ class SchemaMergerTest extends TestCase
             ->method('getRootSchemas')
             ->willReturn([$schemaTemplate]);
         $optimizer = $this->getMockForAbstractClass(OptimizerInterface::class);
-        $optimizer->expects(self::once())->method('optimize')->with($definition)->willReturn($definition);
+        $optimizer->expects(self::once())->method('optimize')->with($schemaTemplate)->willReturn($schemaTemplate);
         $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
         $merger->addOptimizer($optimizer);
         $merger->merge(true);
@@ -452,11 +452,11 @@ class SchemaMergerTest extends TestCase
 
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
-            ->expects(self::exactly(3))
+            ->expects(self::exactly(2))
             ->method('getSchemaDefinition')
             ->willReturn($definition);
         $schemaTemplate
-            ->expects(self::exactly(2))
+            ->expects(self::exactly(1))
             ->method('withSchemaDefinition')
             ->with($definition)
             ->willReturn($schemaTemplate);
@@ -465,7 +465,7 @@ class SchemaMergerTest extends TestCase
             ->method('getFilename')
             ->willReturn('primitive-type.avsc');
         $schemaTemplate
-            ->expects(self::exactly(3))
+            ->expects(self::exactly(2))
             ->method('isPrimitive')
             ->willReturn(true);
 
@@ -475,7 +475,7 @@ class SchemaMergerTest extends TestCase
             ->method('getRootSchemas')
             ->willReturn([$schemaTemplate]);
         $optimizer = $this->getMockBuilder(PrimitiveSchemaOptimizer::class)->getMock();
-        $optimizer->expects(self::once())->method('optimize')->with($definition, true)->willReturn($definition);
+        $optimizer->expects(self::once())->method('optimize')->with($schemaTemplate)->willReturn($schemaTemplate);
         $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
         $merger->addOptimizer($optimizer);
         $merger->merge(true);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Optimizer;
 
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\PrimitiveSchemaOptimizer;
+use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 use PHPUnit\Framework\TestCase;
 
 class PrimitiveSchemaOptimizerTest extends TestCase
@@ -15,9 +16,27 @@ class PrimitiveSchemaOptimizerTest extends TestCase
 
         $expectedResult = json_encode(json_decode('"string"'));
 
+
+        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($schema);
+
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('withSchemaDefinition')
+            ->with($expectedResult)
+            ->willReturn($schemaTemplate);
+
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('isPrimitive')
+            ->willReturn(true);
+
         $optimizer = new PrimitiveSchemaOptimizer();
 
-        self::assertEquals($expectedResult, $optimizer->optimize($schema, true));
+        self::assertInstanceOf(SchemaTemplateInterface::class, $optimizer->optimize($schemaTemplate));
     }
 
     public function testOptimizeForStringSchema(): void
@@ -26,19 +45,42 @@ class PrimitiveSchemaOptimizerTest extends TestCase
 
         $expectedResult = json_encode(json_decode('"string"'));
 
+
+        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($schema);
+
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('withSchemaDefinition')
+            ->with($expectedResult)
+            ->willReturn($schemaTemplate);
+
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('isPrimitive')
+            ->willReturn(true);
+
         $optimizer = new PrimitiveSchemaOptimizer();
 
-        self::assertEquals($expectedResult, $optimizer->optimize($schema, true));
+        self::assertInstanceOf(SchemaTemplateInterface::class, $optimizer->optimize($schemaTemplate));
     }
 
     public function testOptimizeForRecordSchema(): void
     {
-        $schema = '{"type":"record","namespace":"com.example","name":"Book","fields":[{"name":"isbn","type":"string"}]}';
+        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $schemaTemplate->expects(self::never())->method('getSchemaDefinition');
+        $schemaTemplate->expects(self::never())->method('withSchemaDefinition');
 
-        $expectedResult = json_encode(json_decode($schema));
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('isPrimitive')
+            ->willReturn(false);
 
         $optimizer = new PrimitiveSchemaOptimizer();
 
-        self::assertEquals($expectedResult, $optimizer->optimize($schema, false));
+        self::assertInstanceOf(SchemaTemplateInterface::class, $optimizer->optimize($schemaTemplate));
     }
 }
