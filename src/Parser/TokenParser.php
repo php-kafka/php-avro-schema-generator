@@ -39,7 +39,7 @@ class TokenParser
     /**
      * @var string
      */
-    private $className;
+    private string $className;
 
     /**
      * @var string
@@ -200,8 +200,10 @@ class TokenParser
     public function getPropertyClass(ReflectionProperty $property, bool $ignorePrimitive = true)
     {
         $type = null;
-        $phpVersion = false === phpversion() ? '7.0.0' : phpversion();
-        // Get is explicit type decralation if possible
+        /** @var false|string $phpVersionResult */
+        $phpVersionResult = phpversion();
+        $phpVersion = false === $phpVersionResult ? '7.0.0' : $phpVersionResult;
+        // Get is explicit type declaration if possible
         if (version_compare($phpVersion, '7.4.0', '>=') && null !== $property->getType()) {
             $reflectionType = $property->getType();
 
