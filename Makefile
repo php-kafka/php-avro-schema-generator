@@ -1,4 +1,4 @@
-.PHONY: clean code-style coverage help static-analysis update-dependencies install-dependencies infection-testing
+.PHONY: clean code-style coverage fix-code-style help static-analysis update-dependencies install-dependencies infection-testing
 .DEFAULT_GOAL := coverage
 
 PHPUNIT =  ./vendor/bin/phpunit -c ./phpunit.xml
