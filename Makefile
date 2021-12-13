@@ -4,7 +4,7 @@
 PHPUNIT =  ./vendor/bin/phpunit -c ./phpunit.xml
 PHPSTAN  = ./vendor/bin/phpstan
 PHPCS = ./vendor/bin/phpcs --extensions=php
-PHPCBF = ./vendor/bin/
+PHPCBF = ./vendor/bin/phpcbf
 INFECTION = ./vendor/bin/infection
 CONSOLE = ./bin/console
 COVCHECK = ./vendor/bin/coverage-check
