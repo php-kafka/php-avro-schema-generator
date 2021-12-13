@@ -1,10 +1,10 @@
-.PHONY: clean code-style coverage help static-analysis update-dependencies install-dependencies infection-testing
+.PHONY: clean code-style coverage fix-code-style help static-analysis update-dependencies install-dependencies infection-testing
 .DEFAULT_GOAL := coverage
 
 PHPUNIT =  ./vendor/bin/phpunit -c ./phpunit.xml
 PHPSTAN  = ./vendor/bin/phpstan
 PHPCS = ./vendor/bin/phpcs --extensions=php
-PHPCBF = ./vendor/bin/
+PHPCBF = ./vendor/bin/phpcbf
 INFECTION = ./vendor/bin/infection
 CONSOLE = ./bin/console
 COVCHECK = ./vendor/bin/coverage-check

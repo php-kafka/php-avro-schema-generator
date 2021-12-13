@@ -4,5 +4,5 @@ parameters:
     checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
         - "#Call to function token_get_all\\(\\) on a separate line has no effect.#"
-        - "#Strict comparison using === between array<int, mixed>&nonEmpty and ',' will always evaluate to false.#"
-        - "#Strict comparison using === between array<int, mixed>&nonEmpty and ';' will always evaluate to false.#"
+        - "#Strict comparison using === between non-empty-array<int, mixed> and ',' will always evaluate to false.#"
+        - "#Strict comparison using === between non-empty-array<int, mixed> and ';' will always evaluate to false.#"

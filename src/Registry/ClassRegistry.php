@@ -14,7 +14,6 @@ use SplFileInfo;
 
 final class ClassRegistry implements ClassRegistryInterface
 {
-
     /**
      * @var array<string,int>
      */
