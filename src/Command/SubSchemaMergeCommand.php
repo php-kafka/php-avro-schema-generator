@@ -6,6 +6,7 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Command;
 
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FieldOrderOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FullNameOptimizer;
+use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\PrimitiveSchemaOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
@@ -76,6 +77,7 @@ class SubSchemaMergeCommand extends Command
 
         $merger = new SchemaMerger($registry, $outputDirectory);
 
+        /** @var OptimizerInterface $optimizerClass */
         foreach ($this->optimizerOptionMapping as $optionName => $optimizerClass) {
             if (true === (bool) $input->getOption($optionName)) {
                 $merger->addOptimizer(new $optimizerClass());

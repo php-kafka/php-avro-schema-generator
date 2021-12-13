@@ -403,8 +403,9 @@ class SchemaMergerTest extends TestCase
         $optimizer->expects(self::once())->method('optimize')->with($definition)->willReturn($definition);
         $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
         $merger->addOptimizer($optimizer);
-        $merger->merge(true);
+        $mergedFiles = $merger->merge(true);
 
+        self::assertEquals(1, $mergedFiles);
         self::assertFileExists('/tmp/foobar/com.example.Book.avsc');
         unlink('/tmp/foobar/com.example.Book.avsc');
         rmdir('/tmp/foobar');

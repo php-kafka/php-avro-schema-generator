@@ -8,7 +8,6 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass;
 
 interface ClassRegistryInterface
 {
-
     /**
      * @param  string $classDirectory
      * @return ClassRegistryInterface

@@ -11,7 +11,6 @@ use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
 
 final class SchemaGenerator implements SchemaGeneratorInterface
 {
-
     /**
      * @var int[]
      */

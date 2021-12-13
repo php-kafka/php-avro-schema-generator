@@ -39,7 +39,7 @@ class TokenParser
     /**
      * @var string
      */
-    private $className;
+    private string $className;
 
     /**
      * @var string
@@ -143,6 +143,7 @@ class TokenParser
      *
      * @return array<string|int,mixed> A list with all found use statements.
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     public function parseUseStatements($namespaceName)
     {
@@ -196,12 +197,15 @@ class TokenParser
      * @throws \RuntimeException
      * @return string|null Type of the property (content of var annotation)
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     public function getPropertyClass(ReflectionProperty $property, bool $ignorePrimitive = true)
     {
         $type = null;
-        $phpVersion = false === phpversion() ? '7.0.0' : phpversion();
-        // Get is explicit type decralation if possible
+        /** @var false|string $phpVersionResult */
+        $phpVersionResult = phpversion();
+        $phpVersion = false === $phpVersionResult ? '7.0.0' : $phpVersionResult;
+        // Get is explicit type declaration if possible
         if (version_compare($phpVersion, '7.4.0', '>=') && null !== $property->getType()) {
             $reflectionType = $property->getType();
 
@@ -281,6 +285,7 @@ class TokenParser
      *
      * @return string|null Fully qualified name of the type, or null if it could not be resolved
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     private function tryResolveFqn($type, ReflectionClass $class, Reflector $member)
     {
@@ -324,6 +329,7 @@ class TokenParser
      *
      * @return string|null Fully qualified name of the type, or null if it could not be resolved
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     private function tryResolveFqnInTraits($type, ReflectionClass $class, Reflector $member)
     {
@@ -389,6 +395,7 @@ class TokenParser
      *
      * @return array<string,class-string> A list with all found class names for a use statement.
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     private function parseUseStatement()
     {

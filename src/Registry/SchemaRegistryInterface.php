@@ -8,7 +8,6 @@ use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 
 interface SchemaRegistryInterface
 {
-
     /**
      * @param  string $schemaTemplateDirectory
      * @return SchemaRegistryInterface

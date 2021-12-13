@@ -10,7 +10,6 @@ use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 
 interface SchemaMergerInterface
 {
-
     /**
      * @return SchemaRegistryInterface
      */
