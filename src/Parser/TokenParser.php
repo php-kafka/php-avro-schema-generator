@@ -143,6 +143,7 @@ class TokenParser
      *
      * @return array<string|int,mixed> A list with all found use statements.
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     public function parseUseStatements($namespaceName)
     {
@@ -196,6 +197,7 @@ class TokenParser
      * @throws \RuntimeException
      * @return string|null Type of the property (content of var annotation)
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     public function getPropertyClass(ReflectionProperty $property, bool $ignorePrimitive = true)
     {
@@ -283,6 +285,7 @@ class TokenParser
      *
      * @return string|null Fully qualified name of the type, or null if it could not be resolved
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     private function tryResolveFqn($type, ReflectionClass $class, Reflector $member)
     {
@@ -326,6 +329,7 @@ class TokenParser
      *
      * @return string|null Fully qualified name of the type, or null if it could not be resolved
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     private function tryResolveFqnInTraits($type, ReflectionClass $class, Reflector $member)
     {
@@ -391,6 +395,7 @@ class TokenParser
      *
      * @return array<string,class-string> A list with all found class names for a use statement.
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     private function parseUseStatement()
     {
