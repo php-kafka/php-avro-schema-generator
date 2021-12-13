@@ -6,7 +6,6 @@ namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 
 class PhpClassProperty implements PhpClassPropertyInterface
 {
-
     /**
      * @var string
      */
