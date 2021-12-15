@@ -4,28 +4,15 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 
+use PhpKafka\PhpAvroSchemaGenerator\Parser\PropertyAttributesInterface;
+
 class PhpClassProperty implements PhpClassPropertyInterface
 {
-    /**
-     * @var string
-     */
-    private $propertyName;
+    private PropertyAttributesInterface $propertyAttributes;
 
-    /**
-     * @var string
-     */
-    private $propertyType;
-
-    /**
-     * @var string|null
-     */
-    private $propertyArrayType;
-
-    public function __construct(string $propertyName, string $propertyType, ?string $propertyArrayType)
+    public function __construct(PropertyAttributesInterface $propertyAttributes)
     {
-        $this->propertyName = $propertyName;
-        $this->propertyType = $propertyType;
-        $this->propertyArrayType = $propertyArrayType;
+        $this->propertyAttributes = $propertyAttributes;
     }
 
     /**
@@ -33,7 +20,7 @@ class PhpClassProperty implements PhpClassPropertyInterface
      */
     public function getPropertyName(): string
     {
-        return $this->propertyName;
+        return $this->propertyAttributes->getName();
     }
 
     /**
@@ -41,14 +28,21 @@ class PhpClassProperty implements PhpClassPropertyInterface
      */
     public function getPropertyType(): string
     {
-        return $this->propertyType;
+        return $this->propertyAttributes->getTypes();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPropertyArrayType(): ?string
+    public function getPropertyDefault()
     {
-        return $this->propertyArrayType;
+        return $this->propertyAttributes->getDefault();
+    }
+
+    public function getPropertyLogicalType(): ?string
+    {
+        return $this->propertyAttributes->getLogicalType();
+    }
+
+    public function getPropertyDoc(): ?string
+    {
+        return $this->propertyAttributes->getDoc();
     }
 }

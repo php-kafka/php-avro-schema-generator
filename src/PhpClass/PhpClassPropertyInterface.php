@@ -17,7 +17,17 @@ interface PhpClassPropertyInterface
     public function getPropertyType(): string;
 
     /**
-     * @return string|null
+     * @return mixed
      */
-    public function getPropertyArrayType(): ?string;
+    public function getPropertyDefault();
+
+    /**
+     * @return ?string
+     */
+    public function getPropertyLogicalType(): ?string;
+
+    /**
+     * @return ?string
+     */
+    public function getPropertyDoc(): ?string;
 }
