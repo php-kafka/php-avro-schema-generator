@@ -6,28 +6,18 @@ namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 
 interface PhpClassPropertyInterface
 {
-    /**
-     * @return string
-     */
-    public function getPropertyName(): string;
-
-    /**
-     * @return string
-     */
-    public function getPropertyType(): string;
+    public const NO_DEFAULT = 'there-was-no-default-set';
 
     /**
      * @return mixed
      */
     public function getPropertyDefault();
 
-    /**
-     * @return ?string
-     */
+    public function getPropertyDoc(): ?string;
+
     public function getPropertyLogicalType(): ?string;
 
-    /**
-     * @return ?string
-     */
-    public function getPropertyDoc(): ?string;
+    public function getPropertyName(): string;
+
+    public function getPropertyType(): string;
 }

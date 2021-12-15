@@ -103,8 +103,7 @@ final class ClassRegistry implements ClassRegistryInterface
         }
 
         /** @var class-string $className */
-        $className = $parser->getNamespace() . '\\' . $parser->getClassName();
-        $properties = $parser->getProperties($className);
+        $properties = $parser->getProperties();
         $this->classes[] = new PhpClass(
             $parser->getClassName(),
             $parser->getNamespace(),
