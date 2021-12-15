@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Optimizer;
 
+use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
+
 class FullNameOptimizer extends AbstractOptimizer implements OptimizerInterface
 {
     /**
-     * @param string $definition
-     * @return string
+     * @param SchemaTemplateInterface $schemaTemplate
+     * @return SchemaTemplateInterface
      * @throws \JsonException
      */
-    public function optimize(string $definition): string
+    public function optimize(SchemaTemplateInterface $schemaTemplate): SchemaTemplateInterface
     {
-        $data = json_decode($definition, true, JSON_THROW_ON_ERROR);
+        $data = json_decode($schemaTemplate->getSchemaDefinition(), true, JSON_THROW_ON_ERROR);
 
         $currentNamespace = $data['namespace'] ?? '';
         $data = $this->processSchema($currentNamespace, $data, true);
 
-        return json_encode($data, JSON_THROW_ON_ERROR);
+        return $schemaTemplate->withSchemaDefinition(json_encode($data, JSON_THROW_ON_ERROR));
     }
 
     /**

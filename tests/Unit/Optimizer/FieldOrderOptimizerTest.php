@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Optimizer;
 
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FieldOrderOptimizer;
+use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 use PHPUnit\Framework\TestCase;
 
 class FieldOrderOptimizerTest extends TestCase
@@ -203,8 +204,20 @@ class FieldOrderOptimizerTest extends TestCase
             ]
         }'));
 
+        $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($schema);
+
+        $schemaTemplate
+            ->expects(self::once())
+            ->method('withSchemaDefinition')
+            ->with($expectedResult)
+            ->willReturn($schemaTemplate);
+
         $optimizer = new FieldOrderOptimizer();
 
-        self::assertEquals($expectedResult, $optimizer->optimize($schema));
+        self::assertInstanceOf(SchemaTemplateInterface::class, $optimizer->optimize($schemaTemplate));
     }
 }
