@@ -12,6 +12,8 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\UseUse;
 use PhpParser\ParserFactory;
 use PhpParser\Parser;
+use ReflectionClass;
+use ReflectionException;
 
 class ClassParser implements ClassParserInterface
 {
@@ -48,6 +50,30 @@ class ClassParser implements ClassParserInterface
                 foreach ($statement->stmts as $nsStatement) {
                     if ($nsStatement instanceof Class_) {
                         return $nsStatement->name->name;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getParentClassName(): ?string
+    {
+        if (null === $this->statements) {
+            return null;
+        }
+
+        foreach ($this->statements as $statement) {
+            if ($statement instanceof Namespace_) {
+                foreach ($statement->stmts as $nsStatement) {
+                    if ($nsStatement instanceof Class_) {
+                        if (null !== $nsStatement->extends) {
+                            return implode('\\', $nsStatement->extends->parts);
+                        }
                     }
                 }
             }
@@ -100,9 +126,22 @@ class ClassParser implements ClassParserInterface
      */
     public function getProperties(): array
     {
+        $properties = $this->getClassProperties($this->statements);
+
+        $parentStatements = $this->getParentClassStatements();
+
+        if (true === is_array($parentStatements)) {
+            $properties = array_merge($properties, $this->getClassProperties($parentStatements));
+        }
+
+        return $properties;
+    }
+
+    private function getClassProperties(array $statements): array
+    {
         $properties = [];
 
-        foreach ($this->statements as $statement) {
+        foreach ($statements as $statement) {
             if ($statement instanceof Namespace_) {
                 foreach ($statement->stmts as $nsStatement) {
                     if ($nsStatement instanceof Class_) {
@@ -117,5 +156,18 @@ class ClassParser implements ClassParserInterface
         }
 
         return $properties;
+    }
+
+    /**
+     * @return array
+     * @throws ReflectionException
+     */
+    private function getParentClassStatements(): ?array
+    {
+        $usedClasses = $this->getUsedClasses();
+        $rc = new ReflectionClass($usedClasses[$this->getParentClassName()]);
+        $filename = $rc->getFileName();
+
+        return $this->parser->parse(file_get_contents($filename));
     }
 }

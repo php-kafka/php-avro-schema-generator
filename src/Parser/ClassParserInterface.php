@@ -21,4 +21,6 @@ interface ClassParserInterface
      * @return array<string, string>
      */
     public function getUsedClasses(): array;
+
+    public function getParentClassName(): ?string;
 }

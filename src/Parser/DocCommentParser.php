@@ -27,7 +27,7 @@ class DocCommentParser implements DocCommentParserInterface
         }
 
         $doc[self::DOC_DESCRIPTION] =  implode(' ', $cleanLines);
-        
+
         return $doc;
     }
 
