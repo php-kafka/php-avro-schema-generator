@@ -16,4 +16,9 @@ interface ClassParserInterface
      * @return PhpClassProperty[]
      */
     public function getProperties(): array;
+
+    /**
+     * @return array<string, string>
+     */
+    public function getUsedClasses(): array;
 }

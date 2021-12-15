@@ -16,16 +16,16 @@ class PhpClassProperty implements PhpClassPropertyInterface
     private string $propertyType;
 
     /**
-     * @param mixed $propertyDefault
-     * @param string $propertyDoc
-     * @param string $propertyLogicalType
      * @param string $propertyName
      * @param string $propertyType
+     * @param null|mixed $propertyDefault
+     * @param null|string $propertyDoc
+     * @param null|string $propertyLogicalType
      */
     public function __construct(
         string $propertyName,
         string $propertyType,
-        mixed $propertyDefault = self::NO_DEFAULT,
+        $propertyDefault = self::NO_DEFAULT,
         ?string $propertyDoc = null,
         ?string $propertyLogicalType = null
     ) {

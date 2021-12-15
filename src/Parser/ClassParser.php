@@ -8,6 +8,8 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\Use_;
+use PhpParser\Node\Stmt\UseUse;
 use PhpParser\ParserFactory;
 use PhpParser\Parser;
 
@@ -52,6 +54,27 @@ class ClassParser implements ClassParserInterface
         }
 
         return null;
+    }
+
+    public function getUsedClasses(): array
+    {
+        $usedClasses = [];
+
+        foreach ($this->statements as $statement) {
+            if ($statement instanceof Namespace_) {
+                foreach ($statement->stmts as $nStatement) {
+                    if ($nStatement instanceof Use_) {
+                        /** @var UseUse $use */
+                        foreach ($nStatement->uses as $use) {
+                            $className = $use->name->parts[array_key_last($use->name->parts)];
+                            $usedClasses[$className] = implode('\\', $use->name->parts);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $usedClasses;
     }
 
     /**

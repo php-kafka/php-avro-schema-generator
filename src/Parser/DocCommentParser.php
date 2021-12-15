@@ -17,7 +17,7 @@ class DocCommentParser implements DocCommentParserInterface
             if (true === str_starts_with($line, '@')) {
                 $foundFirstAt = true;
                 $nextSpace = strpos($line, ' ');
-                $doc[substr($line, 1, $nextSpace)] = substr($line, $nextSpace + 1);
+                $doc[substr($line, 1, $nextSpace -1 )] = substr($line, $nextSpace + 1);
                 unset($cleanLines[$idx]);
             } elseif (true === $foundFirstAt) {
                 //ignore other stuff for now
@@ -27,7 +27,7 @@ class DocCommentParser implements DocCommentParserInterface
         }
 
         $doc[self::DOC_DESCRIPTION] =  implode(' ', $cleanLines);
-
+        
         return $doc;
     }
 
@@ -48,16 +48,19 @@ class DocCommentParser implements DocCommentParserInterface
     {
         $trimmedString = ltrim(rtrim($docLine));
 
-        if (true === str_starts_with($docLine, '/**')) {
+        if (true === str_starts_with($trimmedString, '/**')) {
             $trimmedString = substr($trimmedString, 3);
+            $trimmedString = ltrim($trimmedString);
         }
 
-        if (true === str_ends_with($docLine, '*/')) {
+        if (true === str_ends_with($trimmedString, '*/')) {
             $trimmedString = substr($trimmedString, 0, strlen($trimmedString) - 2);
+            $trimmedString = rtrim($trimmedString);
         }
 
-        if (true === str_starts_with($docLine, '*')) {
+        if (true === str_starts_with($trimmedString, '*')) {
             $trimmedString = substr($trimmedString, 1);
+            $trimmedString = ltrim($trimmedString);
         }
 
         return ltrim(rtrim($trimmedString));
