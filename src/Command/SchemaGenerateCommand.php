@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Command;
 
 use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
+use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGeneratorInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistry;
+use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,6 +15,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SchemaGenerateCommand extends Command
 {
+    private SchemaGeneratorInterface $generator;
+    private ClassRegistryInterface $classRegistry;
+
+    public function __construct(
+        ClassRegistryInterface $classRegistry,
+        SchemaGeneratorInterface $generator,
+        string $name = null
+    ) {
+        $this->classRegistry = $classRegistry;
+        $this->generator = $generator;
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
         $this
@@ -36,15 +51,12 @@ class SchemaGenerateCommand extends Command
         $classDirectory = $this->getPath($classDirectoryArg);
         $outputDirectory = $this->getPath($outputDirectoryArg);
 
-        $registry = (new ClassRegistry())
-            ->addClassDirectory($classDirectory)
-            ->load();
+        $registry = $this->classRegistry->addClassDirectory($classDirectory)->load();
+        $this->generator->setOutputDirectory($outputDirectory);
+        $this->generator->setClassRegistry($registry);
 
-        $generator = new SchemaGenerator($registry, $outputDirectory);
-
-        $schemas = $generator->generate();
-
-        $result = $generator->exportSchemas($schemas);
+        $schemas = $this->generator->generate();
+        $result = $this->generator->exportSchemas($schemas);
 
         // retrieve the argument value using getArgument()
         $output->writeln(sprintf('Generated %d schema files', $result));

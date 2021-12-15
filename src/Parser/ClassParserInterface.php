@@ -23,4 +23,6 @@ interface ClassParserInterface
     public function getUsedClasses(): array;
 
     public function getParentClassName(): ?string;
+
+    public function setCode(string $code): void;
 }

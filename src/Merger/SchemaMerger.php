@@ -11,36 +11,38 @@ use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
+use RuntimeException;
 
 final class SchemaMerger implements SchemaMergerInterface
 {
-    /**
-     * @var string
-     */
-    private $outputDirectory;
+    private string $outputDirectory;
 
-    /**
-     * @var SchemaRegistryInterface
-     */
-    private $schemaRegistry;
+    private ?SchemaRegistryInterface $schemaRegistry;
 
     /**
      * @var OptimizerInterface[]
      */
-    private $optimizers = [];
+    private array $optimizers = [];
 
-    public function __construct(SchemaRegistryInterface $schemaRegistry, string $outputDirectory = '/tmp')
+    public function __construct(string $outputDirectory = '/tmp')
     {
-        $this->schemaRegistry = $schemaRegistry;
         $this->outputDirectory = $outputDirectory;
+    }
+
+    /**
+     * @return SchemaRegistryInterface|null
+     */
+    public function getSchemaRegistry(): ?SchemaRegistryInterface
+    {
+        return $this->schemaRegistry;
     }
 
     /**
      * @return SchemaRegistryInterface
      */
-    public function getSchemaRegistry(): SchemaRegistryInterface
+    public function setSchemaRegistry(SchemaRegistryInterface $schemaRegistry): void
     {
-        return $this->schemaRegistry;
+        $this->schemaRegistry = $schemaRegistry;
     }
 
     /**
@@ -49,6 +51,14 @@ final class SchemaMerger implements SchemaMergerInterface
     public function getOutputDirectory(): string
     {
         return $this->outputDirectory;
+    }
+
+    /**
+     * @param string $outputDirectory
+     */
+    public function setOutputDirectory(string $outputDirectory): void
+    {
+        $this->outputDirectory = $outputDirectory;
     }
 
     /**
@@ -119,6 +129,10 @@ final class SchemaMerger implements SchemaMergerInterface
     ): int {
         $mergedFiles = 0;
         $registry = $this->getSchemaRegistry();
+
+        if (null === $registry) {
+            throw new RuntimeException('Please set a SchemaRegistery for the merger');
+        }
 
         /** @var SchemaTemplateInterface $rootSchemaTemplate */
         foreach ($registry->getRootSchemas() as $rootSchemaTemplate) {

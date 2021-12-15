@@ -8,13 +8,14 @@ use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
+use RuntimeException;
 
 final class SchemaGenerator implements SchemaGeneratorInterface
 {
     /**
      * @var int[]
      */
-    private $typesToSkip = [
+    private array $typesToSkip = [
         'null' => 1,
         'object' => 1,
         'callable' => 1,
@@ -22,28 +23,32 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         'mixed' => 1
     ];
 
-    /**
-     * @var string
-     */
-    private $outputDirectory;
+    private string $outputDirectory;
 
     /**
      * @var ClassRegistryInterface
      */
-    private $classRegistry;
+    private ClassRegistryInterface $classRegistry;
 
-    public function __construct(ClassRegistryInterface $classRegistry, string $outputDirectory = '/tmp')
+    public function __construct(string $outputDirectory = '/tmp')
     {
-        $this->classRegistry = $classRegistry;
         $this->outputDirectory = $outputDirectory;
+    }
+
+    /**
+     * @return ClassRegistryInterface|null
+     */
+    public function getClassRegistry(): ?ClassRegistryInterface
+    {
+        return $this->classRegistry;
     }
 
     /**
      * @return ClassRegistryInterface
      */
-    public function getClassRegistry(): ClassRegistryInterface
+    public function setClassRegistry(ClassRegistryInterface $classRegistry): void
     {
-        return $this->classRegistry;
+        $this->classRegistry = $classRegistry;
     }
 
     /**
@@ -55,11 +60,23 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
+     * @return string
+     */
+    public function setOutputDirectory(string $outputDirectory): void
+    {
+        $this->outputDirectory = $outputDirectory;
+    }
+
+    /**
      * @return array<string,string|false>
      */
     public function generate(): array
     {
         $schemas = [];
+
+        if (null === $this->getClassRegistry()) {
+            throw new RuntimeException('Please set a ClassRegistry for the generator');
+        }
 
         /** @var PhpClassInterface $class */
         foreach ($this->getClassRegistry()->getClasses() as $class) {
@@ -76,13 +93,18 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 }
 
                 $field = ['name' => $property->getPropertyName()];
-                if ('array' === $property->getPropertyType()) {
-                    $field['type'] = [
-                        'type' => $property->getPropertyType(),
-                        'items' => $this->convertNamespace($property->getPropertyArrayType() ?? 'string')
-                    ];
-                } else {
-                    $field['type'] = $this->convertNamespace($property->getPropertyType());
+                $field['type'] = $property->getPropertyType();
+
+                if (PhpClassPropertyInterface::NO_DEFAULT !== $property->getPropertyDefault()) {
+                    $field['default'] = $property->getPropertyDefault();
+                }
+
+                if (null !== $property->getPropertyDoc() && '' !== $property->getPropertyDoc()) {
+                    $field['doc'] = $property->getPropertyDoc();
+                }
+
+                if (null !== $property->getPropertyLogicalType()) {
+                    $field['logicalType'] = $property->getPropertyLogicalType();
                 }
 
                 $schema['fields'][] = $field;

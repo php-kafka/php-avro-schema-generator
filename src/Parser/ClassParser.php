@@ -17,20 +17,18 @@ use ReflectionException;
 
 class ClassParser implements ClassParserInterface
 {
-    private ParserFactory $parserFactory;
     private ClassPropertyParserInterface $propertyParser;
     private Parser $parser;
     private string $code;
     private array $statements;
 
-    public function __construct(ParserFactory  $parserFactory, ClassPropertyParserInterface $propertyParser)
+    public function __construct(Parser  $parser, ClassPropertyParserInterface $propertyParser)
     {
-        $this->parserFactory = $parserFactory;
-        $this->parser = $parserFactory->create(ParserFactory::PREFER_PHP7);
+        $this->parser = $parser;
         $this->propertyParser = $propertyParser;
     }
 
-    public function setCode(string $code)
+    public function setCode(string $code): void
     {
         $this->code = $code;
         $this->statements = $this->parser->parse($code);

@@ -3,6 +3,8 @@
 
 declare(strict_types=1);
 
+namespace PhpKafka\PhpAvroSchemaGenerator;
+
 if (is_file(__DIR__ . '/../../../autoload.php') === true) {
     include_once __DIR__ . '/../../../autoload.php';
 } else {
@@ -13,9 +15,8 @@ use Symfony\Component\Console\Application;
 use PhpKafka\PhpAvroSchemaGenerator\Command\SubSchemaMergeCommand;
 use PhpKafka\PhpAvroSchemaGenerator\Command\SchemaGenerateCommand;
 
+$container = AppContainer::init();
+
 $application = new Application();
-
-$application->add(new SchemaGenerateCommand());
-$application->add(new SubSchemaMergeCommand());
-
+$application->addCommands($container['console.commands']);
 $application->run();
