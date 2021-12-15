@@ -11,11 +11,17 @@ class DocCommentParser implements DocCommentParserInterface
         $doc = [];
         $docLines = explode(PHP_EOL, $docComment);
         $cleanLines = $this->cleanDocLines($docLines);
+        $foundFirstAt = false;
 
         foreach ($cleanLines as $idx => $line) {
             if (true === str_starts_with($line, '@')) {
+                $foundFirstAt = true;
                 $nextSpace = strpos($line, ' ');
                 $doc[substr($line, 1, $nextSpace)] = substr($line, $nextSpace + 1);
+                unset($cleanLines[$idx]);
+            } elseif (true === $foundFirstAt) {
+                //ignore other stuff for now
+                //TODO: Improve multiline @ doc comment
                 unset($cleanLines[$idx]);
             }
         }
@@ -29,6 +35,10 @@ class DocCommentParser implements DocCommentParserInterface
     {
         foreach ($docLines as $idx => $docLine) {
             $docLines[$idx] = $this->cleanDocLine($docLine);
+
+            if ('' === $docLines[$idx]) {
+                unset($docLines[$idx]);
+            }
         }
 
         return $docLines;
