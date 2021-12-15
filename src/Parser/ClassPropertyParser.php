@@ -10,13 +10,44 @@ use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\UnionType;
+use RuntimeException;
 
 class ClassPropertyParser implements ClassPropertyParserInterface
 {
+    private DocCommentParserInterface $docParser;
+
+    /**
+     * @var string[]
+     */
+    private $mappedTypes = array(
+        'null' => 'null',
+        'bool' => 'boolean',
+        'boolean' => 'boolean',
+        'string' => 'string',
+        'int' => 'int',
+        'integer' => 'int',
+        'float' => 'float',
+        'double' => 'double',
+        'array' => 'array',
+        'object' => 'object',
+        'callable' => 'callable',
+        'resource' => 'resource',
+        'mixed' => 'mixed',
+        'Collection' => 'array',
+    );
+
+    public function __construct(DocCommentParserInterface $docParser)
+    {
+        $this->docParser = $docParser;
+    }
 
     public function parseProperty($property): PhpClassPropertyInterface
     {
-        $propertyAttributes = $this->getPropertyAttributes($pStatement);
+        if (false === $property instanceof Property) {
+            throw new RuntimeException(sprintf('Property must be of type: %s', Property::class));
+        }
+
+        $propertyAttributes = $this->getPropertyAttributes($property);
 
         return new PhpClassProperty(
             $propertyAttributes['name'],
@@ -30,38 +61,27 @@ class ClassPropertyParser implements ClassPropertyParserInterface
 
     private function getPropertyAttributes(Property $property): array
     {
-        $attributes = $this->getAvroAttributesFromCode($property);
-        $attributes['name'] = $property->props[0]->name->name;
-
-        return $attributes;
-    }
-
-    private function getAvroAttributesFromCode(Property $property): array
-    {
         $attributes = $this->getEmptyAttributesArray();
-        $attributes['types'] = $this->getPropertyType($property);
+        $docComments = $this->getAllPropertyDocComments($property);
+        $attributes['name'] = $this->getPropertyName($property);
 
-        return $attributes;
-    }
-
-    private function getPropertyDocComments(Property $property): array
-    {
-        $docComments = [];
-
-        foreach ($property->getAttributes() as $attributeName => $attributeValue) {
-            if ('comments' === $attributeName) {
-                /** @var Doc $comment */
-                foreach ($attributeValue as $comment) {
-                    $docComments[] = $comment->getText();
-                }
-            }
-
+        $attributes['types'] = $this->getTypeFromDocComment($docComments);
+        if (null === $attributes['types']) {
+            $attributes['types'] = $this->getPropertyType($property, $docComments);
         }
 
-        return $docComments;
+        $attributes['default'] = $this->getDefaultFromDocComment($docComments);
+        $attributes['doc'] = $this->getDocFromDocComment($docComments);
+        $attributes['logicalType'] = $this->getLogicalTypeFromDocComment($docComments);
+
+        return $attributes;
     }
 
-    private function getPropertyType(Property $property): string
+    private function getPropertyName(Property $property) {
+        return $property->props[0]->name->name;
+    }
+
+    private function getPropertyType(Property $property, array $docComments): string
     {
         if ($property->type instanceof Identifier) {
             return $this->mappedTypes[$property->type->name] ?? $property->type->name;
@@ -77,48 +97,49 @@ class ClassPropertyParser implements ClassPropertyParserInterface
             return $types;
         }
 
-        return 'string';
+        return $this->getDocCommentByType($docComments, 'var') ?? 'string';
     }
 
-    private function getTypeFromDocComment(array $docComments): string
+    private function getDocCommentByType(array $docComments, string $type)
     {
-        foreach ($docComments as $doc) {
-            if (false !== $varPos = strpos($doc, '@var')) {
-                if (false !== $eolPos = strpos($doc, PHP_EOL, $varPos)) {
-                    $varDoc = substr($doc, $varPos, ($eolPos - $varPos));
-                } else {
-                    $varDoc = substr($doc, $varPos);
-                }
-                $rawTypes = trim(str_replace(['[]', '*/', '@var'], '', $varDoc));
+        return $docComments[$type] ?? null;
+    }
 
-                $types = explode('|', $rawTypes);
+    private function getTypeFromDocComment(array $docComments): ?string
+    {
+        return $docComments['avro-type'] ?? null;
+    }
 
-                foreach ($types as $type) {
-                    if ('array' === $type) {
-                        continue;
-                    }
+    private function getDefaultFromDocComment(array $docComments): ?string
+    {
+        return $docComments['avro-default'] ?? null;
+    }
 
-                    return $this->mappedTypes[$type] ?? $type;
+    private function getLogicalTypeFromDocComment(array $docComments): ?string
+    {
+        return $docComments['avro-logical-type'] ?? null;
+    }
+
+    private function getDocFromDocComment(array $docComments): ?string
+    {
+        return $docComments['avro-doc'] ?? $docComments[DocCommentParserInterface::DOC_DESCRIPTION] ?? null;
+    }
+
+    private function getAllPropertyDocComments(Property $property): array
+    {
+        $docComments = [];
+
+        foreach ($property->getAttributes() as $attributeName => $attributeValue) {
+            if ('comments' === $attributeName) {
+                /** @var Doc $comment */
+                foreach ($attributeValue as $comment) {
+                    $docComments += $this->docParser->parseDoc($comment->getText());
                 }
             }
+
         }
 
-        return 'string';
-    }
-
-    private function getDefaultFromDocComment(): ?string
-    {
-
-    }
-
-    private function getLogicalTypeFromDocComment(): ?string
-    {
-
-    }
-
-    private function getDocFromDocComment(): ?string
-    {
-
+        return $docComments;
     }
 
     private function getEmptyAttributesArray(): array

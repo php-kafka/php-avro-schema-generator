@@ -5,13 +5,9 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
-use PhpParser\Comment\Doc;
-use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\UnionType;
 use PhpParser\ParserFactory;
 use PhpParser\Parser;
 
@@ -22,26 +18,6 @@ class ClassParser implements ClassParserInterface
     private Parser $parser;
     private string $code;
     private array $statements;
-
-    /**
-     * @var string[]
-     */
-    private $mappedTypes = array(
-        'null' => 'null',
-        'bool' => 'boolean',
-        'boolean' => 'boolean',
-        'string' => 'string',
-        'int' => 'int',
-        'integer' => 'int',
-        'float' => 'float',
-        'double' => 'double',
-        'array' => 'array',
-        'object' => 'object',
-        'callable' => 'callable',
-        'resource' => 'resource',
-        'mixed' => 'mixed',
-        'Collection' => 'array',
-    );
 
     public function __construct(ParserFactory  $parserFactory, ClassPropertyParserInterface $propertyParser)
     {
