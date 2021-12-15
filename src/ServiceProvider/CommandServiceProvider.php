@@ -15,8 +15,7 @@ use Pimple\ServiceProviderInterface;
 
 class CommandServiceProvider implements ServiceProviderInterface
 {
-
-    public function register(Container $container)
+    public function register(Container $container): void
     {
         $container['console.commands'] = function () use ($container): array {
             $commands = [];

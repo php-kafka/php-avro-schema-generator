@@ -44,7 +44,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
-     * @return ClassRegistryInterface
+     * @param ClassRegistryInterface $classRegistry
      */
     public function setClassRegistry(ClassRegistryInterface $classRegistry): void
     {
@@ -60,7 +60,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
-     * @return string
+     * @param string $outputDirectory
      */
     public function setOutputDirectory(string $outputDirectory): void
     {
@@ -110,7 +110,13 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 $schema['fields'][] = $field;
             }
 
-            $schemas[$schema['namespace'] . '.' . $schema['name']] = json_encode($schema);
+            $namespace = $schema['namespace'] . '.' . $schema['name'];
+
+            if (null === $schema['namespace']) {
+                $namespace = $schema['name'];
+            }
+
+            $schemas[$namespace] = json_encode($schema);
         }
 
         return $schemas;
@@ -143,11 +149,15 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
-     * @param string $namespace
-     * @return string
+     * @param string|null $namespace
+     * @return string|null
      */
-    private function convertNamespace(string $namespace): string
+    private function convertNamespace(?string $namespace): ?string
     {
+        if (null === $namespace) {
+            return null;
+        }
+
         return str_replace('\\', '.', $namespace);
     }
 }

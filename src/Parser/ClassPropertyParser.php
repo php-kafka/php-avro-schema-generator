@@ -36,11 +36,18 @@ class ClassPropertyParser implements ClassPropertyParserInterface
         'Collection' => 'array',
     );
 
+    /**
+     * @param DocCommentParserInterface $docParser
+     */
     public function __construct(DocCommentParserInterface $docParser)
     {
         $this->docParser = $docParser;
     }
 
+    /**
+     * @param Property|mixed $property
+     * @return PhpClassPropertyInterface
+     */
     public function parseProperty($property): PhpClassPropertyInterface
     {
         if (false === $property instanceof Property) {
@@ -58,7 +65,10 @@ class ClassPropertyParser implements ClassPropertyParserInterface
         );
     }
 
-
+    /**
+     * @param Property $property
+     * @return array<string, mixed>
+     */
     private function getPropertyAttributes(Property $property): array
     {
         $attributes = $this->getEmptyAttributesArray();
@@ -77,10 +87,16 @@ class ClassPropertyParser implements ClassPropertyParserInterface
         return $attributes;
     }
 
-    private function getPropertyName(Property $property) {
+    private function getPropertyName(Property $property): string
+    {
         return $property->props[0]->name->name;
     }
 
+    /**
+     * @param Property $property
+     * @param array<string,mixed> $docComments
+     * @return string
+     */
     private function getPropertyType(Property $property, array $docComments): string
     {
         if ($property->type instanceof Identifier) {
@@ -90,7 +106,8 @@ class ClassPropertyParser implements ClassPropertyParserInterface
             $separator = '';
             /** @var Identifier $type */
             foreach ($property->type->types as $type) {
-                $types .= $separator . $this->mappedTypes[$type->name] ?? $type->name;
+                $type = $this->mappedTypes[$type->name] ?? $type->name;
+                $types .= $separator . $type;
                 $separator = ',';
             }
 
@@ -100,31 +117,55 @@ class ClassPropertyParser implements ClassPropertyParserInterface
         return $this->getDocCommentByType($docComments, 'var') ?? 'string';
     }
 
+    /**
+     * @param array<string, mixed> $docComments
+     * @return mixed
+     */
     private function getDocCommentByType(array $docComments, string $type)
     {
         return $docComments[$type] ?? null;
     }
 
+    /**
+     * @param array<string, mixed> $docComments
+     * @return string|null
+     */
     private function getTypeFromDocComment(array $docComments): ?string
     {
         return $docComments['avro-type'] ?? null;
     }
 
+    /**
+     * @param array<string, mixed> $docComments
+     * @return string
+     */
     private function getDefaultFromDocComment(array $docComments): string
     {
         return $docComments['avro-default'] ?? PhpClassPropertyInterface::NO_DEFAULT;
     }
 
+    /**
+     * @param array<string, mixed> $docComments
+     * @return string|null
+     */
     private function getLogicalTypeFromDocComment(array $docComments): ?string
     {
         return $docComments['avro-logical-type'] ?? null;
     }
 
+    /**
+     * @param array<string, mixed> $docComments
+     * @return string|null
+     */
     private function getDocFromDocComment(array $docComments): ?string
     {
         return $docComments['avro-doc'] ?? $docComments[DocCommentParserInterface::DOC_DESCRIPTION] ?? null;
     }
 
+    /**
+     * @param Property $property
+     * @return array<string, mixed>
+     */
     private function getAllPropertyDocComments(Property $property): array
     {
         $docComments = [];
@@ -133,15 +174,17 @@ class ClassPropertyParser implements ClassPropertyParserInterface
             if ('comments' === $attributeName) {
                 /** @var Doc $comment */
                 foreach ($attributeValue as $comment) {
-                    $docComments += $this->docParser->parseDoc($comment->getText());
+                    $docComments = array_merge($docComments, $this->docParser->parseDoc($comment->getText()));
                 }
             }
-
         }
 
         return $docComments;
     }
 
+    /**
+     * @return array<string,null|string>
+     */
     private function getEmptyAttributesArray(): array
     {
         return [
@@ -152,5 +195,4 @@ class ClassPropertyParser implements ClassPropertyParserInterface
             'doc' => null
         ];
     }
-
 }

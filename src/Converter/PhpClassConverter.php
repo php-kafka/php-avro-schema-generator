@@ -16,7 +16,6 @@ class PhpClassConverter implements PhpClassConverterInterface
 
     /**
      * @param ClassParserInterface $parser
-     * @param string $phpClass
      */
     public function __construct(ClassParserInterface $parser)
     {
@@ -44,7 +43,7 @@ class PhpClassConverter implements PhpClassConverterInterface
 
     /**
      * @param PhpClassPropertyInterface[] $properties
-     * @return array
+     * @return PhpClassPropertyInterface[]
      */
     private function getConvertedProperties(array $properties): array
     {

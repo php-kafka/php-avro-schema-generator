@@ -12,8 +12,7 @@ use Pimple\ServiceProviderInterface;
 
 class ConverterServiceProvider implements ServiceProviderInterface
 {
-
-    public function register(Container $container)
+    public function register(Container $container): void
     {
         $container[PhpClassConverterInterface::class] =
             static function (Container $container): PhpClassConverterInterface {

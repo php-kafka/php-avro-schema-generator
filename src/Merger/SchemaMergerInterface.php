@@ -37,9 +37,11 @@ interface SchemaMergerInterface
     public function getResolvedSchemaTemplate(SchemaTemplateInterface $rootSchemaTemplate): SchemaTemplateInterface;
 
     /**
+     * @param bool $prefixWithNamespace
+     * @param bool $useTemplateName
      * @return int
      */
-    public function merge(): int;
+    public function merge(bool $prefixWithNamespace = false, bool $useTemplateName = false): int;
 
     /**
      * @param SchemaTemplateInterface $rootRootSchemaTemplate

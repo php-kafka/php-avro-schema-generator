@@ -38,7 +38,7 @@ final class SchemaMerger implements SchemaMergerInterface
     }
 
     /**
-     * @return SchemaRegistryInterface
+     * @param SchemaRegistryInterface $schemaRegistry
      */
     public function setSchemaRegistry(SchemaRegistryInterface $schemaRegistry): void
     {
@@ -69,6 +69,10 @@ final class SchemaMerger implements SchemaMergerInterface
      */
     public function getResolvedSchemaTemplate(SchemaTemplateInterface $rootSchemaTemplate): SchemaTemplateInterface
     {
+        if (null === $this->getSchemaRegistry()) {
+            throw new RuntimeException('Please set a SchemaRegistery for the merger');
+        }
+
         $rootDefinition = $rootSchemaTemplate->getSchemaDefinition();
 
         do {
@@ -82,7 +86,7 @@ final class SchemaMerger implements SchemaMergerInterface
                 }
                 $exceptionThrown = true;
                 $schemaId = $this->getSchemaIdFromExceptionMessage($e->getMessage());
-                $embeddedTemplate = $this->schemaRegistry->getSchemaById($schemaId);
+                $embeddedTemplate = $this->getSchemaRegistry()->getSchemaById($schemaId);
                 if (null === $embeddedTemplate) {
                     throw new SchemaMergerException(
                         sprintf(SchemaMergerException::UNKNOWN_SCHEMA_TYPE_EXCEPTION_MESSAGE, $schemaId)

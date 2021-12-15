@@ -6,33 +6,22 @@ namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 
 class PhpClass implements PhpClassInterface
 {
-    /**
-     * @var string
-     */
-    private $classBody;
+    private string $classBody;
+    private string $className;
+    private ?string $classNamespace;
 
     /**
-     * @var string
+     * @var PhpClassPropertyInterface[]
      */
-    private $className;
-
-    /**
-     * @var string
-     */
-    private $classNamespace;
-
-    /**
-     * @var PhpClassProperty[]
-     */
-    private $classProperties;
+    private array $classProperties;
 
     /**
      * @param string $className
-     * @param string $classNamespace
+     * @param ?string $classNamespace
      * @param string $classBody
-     * @param PhpClassProperty[]  $classProperties
+     * @param PhpClassPropertyInterface[]  $classProperties
      */
-    public function __construct(string $className, string $classNamespace, string $classBody, array $classProperties)
+    public function __construct(string $className, ?string $classNamespace, string $classBody, array $classProperties)
     {
         $this->className = $className;
         $this->classNamespace = $classNamespace;
@@ -43,7 +32,7 @@ class PhpClass implements PhpClassInterface
     /**
      * @return string
      */
-    public function getClassNamespace(): string
+    public function getClassNamespace(): ?string
     {
         return $this->classNamespace;
     }
@@ -65,7 +54,7 @@ class PhpClass implements PhpClassInterface
     }
 
     /**
-     * @return PhpClassProperty[]
+     * @return PhpClassPropertyInterface[]
      */
     public function getClassProperties(): array
     {

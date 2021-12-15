@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\UseUse;
-use PhpParser\ParserFactory;
 use PhpParser\Parser;
 use ReflectionClass;
 use ReflectionException;
@@ -19,10 +22,11 @@ class ClassParser implements ClassParserInterface
 {
     private ClassPropertyParserInterface $propertyParser;
     private Parser $parser;
-    private string $code;
-    private array $statements;
 
-    public function __construct(Parser  $parser, ClassPropertyParserInterface $propertyParser)
+    /** @var Stmt[]|null  */
+    private ?array $statements;
+
+    public function __construct(Parser $parser, ClassPropertyParserInterface $propertyParser)
     {
         $this->parser = $parser;
         $this->propertyParser = $propertyParser;
@@ -30,7 +34,6 @@ class ClassParser implements ClassParserInterface
 
     public function setCode(string $code): void
     {
-        $this->code = $code;
         $this->statements = $this->parser->parse($code);
     }
 
@@ -47,7 +50,9 @@ class ClassParser implements ClassParserInterface
             if ($statement instanceof Namespace_) {
                 foreach ($statement->stmts as $nsStatement) {
                     if ($nsStatement instanceof Class_) {
-                        return $nsStatement->name->name;
+                        if ($nsStatement->name instanceof Identifier) {
+                            return $nsStatement->name->name;
+                        }
                     }
                 }
             }
@@ -84,6 +89,10 @@ class ClassParser implements ClassParserInterface
     {
         $usedClasses = [];
 
+        if (null === $this->statements) {
+            return $usedClasses;
+        }
+
         foreach ($this->statements as $statement) {
             if ($statement instanceof Namespace_) {
                 foreach ($statement->stmts as $nStatement) {
@@ -112,7 +121,9 @@ class ClassParser implements ClassParserInterface
 
         foreach ($this->statements as $statement) {
             if ($statement instanceof Namespace_) {
-                return implode('\\', $statement->name->parts);
+                if ($statement->name instanceof Name) {
+                    return implode('\\', $statement->name->parts);
+                }
             }
         }
 
@@ -120,11 +131,11 @@ class ClassParser implements ClassParserInterface
     }
 
     /**
-     * @return PhpClassProperty[]
+     * @return PhpClassPropertyInterface[]
      */
     public function getProperties(): array
     {
-        $properties = $this->getClassProperties($this->statements);
+        $properties = $this->getClassProperties($this->statements ?? []);
 
         $parentStatements = $this->getParentClassStatements();
 
@@ -135,6 +146,10 @@ class ClassParser implements ClassParserInterface
         return $properties;
     }
 
+    /**
+     * @param Stmt[] $statements
+     * @return PhpClassPropertyInterface[]
+     */
     private function getClassProperties(array $statements): array
     {
         $properties = [];
@@ -157,15 +172,27 @@ class ClassParser implements ClassParserInterface
     }
 
     /**
-     * @return array
+     * @return Stmt[]|null
      * @throws ReflectionException
      */
     private function getParentClassStatements(): ?array
     {
+        /** @var class-string[] $usedClasses */
         $usedClasses = $this->getUsedClasses();
+
         $rc = new ReflectionClass($usedClasses[$this->getParentClassName()]);
         $filename = $rc->getFileName();
 
-        return $this->parser->parse(file_get_contents($filename));
+        if (false === $filename) {
+            return [];
+        }
+
+        $parentClass = file_get_contents($filename);
+
+        if (false === $parentClass) {
+            return [];
+        }
+
+        return $this->parser->parse($parentClass);
     }
 }

@@ -6,6 +6,10 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
 class DocCommentParser implements DocCommentParserInterface
 {
+    /**
+     * @param string $docComment
+     * @return array<string, mixed>
+     */
     public function parseDoc(string $docComment): array
     {
         $doc = [];
@@ -17,7 +21,7 @@ class DocCommentParser implements DocCommentParserInterface
             if (true === str_starts_with($line, '@')) {
                 $foundFirstAt = true;
                 $nextSpace = strpos($line, ' ');
-                $doc[substr($line, 1, $nextSpace -1 )] = substr($line, $nextSpace + 1);
+                $doc[substr($line, 1, $nextSpace - 1)] = substr($line, $nextSpace + 1);
                 unset($cleanLines[$idx]);
             } elseif (true === $foundFirstAt) {
                 //ignore other stuff for now
@@ -31,6 +35,10 @@ class DocCommentParser implements DocCommentParserInterface
         return $doc;
     }
 
+    /**
+     * @param string[] $docLines
+     * @return string[]
+     */
     private function cleanDocLines(array $docLines): array
     {
         foreach ($docLines as $idx => $docLine) {

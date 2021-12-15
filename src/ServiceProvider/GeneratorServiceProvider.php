@@ -11,10 +11,9 @@ use Pimple\ServiceProviderInterface;
 
 class GeneratorServiceProvider implements ServiceProviderInterface
 {
-
-    public function register(Container $container)
+    public function register(Container $container): void
     {
-        $container[SchemaGeneratorInterface::class] = static function (Container $container): SchemaGeneratorInterface {
+        $container[SchemaGeneratorInterface::class] = static function (): SchemaGeneratorInterface {
             return new SchemaGenerator();
         };
     }

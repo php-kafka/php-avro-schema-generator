@@ -14,8 +14,7 @@ use Pimple\ServiceProviderInterface;
 
 class RegistryServiceProvider implements ServiceProviderInterface
 {
-
-    public function register(Container $container)
+    public function register(Container $container): void
     {
         $container[ClassRegistryInterface::class] = static function (Container $container): ClassRegistryInterface {
             return new ClassRegistry($container[PhpClassConverterInterface::class]);

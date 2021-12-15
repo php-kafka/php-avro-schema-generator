@@ -11,8 +11,7 @@ use Pimple\ServiceProviderInterface;
 
 class MergerServiceProvider implements ServiceProviderInterface
 {
-
-    public function register(Container $container)
+    public function register(Container $container): void
     {
         $container[SchemaMergerInterface::class] = static function (): SchemaMergerInterface {
             return new SchemaMerger();
