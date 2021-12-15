@@ -110,9 +110,9 @@ class ClassPropertyParser implements ClassPropertyParserInterface
         return $docComments['avro-type'] ?? null;
     }
 
-    private function getDefaultFromDocComment(array $docComments): ?string
+    private function getDefaultFromDocComment(array $docComments): string
     {
-        return $docComments['avro-default'] ?? null;
+        return $docComments['avro-default'] ?? PhpClassPropertyInterface::NO_DEFAULT;
     }
 
     private function getLogicalTypeFromDocComment(array $docComments): ?string
