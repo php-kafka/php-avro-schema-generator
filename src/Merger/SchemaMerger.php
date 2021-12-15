@@ -126,16 +126,12 @@ final class SchemaMerger implements SchemaMergerInterface
                 $resolvedTemplate = $this->getResolvedSchemaTemplate($rootSchemaTemplate);
 
                 foreach ($this->optimizers as $optimizer) {
-                    $resolvedTemplate = $resolvedTemplate->withSchemaDefinition(
-                        $optimizer->optimize(
-                            $resolvedTemplate->getSchemaDefinition(),
-                            $resolvedTemplate->isPrimitive()
-                        )
-                    );
+                    $resolvedTemplate = $optimizer->optimize($resolvedTemplate);
                 }
             } catch (SchemaMergerException $e) {
                 throw $e;
             }
+
             $this->exportSchema($resolvedTemplate, $prefixWithNamespace, $useTemplateName);
 
             ++$mergedFiles;
