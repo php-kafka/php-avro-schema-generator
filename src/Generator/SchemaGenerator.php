@@ -77,21 +77,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
             /** @var PhpClassPropertyInterface $property */
             foreach ($class->getClassProperties() as $property) {
-                $field = ['name' => $property->getPropertyName()];
-                $field['type'] = $property->getPropertyType();
-
-                if (PhpClassPropertyInterface::NO_DEFAULT !== $property->getPropertyDefault()) {
-                    $field['default'] = $property->getPropertyDefault();
-                }
-
-                if (null !== $property->getPropertyDoc() && '' !== $property->getPropertyDoc()) {
-                    $field['doc'] = $property->getPropertyDoc();
-                }
-
-                if (null !== $property->getPropertyLogicalType()) {
-                    $field['logicalType'] = $property->getPropertyLogicalType();
-                }
-
+                $field = $this->getFieldForProperty($property);
                 $schema['fields'][] = $field;
             }
 
@@ -105,6 +91,30 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         }
 
         return $schemas;
+    }
+
+    /**
+     * @param PhpClassPropertyInterface $property
+     * @return array<string, mixed>
+     */
+    private function getFieldForProperty(PhpClassPropertyInterface $property): array
+    {
+        $field = ['name' => $property->getPropertyName()];
+        $field['type'] = $property->getPropertyType();
+
+        if (PhpClassPropertyInterface::NO_DEFAULT !== $property->getPropertyDefault()) {
+            $field['default'] = $property->getPropertyDefault();
+        }
+
+        if (null !== $property->getPropertyDoc() && '' !== $property->getPropertyDoc()) {
+            $field['doc'] = $property->getPropertyDoc();
+        }
+
+        if (null !== $property->getPropertyLogicalType()) {
+            $field['logicalType'] = $property->getPropertyLogicalType();
+        }
+
+        return $field;
     }
 
     /**

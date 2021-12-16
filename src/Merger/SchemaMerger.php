@@ -84,9 +84,11 @@ final class SchemaMerger implements SchemaMergerInterface
                 if (false === strpos($e->getMessage(), ' is not a schema we know about.')) {
                     throw $e;
                 }
+
                 $exceptionThrown = true;
                 $schemaId = $this->getSchemaIdFromExceptionMessage($e->getMessage());
                 $embeddedTemplate = $this->getSchemaRegistry()->getSchemaById($schemaId);
+
                 if (null === $embeddedTemplate) {
                     throw new SchemaMergerException(
                         sprintf(SchemaMergerException::UNKNOWN_SCHEMA_TYPE_EXCEPTION_MESSAGE, $schemaId)
