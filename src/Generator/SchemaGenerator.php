@@ -12,17 +12,6 @@ use RuntimeException;
 
 final class SchemaGenerator implements SchemaGeneratorInterface
 {
-    /**
-     * @var int[]
-     */
-    private array $typesToSkip = [
-        'null' => 1,
-        'object' => 1,
-        'callable' => 1,
-        'resource' => 1,
-        'mixed' => 1
-    ];
-
     private string $outputDirectory;
 
     /**
@@ -88,10 +77,6 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
             /** @var PhpClassPropertyInterface $property */
             foreach ($class->getClassProperties() as $property) {
-                if (true === isset($this->typesToSkip[$property->getPropertyType()])) {
-                    continue;
-                }
-
                 $field = ['name' => $property->getPropertyName()];
                 $field['type'] = $property->getPropertyType();
 

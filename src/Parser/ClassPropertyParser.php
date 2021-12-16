@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
+use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpParser\Comment\Doc;
@@ -15,26 +16,6 @@ use RuntimeException;
 class ClassPropertyParser implements ClassPropertyParserInterface
 {
     private DocCommentParserInterface $docParser;
-
-    /**
-     * @var string[]
-     */
-    private $mappedTypes = array(
-        'null' => 'null',
-        'bool' => 'boolean',
-        'boolean' => 'boolean',
-        'string' => 'string',
-        'int' => 'int',
-        'integer' => 'int',
-        'float' => 'float',
-        'double' => 'double',
-        'array' => 'array',
-        'object' => 'object',
-        'callable' => 'callable',
-        'resource' => 'resource',
-        'mixed' => 'mixed',
-        'Collection' => 'array',
-    );
 
     /**
      * @param DocCommentParserInterface $docParser
@@ -100,13 +81,13 @@ class ClassPropertyParser implements ClassPropertyParserInterface
     private function getPropertyType(Property $property, array $docComments): string
     {
         if ($property->type instanceof Identifier) {
-            return $this->mappedTypes[$property->type->name] ?? $property->type->name;
+            return Avro::MAPPED_TYPES[$property->type->name] ?? $property->type->name;
         } elseif ($property->type instanceof UnionType) {
             $types = '';
             $separator = '';
             /** @var Identifier $type */
             foreach ($property->type->types as $type) {
-                $type = $this->mappedTypes[$type->name] ?? $type->name;
+                $type = Avro::MAPPED_TYPES[$type->name] ?? $type->name;
                 $types .= $separator . $type;
                 $separator = ',';
             }

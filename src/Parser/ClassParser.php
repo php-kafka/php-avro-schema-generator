@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
@@ -179,8 +178,17 @@ class ClassParser implements ClassParserInterface
     {
         /** @var class-string[] $usedClasses */
         $usedClasses = $this->getUsedClasses();
+        $parentClass = $this->getParentClassName();
 
-        $rc = new ReflectionClass($usedClasses[$this->getParentClassName()]);
+        if (null !== $usedClasses[$this->getParentClassName()]) {
+            $parentClass = $usedClasses[$this->getParentClassName()];
+        }
+
+        if (null === $parentClass) {
+            return [];
+        }
+
+        $rc = new ReflectionClass($parentClass);
         $filename = $rc->getFileName();
 
         if (false === $filename) {
