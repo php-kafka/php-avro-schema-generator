@@ -107,11 +107,11 @@ class PhpClassConverter implements PhpClassConverterInterface
         $usedClasses = $this->parser->getUsedClasses();
 
         if (true === isset($usedClasses[$type])) {
-            return $usedClasses[$type];
+            return $this->convertNamespace($usedClasses[$type]);
         }
 
         if (null !== $this->parser->getNamespace()) {
-            return $this->parser->getNamespace() . '\\' . $type;
+            return $this->convertNamespace($this->parser->getNamespace() . '\\' . $type);
         }
 
         return $type;
@@ -194,5 +194,10 @@ class PhpClassConverter implements PhpClassConverterInterface
         }
 
         return false;
+    }
+
+    private function convertNamespace(string $namespace): string
+    {
+        return str_replace('\\', '.', $namespace);
     }
 }
