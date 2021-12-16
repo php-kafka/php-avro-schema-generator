@@ -180,12 +180,12 @@ class ClassParser implements ClassParserInterface
         $usedClasses = $this->getUsedClasses();
         $parentClass = $this->getParentClassName();
 
-        if (null !== $usedClasses[$this->getParentClassName()]) {
-            $parentClass = $usedClasses[$this->getParentClassName()];
-        }
-
         if (null === $parentClass) {
             return [];
+        }
+
+        if (null !== $usedClasses[$this->getParentClassName()]) {
+            $parentClass = $usedClasses[$this->getParentClassName()];
         }
 
         $rc = new ReflectionClass($parentClass);
