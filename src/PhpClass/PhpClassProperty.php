@@ -13,18 +13,20 @@ class PhpClassProperty implements PhpClassPropertyInterface
     private ?string $propertyDoc;
     private ?string $propertyLogicalType;
     private string $propertyName;
-    private string $propertyType;
+
+    /** @var string|string[]  */
+    private $propertyType;
 
     /**
      * @param string $propertyName
-     * @param string $propertyType
+     * @param string[]|string $propertyType
      * @param null|mixed $propertyDefault
      * @param null|string $propertyDoc
      * @param null|string $propertyLogicalType
      */
     public function __construct(
         string $propertyName,
-        string $propertyType,
+        $propertyType,
         $propertyDefault = self::NO_DEFAULT,
         ?string $propertyDoc = null,
         ?string $propertyLogicalType = null
@@ -59,7 +61,10 @@ class PhpClassProperty implements PhpClassPropertyInterface
         return $this->propertyName;
     }
 
-    public function getPropertyType(): string
+    /**
+     * @return string[]|string
+     */
+    public function getPropertyType()
     {
         return $this->propertyType;
     }

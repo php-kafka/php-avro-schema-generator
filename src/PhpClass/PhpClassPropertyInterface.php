@@ -19,5 +19,8 @@ interface PhpClassPropertyInterface
 
     public function getPropertyName(): string;
 
-    public function getPropertyType(): string;
+    /**
+     * @return string[]|string
+     */
+    public function getPropertyType();
 }

@@ -79,7 +79,7 @@ class PhpClassConverter implements PhpClassConverterInterface
         return $convertedProperties;
     }
 
-    private function getConvertedType(string $type): ?string
+    private function getConvertedType(string $type)
     {
         $types = explode('|', $type);
 
@@ -117,11 +117,9 @@ class PhpClassConverter implements PhpClassConverterInterface
         return $type;
     }
 
-    private function getConvertedUnionType(array $types): string
+    private function getConvertedUnionType(array $types): array
     {
-        $convertedUnionType = '[';
-
-        $separator = '';
+        $convertedUnionType = [];
 
         foreach ($types as $type) {
             if (true === isset($this->typesToSkip[$type])) {
@@ -129,23 +127,26 @@ class PhpClassConverter implements PhpClassConverterInterface
             }
 
             if (false === $this->isArrayType($type)) {
-                $convertedUnionType .= $separator . $type;
-                $separator = ',';
+                $convertedUnionType[] = $type;
             }
         }
 
         $arrayType = $this->getArrayType($types);
 
-        if ('' !== $arrayType) {
-            $convertedUnionType .= $separator . $arrayType;
+        if (0 !== count($convertedUnionType) && [] !== $arrayType) {
+            $convertedUnionType[] = $arrayType;
+        } else {
+            return $arrayType;
         }
-
-        $convertedUnionType .= ']';
 
         return $convertedUnionType;
     }
 
-    public function getArrayType(array $types): string
+    /**
+     * @param string[] $types
+     * @return string[]
+     */
+    private function getArrayType(array $types): array
     {
         $arrayTypes = [];
         $itemPrefix = '[';
@@ -158,7 +159,7 @@ class PhpClassConverter implements PhpClassConverterInterface
         }
 
         if (0 === count($arrayTypes)) {
-            return '';
+            return [];
         }
 
         foreach ($arrayTypes as $idx => $arrayType) {
@@ -180,10 +181,10 @@ class PhpClassConverter implements PhpClassConverterInterface
             $itemSuffix = '';
         }
 
-        return json_encode([
+        return [
             'type' => 'array',
             'items' => $itemPrefix . implode(',', $arrayTypes) . $itemSuffix
-        ]);
+        ];
     }
 
     private function isArrayType(string $type): bool
