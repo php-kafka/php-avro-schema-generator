@@ -15,8 +15,10 @@ use PhpParser\ParserFactory;
 $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
 $classPropertyParser = new ClassPropertyParser(new DocCommentParser());
 $classParser = new ClassParser($parser, $classPropertyParser);
+
 $converter = new PhpClassConverter($classParser);
 $registry = (new ClassRegistry($converter))->addClassDirectory('./classes')->load();
+
 $generator = new SchemaGenerator('./schema');
 $generator->setClassRegistry($registry);
 $schemas = $generator->generate();

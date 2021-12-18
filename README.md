@@ -36,7 +36,8 @@ $registry = (new SchemaRegistry())
     ->addSchemaTemplateDirectory('./schemaTemplates')
     ->load();
 
-$merger = new SchemaMerger($registry, './schema');
+$merger = new SchemaMerger('./schema');
+$merger->setSchemaRegistry($registry);
 
 $merger->merge();
 
@@ -68,7 +69,8 @@ $registry = (new SchemaRegistry())
     ->addSchemaTemplateDirectory('./schemaTemplates')
     ->load();
 
-$merger = new SchemaMerger($registry, './schema');
+$merger = new SchemaMerger('./schema');
+$merger->setSchemaRegistry($registry);
 $merger->addOptimizer(new FieldOrderOptimizer());
 $merger->addOptimizer(new FullNameOptimizer());
 $merger->addOptimizer(new PrimitiveSchemaOptimizer());
@@ -91,20 +93,34 @@ Output directory: output directory for your generated schema templates
 ```php
 <?php
 
+use PhpKafka\PhpAvroSchemaGenerator\Converter\PhpClassConverter;
+use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser;
+use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistry;
+use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
+use PhpParser\ParserFactory;
 
-$registry = (new ClassRegistry())
-    ->addClassDirectory('./example/classes')
-    ->load();
+$parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+$classPropertyParser = new ClassPropertyParser(new DocCommentParser());
+$classParser = new ClassParser($parser, $classPropertyParser);
 
-$generator = new SchemaGenerator($registry, './example/schemaTemplates');
+$converter = new PhpClassConverter($classParser);
+$registry = (new ClassRegistry($converter))->addClassDirectory('./classes')->load();
 
+$generator = new SchemaGenerator('./schema');
+$generator->setClassRegistry($registry);
 $schemas = $generator->generate();
-
 $generator->exportSchemas($schemas);
-
 ```
+The generator is able to detect types from:
+- doc comments
+- property types
+- doc annotations
+  - @avro-type to set a fixed type instead of calculating one
+  - @avro-default set a default for this property in your schema
+  - @avro-doc to set schema doc comment
+  - @avro-logical-type set logical type for your property (decimal is not yet supported, since it has additional parameters)
 
 ## Disclaimer
 In `v1.3.0` the option `--optimizeSubSchemaNamespaces` was added. It was not working fully  
