@@ -15,9 +15,9 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     private string $outputDirectory;
 
     /**
-     * @var ClassRegistryInterface
+     * @var ?ClassRegistryInterface
      */
-    private ClassRegistryInterface $classRegistry;
+    private ?ClassRegistryInterface $classRegistry;
 
     public function __construct(string $outputDirectory = '/tmp')
     {
@@ -72,7 +72,9 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $schema = [];
             $schema['type'] = 'record';
             $schema['name'] = $class->getClassName();
-            $schema['namespace'] = $this->convertNamespace($class->getClassNamespace());
+            if (null !== $this->convertNamespace($class->getClassNamespace())) {
+                $schema['namespace'] = $this->convertNamespace($class->getClassNamespace());
+            }
             $schema['fields'] = [];
 
             /** @var PhpClassPropertyInterface $property */

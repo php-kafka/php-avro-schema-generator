@@ -54,18 +54,23 @@ class SchemaGeneratorTest extends TestCase
                     ],
                     [
                         'name' => 'name',
-                        'type' => 'string'
+                        'type' => 'string',
+                        'default' => 'test',
+                        'doc' => 'test',
+                        'logicalType' => 'test'
                     ]
                 ]
             ]),
-            'name.space.Test2Class' => json_encode([
+            'Test2Class' => json_encode([
                 'type' => 'record',
                 'name' => 'Test2Class',
-                'namespace' => 'name.space',
                 'fields' => [
                     [
                         'name' => 'name',
-                        'type' => 'string'
+                        'type' => 'string',
+                        'default' => 'test',
+                        'doc' => 'test',
+                        'logicalType' => 'test'
                     ]
                 ]
             ])
@@ -79,16 +84,19 @@ class SchemaGeneratorTest extends TestCase
         $property2 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
         $property2->expects(self::exactly(2))->method('getPropertyType')->willReturn('string');
         $property2->expects(self::exactly(2))->method('getPropertyName')->willReturn('name');
-        $property2->expects(self::exactly(2))->method('getPropertyDefault')->willReturn(PhpClassPropertyInterface::NO_DEFAULT);
+        $property2->expects(self::exactly(4))->method('getPropertyDefault')->willReturn('test');
+        $property2->expects(self::exactly(6))->method('getPropertyDoc')->willReturn('test');
+        $property2->expects(self::exactly(4))->method('getPropertyLogicalType')->willReturn('test');
+
 
         $class1 = $this->getMockForAbstractClass(PhpClassInterface::class);
         $class1->expects(self::once())->method('getClassName')->willReturn('TestClass');
-        $class1->expects(self::once())->method('getClassNamespace')->willReturn('name\\space');
+        $class1->expects(self::exactly(2))->method('getClassNamespace')->willReturn('name\\space');
         $class1->expects(self::once())->method('getClassProperties')->willReturn([$property1, $property2]);
 
         $class2 = $this->getMockForAbstractClass(PhpClassInterface::class);
         $class2->expects(self::once())->method('getClassName')->willReturn('Test2Class');
-        $class2->expects(self::once())->method('getClassNamespace')->willReturn('name\\space');
+        $class2->expects(self::once())->method('getClassNamespace')->willReturn(null);
         $class2->expects(self::once())->method('getClassProperties')->willReturn([$property2]);
 
         $registry = $this->getMockForAbstractClass(ClassRegistryInterface::class);
@@ -117,5 +125,18 @@ class SchemaGeneratorTest extends TestCase
         self::assertEquals(1, $fileCount);
 
         unlink('/tmp/filename.avsc');
+    }
+
+    public function testGenerateWithoutRegistry()
+    {
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Please set a ClassRegistry for the generator');
+
+        $generator = new SchemaGenerator();
+        $refObject = new \ReflectionObject($generator);
+        $refProperty = $refObject->getProperty('classRegistry');
+        $refProperty->setAccessible( true );
+        $refProperty->setValue($generator, null);
+        $generator->generate();
     }
 }

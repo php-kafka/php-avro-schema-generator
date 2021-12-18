@@ -39,6 +39,14 @@ class SchemaMergerTest extends TestCase
         self::assertEquals($outputDirectory, $merger->getOutputDirectory());
     }
 
+    public function testSetOutputDirectory()
+    {
+        $outputDirectory = '/root';
+        $merger = new SchemaMerger();
+        $merger->setOutputDirectory($outputDirectory);
+        self::assertEquals($outputDirectory, $merger->getOutputDirectory());
+    }
+
     public function testGetResolvedSchemaTemplateThrowsException()
     {
         self::expectException(\AvroSchemaParseException::class);
@@ -576,6 +584,31 @@ class SchemaMergerTest extends TestCase
 
         self::assertFileExists('/tmp/test.avsc');
         unlink('/tmp/test.avsc');
+    }
+
+    public function testMergeWithoutRegistry()
+    {
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Please set a SchemaRegistery for the merger');
+        $merger = new SchemaMerger();
+        $refObject = new \ReflectionObject($merger);
+        $refProperty = $refObject->getProperty('schemaRegistry');
+        $refProperty->setAccessible( true );
+        $refProperty->setValue($merger, null);
+
+        $merger->merge();
+    }
+
+    public function testGetResolvedSchemaTemplateWithoutRegistry()
+    {
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Please set a SchemaRegistery for the merger');
+        $merger = new SchemaMerger();
+        $refObject = new \ReflectionObject($merger);
+        $refProperty = $refObject->getProperty('schemaRegistry');
+        $refProperty->setAccessible( true );
+        $refProperty->setValue($merger, null);
+        $merger->getResolvedSchemaTemplate($this->getMockForAbstractClass(SchemaTemplateInterface::class));
     }
 
     private function reformatJsonString(string $jsonString): string

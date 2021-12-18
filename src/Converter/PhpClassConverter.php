@@ -139,7 +139,7 @@ class PhpClassConverter implements PhpClassConverterInterface
             }
 
             if (false === $this->isArrayType($type)) {
-                $convertedUnionType[] = $type;
+                $convertedUnionType[] = $this->getFullTypeName($type);
             }
         }
 
