@@ -43,6 +43,7 @@ checks:
             threshold: #language-specific defaults. overrides affect all languages.
 exclude_patterns:
     - "src/Command"
+    - "src/Parser/ClassParser.php"
     - "tests/"
     - "**/vendor/"
     - "example/"
