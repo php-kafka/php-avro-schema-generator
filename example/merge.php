@@ -11,6 +11,7 @@ $registry = (new SchemaRegistry())
     ->addSchemaTemplateDirectory('./schemaTemplates')
     ->load();
 
-$merger = new SchemaMerger($registry, './schema');
+$merger = new SchemaMerger('./schema');
+$merger->setSchemaRegistry($registry);
 
 $merger->merge();
