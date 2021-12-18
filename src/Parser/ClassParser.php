@@ -78,6 +78,12 @@ class ClassParser implements ClassParserInterface
                         }
                     }
                 }
+            } else {
+                if ($statement instanceof Class_) {
+                    if (null !== $statement->extends) {
+                        return implode('\\', $statement->extends->parts);
+                    }
+                }
             }
         }
 

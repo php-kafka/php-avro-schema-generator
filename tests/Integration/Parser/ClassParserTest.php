@@ -58,4 +58,38 @@ class ClassParserTest extends TestCase
             self::assertInstanceOf(PhpClassPropertyInterface::class, $property);
         }
     }
+
+    public function testClassAndNamespaceAreNullWithNoCode(): void
+    {
+        $propertyParser = new ClassPropertyParser(new DocCommentParser());
+        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $refObject = new \ReflectionObject($parser);
+        $refProperty = $refObject->getProperty('statements');
+        $refProperty->setAccessible( true );
+        $refProperty->setValue($parser, null);
+        self::assertNull($parser->getClassName());
+        self::assertNull($parser->getNamespace());
+        self::assertNull($parser->getParentClassName());
+        self::assertEquals([], $parser->getUsedClasses());
+    }
+
+    public function testClassWithNoParent(): void
+    {
+        $propertyParser = new ClassPropertyParser(new DocCommentParser());
+        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser->setCode('<?php class foo {}');
+        self::assertNull($parser->getNamespace());
+        self::assertNull($parser->getParentClassName());
+        self::assertEquals([], $parser->getProperties());
+
+    }
+
+    public function testClassWithNoParentFile(): void
+    {
+        $propertyParser = new ClassPropertyParser(new DocCommentParser());
+        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser->setCode('<?php class foo extends \RuntimeException {private $x;}');
+        self::assertEquals([], $parser->getProperties());
+
+    }
 }
