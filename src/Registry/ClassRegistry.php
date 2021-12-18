@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Registry;
 
 use FilesystemIterator;
+use PhpKafka\PhpAvroSchemaGenerator\Converter\PhpClassConverterInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\ClassRegistryException;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\TokenParser;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -20,9 +22,16 @@ final class ClassRegistry implements ClassRegistryInterface
     protected $classDirectories = [];
 
     /**
-     * @var PhpClass[]
+     * @var PhpClassInterface[]
      */
     protected $classes = [];
+
+    private PhpClassConverterInterface $classConverter;
+
+    public function __construct(PhpClassConverterInterface $classConverter)
+    {
+        $this->classConverter = $classConverter;
+    }
 
     /**
      * @param string $classDirectory
@@ -69,7 +78,7 @@ final class ClassRegistry implements ClassRegistryInterface
     }
 
     /**
-     * @return PhpClass[]
+     * @return PhpClassInterface[]
      */
     public function getClasses(): array
     {
@@ -95,21 +104,10 @@ final class ClassRegistry implements ClassRegistryInterface
                 )
             );
         }
+        $convertedClass = $this->classConverter->convert($fileContent);
 
-        $parser = new TokenParser($fileContent);
-
-        if (null === $parser->getClassName()) {
-            return;
+        if (null !== $convertedClass) {
+            $this->classes[] = $convertedClass;
         }
-
-        /** @var class-string $className */
-        $className = $parser->getNamespace() . '\\' . $parser->getClassName();
-        $properties = $parser->getProperties($className);
-        $this->classes[] = new PhpClass(
-            $parser->getClassName(),
-            $parser->getNamespace(),
-            $fileContent,
-            $properties
-        );
     }
 }

@@ -8,42 +8,36 @@ use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
+use RuntimeException;
 
 final class SchemaGenerator implements SchemaGeneratorInterface
 {
-    /**
-     * @var int[]
-     */
-    private $typesToSkip = [
-        'null' => 1,
-        'object' => 1,
-        'callable' => 1,
-        'resource' => 1,
-        'mixed' => 1
-    ];
+    private string $outputDirectory;
 
     /**
-     * @var string
+     * @var ?ClassRegistryInterface
      */
-    private $outputDirectory;
+    private ?ClassRegistryInterface $classRegistry;
 
-    /**
-     * @var ClassRegistryInterface
-     */
-    private $classRegistry;
-
-    public function __construct(ClassRegistryInterface $classRegistry, string $outputDirectory = '/tmp')
+    public function __construct(string $outputDirectory = '/tmp')
     {
-        $this->classRegistry = $classRegistry;
         $this->outputDirectory = $outputDirectory;
     }
 
     /**
-     * @return ClassRegistryInterface
+     * @return ClassRegistryInterface|null
      */
-    public function getClassRegistry(): ClassRegistryInterface
+    public function getClassRegistry(): ?ClassRegistryInterface
     {
         return $this->classRegistry;
+    }
+
+    /**
+     * @param ClassRegistryInterface $classRegistry
+     */
+    public function setClassRegistry(ClassRegistryInterface $classRegistry): void
+    {
+        $this->classRegistry = $classRegistry;
     }
 
     /**
@@ -55,43 +49,74 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
+     * @param string $outputDirectory
+     */
+    public function setOutputDirectory(string $outputDirectory): void
+    {
+        $this->outputDirectory = $outputDirectory;
+    }
+
+    /**
      * @return array<string,string|false>
      */
     public function generate(): array
     {
         $schemas = [];
 
+        if (null === $this->getClassRegistry()) {
+            throw new RuntimeException('Please set a ClassRegistry for the generator');
+        }
+
         /** @var PhpClassInterface $class */
         foreach ($this->getClassRegistry()->getClasses() as $class) {
             $schema = [];
             $schema['type'] = 'record';
             $schema['name'] = $class->getClassName();
-            $schema['namespace'] = $this->convertNamespace($class->getClassNamespace());
+            if (null !== $this->convertNamespace($class->getClassNamespace())) {
+                $schema['namespace'] = $this->convertNamespace($class->getClassNamespace());
+            }
             $schema['fields'] = [];
 
             /** @var PhpClassPropertyInterface $property */
             foreach ($class->getClassProperties() as $property) {
-                if (true === isset($this->typesToSkip[$property->getPropertyType()])) {
-                    continue;
-                }
-
-                $field = ['name' => $property->getPropertyName()];
-                if ('array' === $property->getPropertyType()) {
-                    $field['type'] = [
-                        'type' => $property->getPropertyType(),
-                        'items' => $this->convertNamespace($property->getPropertyArrayType() ?? 'string')
-                    ];
-                } else {
-                    $field['type'] = $this->convertNamespace($property->getPropertyType());
-                }
-
+                $field = $this->getFieldForProperty($property);
                 $schema['fields'][] = $field;
             }
 
-            $schemas[$schema['namespace'] . '.' . $schema['name']] = json_encode($schema);
+            if (false === isset($schema['namespace'])) {
+                $namespace = $schema['name'];
+            } else {
+                $namespace = $schema['namespace'] . '.' . $schema['name'];
+            }
+
+            $schemas[$namespace] = json_encode($schema);
         }
 
         return $schemas;
+    }
+
+    /**
+     * @param PhpClassPropertyInterface $property
+     * @return array<string, mixed>
+     */
+    private function getFieldForProperty(PhpClassPropertyInterface $property): array
+    {
+        $field = ['name' => $property->getPropertyName()];
+        $field['type'] = $property->getPropertyType();
+
+        if (PhpClassPropertyInterface::NO_DEFAULT !== $property->getPropertyDefault()) {
+            $field['default'] = $property->getPropertyDefault();
+        }
+
+        if (null !== $property->getPropertyDoc() && '' !== $property->getPropertyDoc()) {
+            $field['doc'] = $property->getPropertyDoc();
+        }
+
+        if (null !== $property->getPropertyLogicalType()) {
+            $field['logicalType'] = $property->getPropertyLogicalType();
+        }
+
+        return $field;
     }
 
     /**
@@ -121,11 +146,15 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
-     * @param string $namespace
-     * @return string
+     * @param string|null $namespace
+     * @return string|null
      */
-    private function convertNamespace(string $namespace): string
+    private function convertNamespace(?string $namespace): ?string
     {
+        if (null === $namespace) {
+            return null;
+        }
+
         return str_replace('\\', '.', $namespace);
     }
 }

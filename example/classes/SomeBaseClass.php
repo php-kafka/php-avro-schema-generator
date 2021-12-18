@@ -8,7 +8,6 @@ use PhpKafka\PhpAvroSchemaGenerator\Example\Wonderland\Wonderland;
 
 abstract class SomeBaseClass
 {
-
     /**
      * @var Wonderland
      */

@@ -21,22 +21,29 @@ class SchemaMergerTest extends TestCase
     public function testGetSchemaRegistry()
     {
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
         self::assertEquals($schemaRegistry, $merger->getSchemaRegistry());
     }
 
     public function testGetOutputDirectoryDefault()
     {
-        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
         self::assertEquals('/tmp', $merger->getOutputDirectory());
     }
 
     public function testGetOutputDirectory()
     {
-        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
         $outputDirectory = '/root';
-        $merger = new SchemaMerger($schemaRegistry, $outputDirectory);
+        $merger = new SchemaMerger($outputDirectory);
+        self::assertEquals($outputDirectory, $merger->getOutputDirectory());
+    }
+
+    public function testSetOutputDirectory()
+    {
+        $outputDirectory = '/root';
+        $merger = new SchemaMerger();
+        $merger->setOutputDirectory($outputDirectory);
         self::assertEquals($outputDirectory, $merger->getOutputDirectory());
     }
 
@@ -47,7 +54,8 @@ class SchemaMergerTest extends TestCase
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate->expects(self::once())->method('getSchemaDefinition')->willReturn('{"type": 1}');
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
 
         self::assertEquals([], $merger->getResolvedSchemaTemplate($schemaTemplate));
     }
@@ -71,7 +79,8 @@ class SchemaMergerTest extends TestCase
             ->expects(self::once())
             ->method('getSchemaDefinition')
             ->willReturn($definitionWithType);
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
 
         self::assertEquals([], $merger->getResolvedSchemaTemplate($schemaTemplate));
     }
@@ -119,7 +128,8 @@ class SchemaMergerTest extends TestCase
             ->with($expectedResult)
             ->willReturn($rootSchemaTemplate);
 
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
 
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
@@ -289,7 +299,8 @@ class SchemaMergerTest extends TestCase
             ->with($expectedResult)
             ->willReturn($rootSchemaTemplate);
 
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
 
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
@@ -339,7 +350,8 @@ class SchemaMergerTest extends TestCase
             ->with($expectedResult)
             ->willReturn($rootSchemaTemplate);
 
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
 
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
@@ -368,7 +380,9 @@ class SchemaMergerTest extends TestCase
             ->expects(self::once())
             ->method('getRootSchemas')
             ->willReturn([$schemaTemplate]);
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
+
         $merger->merge();
     }
 
@@ -401,7 +415,8 @@ class SchemaMergerTest extends TestCase
             ->willReturn([$schemaTemplate]);
         $optimizer = $this->getMockForAbstractClass(OptimizerInterface::class);
         $optimizer->expects(self::once())->method('optimize')->with($schemaTemplate)->willReturn($schemaTemplate);
-        $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
+        $merger = new SchemaMerger('/tmp/foobar');
+        $merger->setSchemaRegistry($schemaRegistry);
         $merger->addOptimizer($optimizer);
         $mergedFiles = $merger->merge(true);
 
@@ -437,7 +452,8 @@ class SchemaMergerTest extends TestCase
             ->expects(self::once())
             ->method('getRootSchemas')
             ->willReturn([$schemaTemplate]);
-        $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
+        $merger = new SchemaMerger('/tmp/foobar');
+        $merger->setSchemaRegistry($schemaRegistry);
         $merger->merge(false, true);
 
         self::assertFileExists('/tmp/foobar/primitive-type.avsc');
@@ -477,7 +493,8 @@ class SchemaMergerTest extends TestCase
             ->willReturn([$schemaTemplate]);
         $optimizer = $this->getMockBuilder(PrimitiveSchemaOptimizer::class)->getMock();
         $optimizer->expects(self::once())->method('optimize')->with($schemaTemplate)->willReturn($schemaTemplate);
-        $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
+        $merger = new SchemaMerger('/tmp/foobar');
+        $merger->setSchemaRegistry($schemaRegistry);
         $merger->addOptimizer($optimizer);
         $merger->merge(true);
 
@@ -517,7 +534,8 @@ class SchemaMergerTest extends TestCase
             ->expects(self::once())
             ->method('getRootSchemas')
             ->willReturn([$schemaTemplate]);
-        $merger = new SchemaMerger($schemaRegistry, '/tmp/foobar');
+        $merger = new SchemaMerger('/tmp/foobar');
+        $merger->setSchemaRegistry($schemaRegistry);
         $merger->merge(true, true);
 
         self::assertFileExists('/tmp/foobar/bla.avsc');
@@ -534,7 +552,8 @@ class SchemaMergerTest extends TestCase
             ->willReturn('{"name": "test"}');
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
 
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
         $merger->exportSchema($schemaTemplate);
 
         self::assertFileExists('/tmp/test.avsc');
@@ -559,11 +578,37 @@ class SchemaMergerTest extends TestCase
             ->willReturn('test.avsc');
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
 
-        $merger = new SchemaMerger($schemaRegistry);
+        $merger = new SchemaMerger();
+        $merger->setSchemaRegistry($schemaRegistry);
         $merger->exportSchema($schemaTemplate, true);
 
         self::assertFileExists('/tmp/test.avsc');
         unlink('/tmp/test.avsc');
+    }
+
+    public function testMergeWithoutRegistry()
+    {
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Please set a SchemaRegistery for the merger');
+        $merger = new SchemaMerger();
+        $refObject = new \ReflectionObject($merger);
+        $refProperty = $refObject->getProperty('schemaRegistry');
+        $refProperty->setAccessible( true );
+        $refProperty->setValue($merger, null);
+
+        $merger->merge();
+    }
+
+    public function testGetResolvedSchemaTemplateWithoutRegistry()
+    {
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Please set a SchemaRegistery for the merger');
+        $merger = new SchemaMerger();
+        $refObject = new \ReflectionObject($merger);
+        $refProperty = $refObject->getProperty('schemaRegistry');
+        $refProperty->setAccessible( true );
+        $refProperty->setValue($merger, null);
+        $merger->getResolvedSchemaTemplate($this->getMockForAbstractClass(SchemaTemplateInterface::class));
     }
 
     private function reformatJsonString(string $jsonString): string

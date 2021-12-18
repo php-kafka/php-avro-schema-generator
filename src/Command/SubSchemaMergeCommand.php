@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Command;
 
+use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMergerInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FieldOrderOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\FullNameOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\PrimitiveSchemaOptimizer;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
+use PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,12 +20,26 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SubSchemaMergeCommand extends Command
 {
+    private SchemaRegistryInterface $schemaRegistry;
+    private SchemaMergerInterface $schemaMerger;
+
     /** @var string[] */
-    protected $optimizerOptionMapping = [
+    protected array $optimizerOptionMapping = [
         'optimizeFieldOrder' => FieldOrderOptimizer::class,
         'optimizeFullNames' => FullNameOptimizer::class,
         'optimizePrimitiveSchemas' => PrimitiveSchemaOptimizer::class,
     ];
+
+    public function __construct(
+        SchemaMergerInterface $schemaMerger,
+        SchemaRegistryInterface $schemaRegistry,
+        string $name = null
+    ) {
+        $this->schemaMerger = $schemaMerger;
+        $this->schemaRegistry = $schemaRegistry;
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
         $this
@@ -71,20 +87,19 @@ class SubSchemaMergeCommand extends Command
         $templateDirectory = $this->getPath($templateDirectoryArg);
         $outputDirectory = $this->getPath($outputDirectoryArg);
 
-        $registry = (new SchemaRegistry())
-            ->addSchemaTemplateDirectory($templateDirectory)
-            ->load();
+        $registry = $this->schemaRegistry->addSchemaTemplateDirectory($templateDirectory)->load();
 
-        $merger = new SchemaMerger($registry, $outputDirectory);
+        $this->schemaMerger->setSchemaRegistry($registry);
+        $this->schemaMerger->setOutputDirectory($outputDirectory);
 
         /** @var OptimizerInterface $optimizerClass */
         foreach ($this->optimizerOptionMapping as $optionName => $optimizerClass) {
             if (true === (bool) $input->getOption($optionName)) {
-                $merger->addOptimizer(new $optimizerClass());
+                $this->schemaMerger->addOptimizer(new $optimizerClass());
             }
         }
 
-        $result = $merger->merge(
+        $result = $this->schemaMerger->merge(
             (bool) $input->getOption('prefixWithNamespace'),
             (bool) $input->getOption('useFilenameAsSchemaName')
         );

@@ -6,14 +6,14 @@ namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 
 interface PhpClassInterface
 {
-    public function getClassNamespace(): string;
+    public function getClassNamespace(): ?string;
 
     public function getClassName(): string;
 
     public function getClassBody(): string;
 
     /**
-     * @return PhpClassProperty[]
+     * @return PhpClassPropertyInterface[]
      */
     public function getClassProperties(): array;
 }
