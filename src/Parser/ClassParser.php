@@ -204,7 +204,9 @@ class ClassParser implements ClassParserInterface
         $parentClass = file_get_contents($filename);
 
         if (false === $parentClass) {
+            // @codeCoverageIgnoreStart
             return [];
+            // @codeCoverageIgnoreEnd
         }
 
         return $this->parser->parse($parentClass);
