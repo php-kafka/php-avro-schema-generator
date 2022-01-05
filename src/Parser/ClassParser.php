@@ -184,28 +184,18 @@ class ClassParser implements ClassParserInterface
     {
         /** @var class-string[] $usedClasses */
         $usedClasses = $this->getUsedClasses();
-        $parentClass = $this->getParentClassName();
 
-        if (null === $parentClass) {
+        try {
+            $pc = (new ReflectionClass($this->getNamespace() . '\\' . $this->getClassName()))->getParentClass();
+        }
+        catch (\ReflectionException $e) {
+            throw new ReflectionException("Can't get parent class for [{$this->getNamespace()}\\{$this->getClassName()}]!", $e->getCode(), $e);
+        }
+        if (false === $pc) {
             return [];
         }
 
-        if (null !== @$usedClasses[$this->getParentClassName()]) {
-            $parentClass = $usedClasses[$this->getParentClassName()];
-        }
-
-        try {
-            $rc = new ReflectionClass($parentClass);
-        }
-        catch (\ReflectionException $e) {
-            try {
-                $rc = new ReflectionClass($this->getNamespace() . '\\' . $parentClass);
-            }
-            catch (\ReflectionException $e) {
-                throw new ReflectionException("Parent class [{$parentClass}] for [{$this->getNamespace()}\\{$this->getClassName()}] not found!", $e->getCode(), $e);
-            }
-        }
-        $filename = $rc->getFileName();
+        $filename = $pc->getFileName();
 
         if (false === $filename) {
             return [];
