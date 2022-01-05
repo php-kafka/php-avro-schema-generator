@@ -163,13 +163,27 @@ class ClassParser implements ClassParserInterface
             if ($statement instanceof Namespace_) {
                 foreach ($statement->stmts as $nsStatement) {
                     if ($nsStatement instanceof Class_) {
-                        foreach ($nsStatement->stmts as $pStatement) {
-                            if ($pStatement instanceof Property) {
-                                $properties[] = $this->propertyParser->parseProperty($pStatement);
-                            }
-                        }
+                        $properties = $this->getAllClassProperties($nsStatement, $properties);
                     }
                 }
+            } elseif ($statement instanceof Class_) {
+                $properties = $this->getAllClassProperties($statement, $properties);
+            }
+        }
+
+        return $properties;
+    }
+
+    /**
+     * @param Class_ $class
+     * @param PhpClassPropertyInterface[] $properties
+     * @return PhpClassPropertyInterface[]
+     */
+    private function getAllClassProperties(Class_ $class, array $properties): array {
+
+        foreach ($class->stmts as $pStatement) {
+            if ($pStatement instanceof Property) {
+                $properties[] = $this->propertyParser->parseProperty($pStatement);
             }
         }
 

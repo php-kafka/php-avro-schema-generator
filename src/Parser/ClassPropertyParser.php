@@ -9,6 +9,7 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\UnionType;
 use RuntimeException;
@@ -80,7 +81,12 @@ class ClassPropertyParser implements ClassPropertyParserInterface
      */
     private function getPropertyType(Property $property, array $docComments): string
     {
-        if ($property->type instanceof Identifier) {
+        if ($property->type instanceof NullableType) {
+            if ($property->type->type instanceof Identifier) {
+                $type = Avro::MAPPED_TYPES[$property->type->type->name] ?? $property->type->type->name;
+                return 'null|' . $type;
+            }
+        } elseif ($property->type instanceof Identifier) {
             return Avro::MAPPED_TYPES[$property->type->name] ?? $property->type->name;
         } elseif ($property->type instanceof UnionType) {
             $types = '';
@@ -89,7 +95,7 @@ class ClassPropertyParser implements ClassPropertyParserInterface
             foreach ($property->type->types as $type) {
                 $type = Avro::MAPPED_TYPES[$type->name] ?? $type->name;
                 $types .= $separator . $type;
-                $separator = ',';
+                $separator = '|';
             }
 
             return $types;

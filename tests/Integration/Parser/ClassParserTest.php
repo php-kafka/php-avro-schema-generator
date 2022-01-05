@@ -52,7 +52,7 @@ class ClassParserTest extends TestCase
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
         $parser->setCode(file_get_contents($filePath));
         $properties = $parser->getProperties();
-        self::assertCount(15, $properties);
+        self::assertCount(16, $properties);
 
         foreach($properties as $property) {
             self::assertInstanceOf(PhpClassPropertyInterface::class, $property);
@@ -84,12 +84,61 @@ class ClassParserTest extends TestCase
 
     }
 
+    public function testClassWithNullableType(): void
+    {
+        $propertyParser = new ClassPropertyParser(new DocCommentParser());
+        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser->setCode('
+            <?php
+                class foo {
+                    public ?string $bla;
+                }
+        ');
+        $properties = $parser->getProperties();
+        self::assertEquals(1, count($properties));
+        self::assertEquals('null|string', $properties[0]->getPropertyType());
+    }
+
+    public function testClassWithUnionType(): void
+    {
+        $propertyParser = new ClassPropertyParser(new DocCommentParser());
+        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser->setCode('
+            <?php
+                class foo {
+                    public int|string $bla;
+                }
+        ');
+        $properties = $parser->getProperties();
+        self::assertEquals(1, count($properties));
+        self::assertEquals('int|string', $properties[0]->getPropertyType());
+    }
+
+    public function testClassWithDocUnionType(): void
+    {
+        $propertyParser = new ClassPropertyParser(new DocCommentParser());
+        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser->setCode('
+            <?php
+                class foo {
+                    /**
+                     * @var int|string
+                     */
+                    public $bla;
+                }
+        ');
+        $properties = $parser->getProperties();
+        self::assertEquals(1, count($properties));
+        self::assertEquals('int|string', $properties[0]->getPropertyType());
+    }
+
     public function testClassWithNoParentFile(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
         $parser->setCode('<?php class foo extends \RuntimeException {private $x;}');
-        self::assertEquals([], $parser->getProperties());
-
+        $properties = $parser->getProperties();
+        self::assertEquals(1, count($properties));
+        self::assertEquals('string', $properties[0]->getPropertyType());
     }
 }

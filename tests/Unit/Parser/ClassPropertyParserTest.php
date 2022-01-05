@@ -9,6 +9,7 @@ use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParserInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\PropertyProperty;
 use PhpParser\Node\UnionType;
@@ -28,6 +29,8 @@ class ClassPropertyParserTest extends TestCase
         $ut->types = [$identifier];
         $propertyProperty = $this->getMockBuilder(PropertyProperty::class)->disableOriginalConstructor()->getMock();
         $propertyProperty->name = $varId;
+        $nullableType = $this->getMockBuilder(NullableType::class)->disableOriginalConstructor()->getMock();
+        $nullableType->type = $identifier;
         $doc->expects(self::once())->method('getText')->willReturn('bla');
         $docParser = $this->getMockForAbstractClass(DocCommentParserInterface::class);
         $property1 = $this->getMockBuilder(Property::class)->disableOriginalConstructor()->getMock();
@@ -40,11 +43,15 @@ class ClassPropertyParserTest extends TestCase
         $property3 = $this->getMockBuilder(Property::class)->disableOriginalConstructor()->getMock();
         $property3->type = $ut;
         $property3->props = [$propertyProperty];
+        $property4 = $this->getMockBuilder(Property::class)->disableOriginalConstructor()->getMock();
+        $property4->type = $nullableType;
+        $property4->props = [$propertyProperty];
         $cpp = new ClassPropertyParser($docParser);
 
         self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property1));
         self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property2));
         self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property3));
+        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property4));
     }
 
     public function testParsePropertyExceptionOnNonProperty(): void
