@@ -132,6 +132,30 @@ class ClassParserTest extends TestCase
         self::assertEquals('int|string', $properties[0]->getPropertyType());
     }
 
+    public function testClassWithAnnotations(): void
+    {
+        $propertyParser = new ClassPropertyParser(new DocCommentParser());
+        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser->setCode('
+            <?php
+                class foo {
+                    /**
+                     * @avro-type string
+                     * @avro-default abc def
+                     * @avro-doc some doc bla bla
+                     * @var int|string
+                     */
+                    public $bla;
+                }
+        ');
+        $properties = $parser->getProperties();
+        self::assertEquals(1, count($properties));
+        self::assertEquals('string', $properties[0]->getPropertyType());
+        self::assertEquals('abc def', $properties[0]->getPropertyDefault());
+        self::assertEquals('some doc bla bla', $properties[0]->getPropertyDoc());
+
+    }
+
     public function testClassWithNoParentFile(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
