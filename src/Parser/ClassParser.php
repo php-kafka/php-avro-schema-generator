@@ -190,11 +190,21 @@ class ClassParser implements ClassParserInterface
             return [];
         }
 
-        if (null !== $usedClasses[$this->getParentClassName()]) {
+        if (null !== @$usedClasses[$this->getParentClassName()]) {
             $parentClass = $usedClasses[$this->getParentClassName()];
         }
 
-        $rc = new ReflectionClass($parentClass);
+        try {
+            $rc = new ReflectionClass($parentClass);
+        }
+        catch (\ReflectionException $e) {
+            try {
+                $rc = new ReflectionClass($this->getNamespace() . '\\' . $parentClass);
+            }
+            catch (\ReflectionException $e) {
+                throw new ReflectionException("Parent class [{$parentClass}] for [{$this->getNamespace()}\\{$this->getClassName()}] not found!", $e->getCode(), $e);
+            }
+        }
         $filename = $rc->getFileName();
 
         if (false === $filename) {
