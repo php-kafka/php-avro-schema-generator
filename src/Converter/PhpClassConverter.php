@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Converter;
 
+use PHP_CodeSniffer\Tokenizers\PHP;
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParserInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass;
@@ -147,7 +148,7 @@ class PhpClassConverter implements PhpClassConverterInterface
 
         if (0 !== count($convertedUnionType) && [] !== $arrayType) {
             $convertedUnionType[] = $arrayType;
-        } else {
+        } elseif (0 === count($convertedUnionType) && [] !== $arrayType) {
             return $arrayType;
         }
 
