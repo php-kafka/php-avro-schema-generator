@@ -104,7 +104,7 @@ class ClassParser implements ClassParserInterface
                     if ($nStatement instanceof Use_) {
                         /** @var UseUse $use */
                         foreach ($nStatement->uses as $use) {
-                            $className = $use->name->parts[array_key_last($use->name->parts)];
+                            $className = $use->alias ? $use->alias->name : $use->name->parts[array_key_last($use->name->parts)];
                             $usedClasses[$className] = implode('\\', $use->name->parts);
                         }
                     }
