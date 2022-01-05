@@ -179,8 +179,8 @@ class ClassParser implements ClassParserInterface
      * @param PhpClassPropertyInterface[] $properties
      * @return PhpClassPropertyInterface[]
      */
-    private function getAllClassProperties(Class_ $class, array $properties): array {
-
+    private function getAllClassProperties(Class_ $class, array $properties): array
+    {
         foreach ($class->stmts as $pStatement) {
             if ($pStatement instanceof Property) {
                 $properties[] = $this->propertyParser->parseProperty($pStatement);
