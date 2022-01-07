@@ -132,6 +132,10 @@ class ClassPropertyParser implements ClassPropertyParserInterface
             return PhpClassPropertyInterface::NO_DEFAULT;
         }
 
+        if (PhpClassPropertyInterface::EMPTY_STRING_DEFAULT === $docComments['avro-default']) {
+            return '';
+        }
+
         if (true === is_string($docComments['avro-default']) && true === is_numeric($docComments['avro-default'])) {
             $docComments['avro-default'] = $this->convertStringToNumber($docComments['avro-default']);
         }

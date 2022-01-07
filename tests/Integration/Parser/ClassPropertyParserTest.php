@@ -69,4 +69,22 @@ class ClassPropertyParserTest extends TestCase
         self::assertEquals(1, count($properties));
         self::assertIsFloat($properties[0]->getPropertyDefault());
     }
+
+    public function testEmptyStringDefaultProperty(): void
+    {
+        $propertyParser = new ClassPropertyParser(new DocCommentParser());
+        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser->setCode('
+            <?php
+                class foo {
+                    /**
+                     * @avro-default empty-string-default
+                     */
+                    public $bla;
+                }
+        ');
+        $properties = $parser->getProperties();
+        self::assertEquals(1, count($properties));
+        self::assertEquals('', $properties[0]->getPropertyDefault());
+    }
 }
