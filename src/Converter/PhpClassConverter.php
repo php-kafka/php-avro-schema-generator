@@ -115,11 +115,10 @@ final class PhpClassConverter implements PhpClassConverterInterface
             $type = Avro::MAPPED_TYPES[$type];
         }
 
-        if (false === $isUnionType && true === isset($this->singleTypesToSkip[$type])) {
-            return null;
-        }
-
-        if (true === $isUnionType && true === isset($this->unionTypesToSkip[$type])) {
+        if (
+            (false === $isUnionType && true === isset($this->singleTypesToSkip[$type]))
+            || (true === $isUnionType && true === isset($this->unionTypesToSkip[$type]))
+        ) {
             return null;
         }
 
