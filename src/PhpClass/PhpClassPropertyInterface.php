@@ -7,6 +7,8 @@ namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 interface PhpClassPropertyInterface
 {
     public const NO_DEFAULT = 'there-was-no-default-set';
+    public const EMPTY_STRING_DEFAULT = 'empty-string-default';
+
 
     /**
      * @return mixed
