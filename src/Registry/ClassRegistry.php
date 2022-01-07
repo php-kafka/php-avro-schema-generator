@@ -8,7 +8,6 @@ use FilesystemIterator;
 use PhpKafka\PhpAvroSchemaGenerator\Converter\PhpClassConverterInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\ClassRegistryException;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\TokenParser;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
