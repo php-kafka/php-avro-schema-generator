@@ -14,7 +14,7 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\UnionType;
 use RuntimeException;
 
-class ClassPropertyParser implements ClassPropertyParserInterface
+final class ClassPropertyParser implements ClassPropertyParserInterface
 {
     private DocCommentParserInterface $docParser;
 

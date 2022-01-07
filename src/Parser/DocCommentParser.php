@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
-class DocCommentParser implements DocCommentParserInterface
+final class DocCommentParser implements DocCommentParserInterface
 {
     /**
      * @param string $docComment

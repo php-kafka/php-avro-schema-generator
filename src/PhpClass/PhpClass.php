@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 
-class PhpClass implements PhpClassInterface
+final class PhpClass implements PhpClassInterface
 {
     private string $classBody;
     private string $className;
