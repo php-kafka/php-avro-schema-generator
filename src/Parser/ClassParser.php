@@ -17,7 +17,7 @@ use PhpParser\Parser;
 use ReflectionClass;
 use ReflectionException;
 
-class ClassParser implements ClassParserInterface
+final class ClassParser implements ClassParserInterface
 {
     private ClassPropertyParserInterface $propertyParser;
     private Parser $parser;
