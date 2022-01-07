@@ -124,11 +124,38 @@ class ClassPropertyParser implements ClassPropertyParserInterface
 
     /**
      * @param array<string, mixed> $docComments
-     * @return string
+     * @return string|int|float|null
      */
-    private function getDefaultFromDocComment(array $docComments): string
+    private function getDefaultFromDocComment(array $docComments)
     {
-        return $docComments['avro-default'] ?? PhpClassPropertyInterface::NO_DEFAULT;
+        if (false === isset($docComments['avro-default'])) {
+            return PhpClassPropertyInterface::NO_DEFAULT;
+        }
+
+        if (true === is_string($docComments['avro-default']) && true === is_numeric($docComments['avro-default'])) {
+            $docComments['avro-default'] = $this->convertStringToNumber($docComments['avro-default']);
+        }
+
+        if ('null' === $docComments['avro-default']) {
+            return null;
+        }
+
+        return $docComments['avro-default'];
+    }
+
+    /**
+     * @param string $number
+     * @return float|int
+     */
+    private function convertStringToNumber(string $number)
+    {
+        $int = (int) $number;
+
+        if (strval($int) == $number) {
+            return $int;
+        }
+
+        return (float) $number;
     }
 
     /**
