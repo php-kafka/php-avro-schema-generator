@@ -11,15 +11,25 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 
-class PhpClassConverter implements PhpClassConverterInterface
+final class PhpClassConverter implements PhpClassConverterInterface
 {
     private ClassParserInterface $parser;
 
     /**
      * @var array<string,int>
      */
-    private array $typesToSkip = [
+    private array $singleTypesToSkip = [
         'null' => 1,
+        'object' => 1,
+        'callable' => 1,
+        'resource' => 1,
+        'mixed' => 1
+    ];
+
+    /**
+     * @var array<string,int>
+     */
+    private array $unionTypesToSkip = [
         'object' => 1,
         'callable' => 1,
         'resource' => 1,
@@ -98,13 +108,17 @@ class PhpClassConverter implements PhpClassConverterInterface
         return $this->getConvertedUnionType($types);
     }
 
-    private function getFullTypeName(string $type): ?string
+    private function getFullTypeName(string $type, bool $isUnionType = false): ?string
     {
+
         if (true === isset(Avro::MAPPED_TYPES[$type])) {
             $type = Avro::MAPPED_TYPES[$type];
         }
 
-        if (true === isset($this->typesToSkip[$type])) {
+        if (
+            (false === $isUnionType && true === isset($this->singleTypesToSkip[$type]))
+            || (true === $isUnionType && true === isset($this->unionTypesToSkip[$type]))
+        ) {
             return null;
         }
 
@@ -134,12 +148,8 @@ class PhpClassConverter implements PhpClassConverterInterface
         $convertedUnionType = [];
 
         foreach ($types as $type) {
-            if (true === isset($this->typesToSkip[$type])) {
-                continue;
-            }
-
-            if (false === $this->isArrayType($type)) {
-                $convertedUnionType[] = $this->getFullTypeName($type);
+            if (false === $this->isArrayType($type) && null !== $formattedType = $this->getFullTypeName($type, true)) {
+                $convertedUnionType[] = $formattedType;
             }
         }
 
@@ -147,7 +157,7 @@ class PhpClassConverter implements PhpClassConverterInterface
 
         if (0 !== count($convertedUnionType) && [] !== $arrayType) {
             $convertedUnionType[] = $arrayType;
-        } else {
+        } elseif (0 === count($convertedUnionType) && [] !== $arrayType) {
             return $arrayType;
         }
 
