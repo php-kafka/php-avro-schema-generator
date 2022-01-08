@@ -24,7 +24,15 @@ class ClassParser implements ClassParserInterface
     private Parser $parser;
 
     /** @var Stmt[]|null  */
-    private ?array $statements;
+    protected ?array $statements;
+
+    /**
+     * @return Stmt[]|null
+     */
+    public function getStatements(): ?array
+    {
+        return $this->statements;
+    }
 
     public function __construct(Parser $parser, ClassPropertyParserInterface $propertyParser)
     {
@@ -54,6 +62,10 @@ class ClassParser implements ClassParserInterface
                             return $nsStatement->name->name;
                         }
                     }
+                }
+            } elseif ($statement instanceof Class_){
+                if ($statement->name instanceof Identifier) {
+                    return $statement->name->name;
                 }
             }
         }
@@ -180,7 +192,7 @@ class ClassParser implements ClassParserInterface
      * @param PhpClassPropertyInterface[] $properties
      * @return PhpClassPropertyInterface[]
      */
-    private function getAllClassProperties(Class_ $class, array $properties): array
+    public function getAllClassProperties(Class_ $class, array $properties): array
     {
         foreach ($class->stmts as $pStatement) {
             if ($pStatement instanceof Property) {
@@ -231,40 +243,4 @@ class ClassParser implements ClassParserInterface
 
         return $this->parser->parse($parentClass);
     }
-
-//    /**
-//     * @return Stmt[]|null
-//     * @throws ReflectionException
-//     */
-//    private function getParentClassStatements(): ?array
-//    {
-//        /** @var class-string[] $usedClasses */
-//        $usedClasses = $this->getUsedClasses();
-//        $parentClass = $this->getParentClassName();
-//
-//        if (null === $parentClass) {
-//            return [];
-//        }
-//
-//        if (null !== $usedClasses[$this->getParentClassName()]) {
-//            $parentClass = $usedClasses[$this->getParentClassName()];
-//        }
-//
-//        $rc = new ReflectionClass($parentClass);
-//        $filename = $rc->getFileName();
-//
-//        if (false === $filename) {
-//            return [];
-//        }
-//
-//        $parentClass = file_get_contents($filename);
-//
-//        if (false === $parentClass) {
-//            // @codeCoverageIgnoreStart
-//            return [];
-//            // @codeCoverageIgnoreEnd
-//        }
-//
-//        return $this->parser->parse($parentClass);
-//    }
 }

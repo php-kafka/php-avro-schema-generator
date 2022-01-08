@@ -171,9 +171,11 @@ class ClassParserTest extends TestCase
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
-        $parser->setCode('<?php class foo extends \RuntimeException {private $x;}');
+        $code = 'class foo extends \RuntimeException {private $x;}';
+        eval($code); // Eval to register class which should be available for the reflection
+        $parser->setCode('<' . '?php ' . $code);
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('string', $properties[0]->getPropertyType());
+        self::assertEquals(new PhpClassPropertyType(), $properties[0]->getPropertyType());
     }
 }

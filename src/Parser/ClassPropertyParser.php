@@ -13,13 +13,12 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyTypeItem;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\NullableType;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\UnionType;
 
 class ClassPropertyParser implements ClassPropertyParserInterface
 {
-    private DocCommentParserInterface $docParser;
+    protected DocCommentParserInterface $docParser;
 
     /**
      * @param DocCommentParserInterface $docParser
