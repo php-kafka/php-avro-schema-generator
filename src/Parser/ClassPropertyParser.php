@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
-use JetBrains\PhpStorm\Pure;
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
@@ -14,9 +13,9 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyTypeItem;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\NullableType;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\UnionType;
-use RuntimeException;
 
 class ClassPropertyParser implements ClassPropertyParserInterface
 {
@@ -31,16 +30,11 @@ class ClassPropertyParser implements ClassPropertyParserInterface
     }
 
     /**
-     * @param Property|mixed $property
-     * @return PhpClassPropertyInterface
+     * @inheritdoc
      */
-    public function parseProperty($property): PhpClassPropertyInterface
+    public function parseProperty(Property $property, ClassParserInterface $classParser): PhpClassPropertyInterface
     {
-        if (false === $property instanceof Property) {
-            throw new RuntimeException(sprintf('Property must be of type: %s', Property::class));
-        }
-
-        $propertyAttributes = $this->getPropertyAttributes($property);
+        $propertyAttributes = $this->getPropertyAttributes($property, $classParser);
 
         return new PhpClassProperty(
             $propertyAttributes['name'],
@@ -55,7 +49,7 @@ class ClassPropertyParser implements ClassPropertyParserInterface
      * @param Property $property
      * @return array<string, mixed>
      */
-    private function getPropertyAttributes(Property $property): array
+    protected function getPropertyAttributes(Property $property): array
     {
         $attributes = $this->getEmptyAttributesArray();
         $docComments = $this->getAllPropertyDocComments($property);

@@ -3,11 +3,11 @@
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SkipPropertyException;
-use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyType;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyTypeItem;
+use PhpParser\Node\Stmt\Property;
 
 /**
  * We will skip transient and private properties like starting at 'o_', '_', 'omitMandatoryCheck', 'allLazyKeysMarkedAsLoaded'
@@ -15,10 +15,10 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyTypeItem;
 class AvroClassPropertyParser extends ClassPropertyParser {
 
     /**
-     * @throws SkipPropertyException
+     * @inheritdoc
      */
-    public function parseProperty($property): PhpClassPropertyInterface {
-        $prop = parent::parseProperty($property);
+    public function parseProperty(Property $property, ClassParserInterface $classParser): PhpClassPropertyInterface {
+        $prop = parent::parseProperty($property, $classParser);
         if (str_starts_with($prop->getPropertyName(), 'o_') or str_starts_with($prop->getPropertyName(), '_')
             or in_array($prop->getPropertyName(), ['omitMandatoryCheck', 'allLazyKeysMarkedAsLoaded'])) {
             throw new SkipPropertyException();

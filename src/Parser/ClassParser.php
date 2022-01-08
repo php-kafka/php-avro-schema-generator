@@ -18,7 +18,7 @@ use PhpParser\Parser;
 use ReflectionClass;
 use ReflectionException;
 
-final class ClassParser implements ClassParserInterface
+class ClassParser implements ClassParserInterface
 {
     private ClassPropertyParserInterface $propertyParser;
     private Parser $parser;
@@ -185,7 +185,7 @@ final class ClassParser implements ClassParserInterface
         foreach ($class->stmts as $pStatement) {
             if ($pStatement instanceof Property) {
                 try {
-                    $properties[] = $this->propertyParser->parseProperty($pStatement);
+                    $properties[] = $this->propertyParser->parseProperty($pStatement, $this);
                 }
                 catch(SkipPropertyException $skip){ }
             }

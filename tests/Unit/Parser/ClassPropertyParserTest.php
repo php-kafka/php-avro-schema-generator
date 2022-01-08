@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Parser;
 
+use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParserInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\NullableType;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\PropertyProperty;
 use PhpParser\Node\UnionType;
@@ -20,6 +22,7 @@ class ClassPropertyParserTest extends TestCase
 {
     public function testParseProperty(): void
     {
+        $classParser = $this->getMockBuilder(ClassParser::class)->disableOriginalConstructor()->getMock();
         $doc = $this->getMockBuilder(Doc::class)->disableOriginalConstructor()->getMock();
         $varId = $this->getMockBuilder(VarLikeIdentifier::class)->disableOriginalConstructor()->getMock();
         $varId->name = 'bla';
@@ -48,19 +51,9 @@ class ClassPropertyParserTest extends TestCase
         $property4->props = [$propertyProperty];
         $cpp = new ClassPropertyParser($docParser);
 
-        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property1));
-        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property2));
-        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property3));
-        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property4));
-    }
-
-    public function testParsePropertyExceptionOnNonProperty(): void
-    {
-        self::expectException(\RuntimeException::class);
-        self::expectExceptionMessage('Property must be of type: PhpParser\Node\Stmt\Property');
-        $docParser = $this->getMockForAbstractClass(DocCommentParserInterface::class);
-        $cpp = new ClassPropertyParser($docParser);
-
-        $cpp->parseProperty(1);
+        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property1, $classParser));
+        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property2, $classParser));
+        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property3, $classParser));
+        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property4, $classParser));
     }
 }
