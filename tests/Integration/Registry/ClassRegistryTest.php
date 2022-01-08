@@ -56,31 +56,6 @@ class ClassRegistryTest extends TestCase
         }
     }
 
-    public function testLoadMinimal() {
-        $classDir = __DIR__ . '/../../../example/classes_minimal';
-
-//        $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $propertyParser = new AvroClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
-        $converter = new PhpClassConverter($parser);
-        $registry = (new ClassRegistry($converter))->addClassDirectory($classDir)->load();
-
-        self::assertInstanceOf(ClassRegistryInterface::class, $registry);
-
-        $classes = $registry->getClasses();
-
-        self::assertCount(1, $classes);
-
-        foreach ($classes as $class) {
-            self::assertInstanceOf(PhpClassInterface::class, $class);
-        }
-
-        $generator = new SchemaGenerator('');
-        $generator->setClassRegistry($registry);
-        $schemas = $generator->generate();
-        self::assertCount(1, $schemas);
-    }
-
     public function testRegisterSchemaFileThatDoesntExist()
     {
         $fileInfo = new SplFileInfo('somenonexistingfile');
