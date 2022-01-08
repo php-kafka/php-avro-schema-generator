@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
+use JetBrains\PhpStorm\Pure;
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyType;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyTypeInterface;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyTypeItem;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\NullableType;
@@ -14,7 +18,7 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\UnionType;
 use RuntimeException;
 
-final class ClassPropertyParser implements ClassPropertyParserInterface
+class ClassPropertyParser implements ClassPropertyParserInterface
 {
     private DocCommentParserInterface $docParser;
 
@@ -77,49 +81,73 @@ final class ClassPropertyParser implements ClassPropertyParserInterface
     /**
      * @param Property $property
      * @param array<string,mixed> $docComments
-     * @return string
+     * @return PhpClassPropertyTypeInterface
      */
-    private function getPropertyType(Property $property, array $docComments): string
+    private function getPropertyType(Property $property, array $docComments): PhpClassPropertyTypeInterface
     {
         if ($property->type instanceof NullableType) {
             if ($property->type->type instanceof Identifier) {
-                $type = Avro::MAPPED_TYPES[$property->type->type->name] ?? $property->type->type->name;
-                return 'null|' . $type;
+                return new PhpClassPropertyType(new PhpClassPropertyTypeItem('null'), $this->mapPropertyTypeItem($property->type->type->name));
             }
         } elseif ($property->type instanceof Identifier) {
-            return Avro::MAPPED_TYPES[$property->type->name] ?? $property->type->name;
+            return new PhpClassPropertyType($this->mapPropertyTypeItem($property->type->name));
         } elseif ($property->type instanceof UnionType) {
-            $types = '';
-            $separator = '';
-            /** @var Identifier $type */
-            foreach ($property->type->types as $type) {
-                $type = Avro::MAPPED_TYPES[$type->name] ?? $type->name;
-                $types .= $separator . $type;
-                $separator = '|';
-            }
-
-            return $types;
+            return new PhpClassPropertyType(
+                ...array_map(
+                    function($type){
+                        return new PhpClassPropertyTypeItem($type->name);
+                    },
+                    $property->type->types)
+            );
         }
 
-        return $this->getDocCommentByType($docComments, 'var') ?? 'string';
+        return $this->getDocCommentByType($docComments, 'var');
+    }
+
+    /**
+     * @param string $typeName values like 'string', or 'string|int',  or 'string|int[]'
+     * @return PhpClassPropertyType
+     */
+    protected function mapPropertyType(string $typeName): PhpClassPropertyType
+    {
+        return new PhpClassPropertyType(
+            ...array_map([$this, 'mapPropertyTypeItem'], explode('|', $typeName))
+        );
+    }
+
+    /**
+     * @param string $typeName Handle single type item like: 'string', 'string[]'
+     * @return PhpClassPropertyTypeItem
+     */
+    protected function mapPropertyTypeItem(string $typeName): PhpClassPropertyTypeItem
+    {
+        $arr = explode('[]', $typeName);
+        $itemTypeName = $arr[0];
+
+        return new PhpClassPropertyTypeItem(Avro::MAPPED_TYPES[$itemTypeName] ?? $itemTypeName, count($arr) > 1);
     }
 
     /**
      * @param array<string, mixed> $docComments
-     * @return mixed
+     * @param string $type
+     * @return PhpClassPropertyType
      */
-    private function getDocCommentByType(array $docComments, string $type)
+    private function getDocCommentByType(array $docComments, string $type): PhpClassPropertyType
     {
-        return $docComments[$type] ?? null;
+        return isset($docComments[$type])
+            ? $this->mapPropertyType($docComments[$type])
+            : new PhpClassPropertyType();
     }
 
     /**
      * @param array<string, mixed> $docComments
-     * @return string|null
+     * @return null|PhpClassPropertyType
      */
-    private function getTypeFromDocComment(array $docComments): ?string
+    private function getTypeFromDocComment(array $docComments): ?PhpClassPropertyType
     {
-        return $docComments['avro-type'] ?? null;
+        if (!isset($docComments['avro-type'])) return null;
+
+        return $this->mapPropertyType($docComments['avro-type']);
     }
 
     /**

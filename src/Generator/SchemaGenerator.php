@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Generator;
 
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
+use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaGeneratorException;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
@@ -98,6 +99,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     /**
      * @param PhpClassPropertyInterface $property
      * @return array<string, mixed>
+     * @throws SchemaGeneratorException
      */
     private function getFieldForProperty(PhpClassPropertyInterface $property): array
     {
@@ -106,6 +108,9 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
         if (PhpClassPropertyInterface::NO_DEFAULT !== $property->getPropertyDefault()) {
             $field['default'] = $property->getPropertyDefault();
+            if (null === $field['default'] and !$field['type']->isNullable()){
+                throw new SchemaGeneratorException('Provided default value "null", but that type does not present as first possible in union (see https://avro.apache.org/docs/current/spec.html#Unions)!');
+            }
         }
 
         if (null !== $property->getPropertyDoc() && '' !== $property->getPropertyDoc()) {

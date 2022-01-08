@@ -5,6 +5,8 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Generator;
 use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyType;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyTypeItem;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -77,12 +79,12 @@ class SchemaGeneratorTest extends TestCase
         ];
 
         $property1 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property1->expects(self::exactly(1))->method('getPropertyType')->willReturn(["type" => "array","items" => "test.foo"]);
+        $property1->expects(self::exactly(1))->method('getPropertyType')->willReturn(new PhpClassPropertyType(new PhpClassPropertyTypeItem('test.foo', true)));
         $property1->expects(self::exactly(1))->method('getPropertyName')->willReturn('items');
         $property1->expects(self::exactly(1))->method('getPropertyDefault')->willReturn(PhpClassPropertyInterface::NO_DEFAULT);
 
         $property2 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property2->expects(self::exactly(2))->method('getPropertyType')->willReturn('string');
+        $property2->expects(self::exactly(2))->method('getPropertyType')->willReturn(new PhpClassPropertyType(new PhpClassPropertyTypeItem('string', )));
         $property2->expects(self::exactly(2))->method('getPropertyName')->willReturn('name');
         $property2->expects(self::exactly(4))->method('getPropertyDefault')->willReturn('test');
         $property2->expects(self::exactly(6))->method('getPropertyDoc')->willReturn('test');

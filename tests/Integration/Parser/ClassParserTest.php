@@ -8,6 +8,8 @@ use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyType;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyTypeItem;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -96,7 +98,10 @@ class ClassParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('null|string', $properties[0]->getPropertyType());
+        self::assertEquals(
+            new PhpClassPropertyType(new PhpClassPropertyTypeItem('null'), new PhpClassPropertyTypeItem('string')),
+            $properties[0]->getPropertyType()
+        );
     }
 
     public function testClassWithUnionType(): void
@@ -111,7 +116,10 @@ class ClassParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('int|string', $properties[0]->getPropertyType());
+        self::assertEquals(
+            new PhpClassPropertyType(new PhpClassPropertyTypeItem('int'), new PhpClassPropertyTypeItem('string')),
+            $properties[0]->getPropertyType()
+        );
     }
 
     public function testClassWithDocUnionType(): void
@@ -129,7 +137,10 @@ class ClassParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('int|string', $properties[0]->getPropertyType());
+        self::assertEquals(
+            new PhpClassPropertyType(new PhpClassPropertyTypeItem('int'), new PhpClassPropertyTypeItem('string')),
+            $properties[0]->getPropertyType()
+        );
     }
 
     public function testClassWithAnnotations(): void
@@ -150,7 +161,7 @@ class ClassParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('string', $properties[0]->getPropertyType());
+        self::assertEquals(new PhpClassPropertyType(new PhpClassPropertyTypeItem('string')), $properties[0]->getPropertyType());
         self::assertEquals('abc def', $properties[0]->getPropertyDefault());
         self::assertEquals('some doc bla bla', $properties[0]->getPropertyDoc());
 

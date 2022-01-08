@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
+use PhpKafka\PhpAvroSchemaGenerator\Exception\SkipPropertyException;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
@@ -183,7 +184,10 @@ final class ClassParser implements ClassParserInterface
     {
         foreach ($class->stmts as $pStatement) {
             if ($pStatement instanceof Property) {
-                $properties[] = $this->propertyParser->parseProperty($pStatement);
+                try {
+                    $properties[] = $this->propertyParser->parseProperty($pStatement);
+                }
+                catch(SkipPropertyException $skip){ }
             }
         }
 
@@ -196,8 +200,10 @@ final class ClassParser implements ClassParserInterface
      */
     private function getParentClassStatements(): ?array
     {
-        /** @var class-string[] $usedClasses */
-        $usedClasses = $this->getUsedClasses();
+        $parentClass = $this->getParentClassName(); // Especially for speedup and tests! Do not use Reflection when parser show no any parents.
+        if (null === $parentClass) {
+            return [];
+        }
 
         try {
             $pc = (new ReflectionClass($this->getNamespace() . '\\' . $this->getClassName()))->getParentClass();
@@ -225,4 +231,40 @@ final class ClassParser implements ClassParserInterface
 
         return $this->parser->parse($parentClass);
     }
+
+//    /**
+//     * @return Stmt[]|null
+//     * @throws ReflectionException
+//     */
+//    private function getParentClassStatements(): ?array
+//    {
+//        /** @var class-string[] $usedClasses */
+//        $usedClasses = $this->getUsedClasses();
+//        $parentClass = $this->getParentClassName();
+//
+//        if (null === $parentClass) {
+//            return [];
+//        }
+//
+//        if (null !== $usedClasses[$this->getParentClassName()]) {
+//            $parentClass = $usedClasses[$this->getParentClassName()];
+//        }
+//
+//        $rc = new ReflectionClass($parentClass);
+//        $filename = $rc->getFileName();
+//
+//        if (false === $filename) {
+//            return [];
+//        }
+//
+//        $parentClass = file_get_contents($filename);
+//
+//        if (false === $parentClass) {
+//            // @codeCoverageIgnoreStart
+//            return [];
+//            // @codeCoverageIgnoreEnd
+//        }
+//
+//        return $this->parser->parse($parentClass);
+//    }
 }
