@@ -6,7 +6,7 @@ namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 
 use PhpKafka\PhpAvroSchemaGenerator\Parser\PropertyAttributesInterface;
 
-class PhpClassProperty implements PhpClassPropertyInterface
+final class PhpClassProperty implements PhpClassPropertyInterface
 {
     /** @var mixed */
     private $propertyDefault;
