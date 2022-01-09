@@ -23,7 +23,7 @@ class PhpClassPropertyTypeItem implements PhpClassPropertyTypeItemInterface
         return $this->itemType;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         if ($this->isArray()){
             return [

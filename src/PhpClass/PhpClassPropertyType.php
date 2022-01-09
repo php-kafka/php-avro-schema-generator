@@ -34,7 +34,7 @@ class PhpClassPropertyType implements PhpClassPropertyTypeInterface
      * Allow easy serialization into JSON
      * @return array|mixed|PhpClassPropertyTypeItemInterface|PhpClassPropertyTypeItemInterface[]
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         if (0 == count($this->types)){
             return [];
