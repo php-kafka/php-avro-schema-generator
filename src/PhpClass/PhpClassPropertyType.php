@@ -30,7 +30,11 @@ class PhpClassPropertyType implements PhpClassPropertyTypeInterface
         return (bool)current(array_filter($this->types, function ($type) { return !$type->isArray() && 'null' == $type->getItemType(); }));
     }
 
-    public function jsonSerialize(): mixed
+    /**
+     * Allow easy serialization into JSON
+     * @return array|mixed|PhpClassPropertyTypeItemInterface|PhpClassPropertyTypeItemInterface[]
+     */
+    public function jsonSerialize()
     {
         if (0 == count($this->types)){
             return [];
