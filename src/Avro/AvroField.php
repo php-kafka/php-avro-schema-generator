@@ -23,9 +23,9 @@ final class AvroField implements AvroFieldInterface
      * @param null|string $fieldLogicalType
      */
     public function __construct(
-        string  $fieldName,
-                $fieldType,
-                $fieldDefault = self::NO_DEFAULT,
+        string $fieldName,
+        $fieldType,
+        $fieldDefault = self::NO_DEFAULT,
         ?string $fieldDoc = null,
         ?string $fieldLogicalType = null
     ) {
