@@ -47,7 +47,7 @@ class SchemaRegistryTest extends TestCase
             self::assertContains($schema->getSchemaId(), $schemaIds);
         }
 
-        self::assertSame(['Library', 'CD', 'Collection', 'Page'], $registry->getSchemaNamesPerNamespace('com.example'));
+        self::assertEqualsCanonicalizing(['Library', 'CD', 'Collection', 'Page'], $registry->getSchemaNamesPerNamespace('com.example'));
     }
 
     public function testGetRootSchemas()
