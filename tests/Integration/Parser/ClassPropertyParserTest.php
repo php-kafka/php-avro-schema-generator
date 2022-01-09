@@ -7,7 +7,7 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Integration\Parser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -31,7 +31,7 @@ class ClassPropertyParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertNull($properties[0]->getPropertyDefault());
+        self::assertNull($properties[0]->getFieldDefault());
     }
 
     public function testIntDefaultProperty(): void
@@ -49,7 +49,7 @@ class ClassPropertyParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertIsInt($properties[0]->getPropertyDefault());
+        self::assertIsInt($properties[0]->getFieldDefault());
     }
 
     public function testFloatDefaultProperty(): void
@@ -67,7 +67,7 @@ class ClassPropertyParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertIsFloat($properties[0]->getPropertyDefault());
+        self::assertIsFloat($properties[0]->getFieldDefault());
     }
 
     public function testEmptyStringDefaultProperty(): void
@@ -85,6 +85,6 @@ class ClassPropertyParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('', $properties[0]->getPropertyDefault());
+        self::assertEquals('', $properties[0]->getFieldDefault());
     }
 }

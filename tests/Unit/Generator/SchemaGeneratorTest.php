@@ -3,8 +3,8 @@
 namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Generator;
 
 use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroRecordInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -76,28 +76,28 @@ class SchemaGeneratorTest extends TestCase
             ])
         ];
 
-        $property1 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property1->expects(self::exactly(1))->method('getPropertyType')->willReturn(["type" => "array","items" => "test.foo"]);
-        $property1->expects(self::exactly(1))->method('getPropertyName')->willReturn('items');
-        $property1->expects(self::exactly(1))->method('getPropertyDefault')->willReturn(PhpClassPropertyInterface::NO_DEFAULT);
+        $property1 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property1->expects(self::exactly(1))->method('getFieldType')->willReturn(["type" => "array","items" => "test.foo"]);
+        $property1->expects(self::exactly(1))->method('getFieldName')->willReturn('items');
+        $property1->expects(self::exactly(1))->method('getFieldDefault')->willReturn(AvroFieldInterface::NO_DEFAULT);
 
-        $property2 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property2->expects(self::exactly(2))->method('getPropertyType')->willReturn('string');
-        $property2->expects(self::exactly(2))->method('getPropertyName')->willReturn('name');
-        $property2->expects(self::exactly(4))->method('getPropertyDefault')->willReturn('test');
-        $property2->expects(self::exactly(6))->method('getPropertyDoc')->willReturn('test');
-        $property2->expects(self::exactly(4))->method('getPropertyLogicalType')->willReturn('test');
+        $property2 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property2->expects(self::exactly(2))->method('getFieldType')->willReturn('string');
+        $property2->expects(self::exactly(2))->method('getFieldName')->willReturn('name');
+        $property2->expects(self::exactly(4))->method('getFieldDefault')->willReturn('test');
+        $property2->expects(self::exactly(6))->method('getFieldDoc')->willReturn('test');
+        $property2->expects(self::exactly(4))->method('getFieldLogicalType')->willReturn('test');
 
 
-        $class1 = $this->getMockForAbstractClass(PhpClassInterface::class);
-        $class1->expects(self::once())->method('getClassName')->willReturn('TestClass');
-        $class1->expects(self::exactly(2))->method('getClassNamespace')->willReturn('name\\space');
-        $class1->expects(self::once())->method('getClassProperties')->willReturn([$property1, $property2]);
+        $class1 = $this->getMockForAbstractClass(AvroRecordInterface::class);
+        $class1->expects(self::once())->method('getRecordName')->willReturn('TestClass');
+        $class1->expects(self::exactly(2))->method('getRecordNamespace')->willReturn('name\\space');
+        $class1->expects(self::once())->method('getRecordFields')->willReturn([$property1, $property2]);
 
-        $class2 = $this->getMockForAbstractClass(PhpClassInterface::class);
-        $class2->expects(self::once())->method('getClassName')->willReturn('Test2Class');
-        $class2->expects(self::once())->method('getClassNamespace')->willReturn(null);
-        $class2->expects(self::once())->method('getClassProperties')->willReturn([$property2]);
+        $class2 = $this->getMockForAbstractClass(AvroRecordInterface::class);
+        $class2->expects(self::once())->method('getRecordName')->willReturn('Test2Class');
+        $class2->expects(self::once())->method('getRecordNamespace')->willReturn(null);
+        $class2->expects(self::once())->method('getRecordFields')->willReturn([$property2]);
 
         $registry = $this->getMockForAbstractClass(ClassRegistryInterface::class);
         $registry->expects(self::once())->method('getClasses')->willReturn([$class1, $class2]);

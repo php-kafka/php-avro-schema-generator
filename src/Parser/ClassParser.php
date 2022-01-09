@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
@@ -136,7 +136,7 @@ final class ClassParser implements ClassParserInterface
     }
 
     /**
-     * @return PhpClassPropertyInterface[]
+     * @return AvroFieldInterface[]
      */
     public function getProperties(): array
     {
@@ -153,7 +153,7 @@ final class ClassParser implements ClassParserInterface
 
     /**
      * @param Stmt[] $statements
-     * @return PhpClassPropertyInterface[]
+     * @return AvroFieldInterface[]
      */
     private function getClassProperties(array $statements): array
     {
@@ -176,8 +176,8 @@ final class ClassParser implements ClassParserInterface
 
     /**
      * @param Class_ $class
-     * @param PhpClassPropertyInterface[] $properties
-     * @return PhpClassPropertyInterface[]
+     * @param AvroFieldInterface[] $properties
+     * @return AvroFieldInterface[]
      */
     private function getAllClassProperties(Class_ $class, array $properties): array
     {
