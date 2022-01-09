@@ -14,7 +14,7 @@ composer require php-kafka/php-avro-schema-generator "^3.0"
 This library enables you to:
 - Manage your embedded schema as separate files
 - The library is able to merge those files
-- The library is able to generate avsc schema from PHP classes
+- The library is able to generate avsc schema templates from PHP classes
 
 ### Merging subschemas / schemas
 Schema template directories: directories containing avsc template files (with subschema)  
@@ -83,6 +83,7 @@ $merger->merge();
 You will need to adjust the generated templates, but it gives you a good starting point to work with.  
 Class directories: Directories containing the classes you want to generate schemas from  
 Output directory: output directory for your generated schema templates  
+After you have reviewed and adjusted your templates you will need to merge them (see above)  
 
 **Console example**
 ```bash
