@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroField;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\NullableType;
@@ -28,9 +28,9 @@ final class ClassPropertyParser implements ClassPropertyParserInterface
 
     /**
      * @param Property|mixed $property
-     * @return PhpClassPropertyInterface
+     * @return AvroFieldInterface
      */
-    public function parseProperty($property): PhpClassPropertyInterface
+    public function parseProperty($property): AvroFieldInterface
     {
         if (false === $property instanceof Property) {
             throw new RuntimeException(sprintf('Property must be of type: %s', Property::class));
@@ -38,7 +38,7 @@ final class ClassPropertyParser implements ClassPropertyParserInterface
 
         $propertyAttributes = $this->getPropertyAttributes($property);
 
-        return new PhpClassProperty(
+        return new AvroField(
             $propertyAttributes['name'],
             $propertyAttributes['types'],
             $propertyAttributes['default'],
@@ -55,7 +55,7 @@ final class ClassPropertyParser implements ClassPropertyParserInterface
     {
         $attributes = $this->getEmptyAttributesArray();
         $docComments = $this->getAllPropertyDocComments($property);
-        $attributes['name'] = $this->getPropertyName($property);
+        $attributes['name'] = $this->getFieldName($property);
 
         $attributes['types'] = $this->getTypeFromDocComment($docComments);
         if (null === $attributes['types']) {
@@ -69,7 +69,7 @@ final class ClassPropertyParser implements ClassPropertyParserInterface
         return $attributes;
     }
 
-    private function getPropertyName(Property $property): string
+    private function getFieldName(Property $property): string
     {
         return $property->props[0]->name->name;
     }
@@ -129,10 +129,10 @@ final class ClassPropertyParser implements ClassPropertyParserInterface
     private function getDefaultFromDocComment(array $docComments)
     {
         if (false === isset($docComments['avro-default'])) {
-            return PhpClassPropertyInterface::NO_DEFAULT;
+            return AvroFieldInterface::NO_DEFAULT;
         }
 
-        if (PhpClassPropertyInterface::EMPTY_STRING_DEFAULT === $docComments['avro-default']) {
+        if (AvroFieldInterface::EMPTY_STRING_DEFAULT === $docComments['avro-default']) {
             return '';
         }
 
@@ -208,7 +208,7 @@ final class ClassPropertyParser implements ClassPropertyParserInterface
         return [
             'name' => null,
             'types' => null,
-            'default' => PhpClassPropertyInterface::NO_DEFAULT,
+            'default' => AvroFieldInterface::NO_DEFAULT,
             'logicalType' => null,
             'doc' => null
         ];

@@ -7,7 +7,7 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Integration\Parser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ClassParserTest extends TestCase
 {
-    public function testGetClassName()
+    public function testgetClassName()
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestClass.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
@@ -26,7 +26,7 @@ class ClassParserTest extends TestCase
         self::assertEquals('SomeTestClass', $parser->getClassName());
     }
 
-    public function testGetClassNameForInterface()
+    public function testgetClassNameForInterface()
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestInterface.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
@@ -55,7 +55,7 @@ class ClassParserTest extends TestCase
         self::assertCount(16, $properties);
 
         foreach($properties as $property) {
-            self::assertInstanceOf(PhpClassPropertyInterface::class, $property);
+            self::assertInstanceOf(AvroFieldInterface::class, $property);
         }
     }
 
@@ -96,7 +96,7 @@ class ClassParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('null|string', $properties[0]->getPropertyType());
+        self::assertEquals('null|string', $properties[0]->getFieldType());
     }
 
     public function testClassWithUnionType(): void
@@ -111,7 +111,7 @@ class ClassParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('int|string', $properties[0]->getPropertyType());
+        self::assertEquals('int|string', $properties[0]->getFieldType());
     }
 
     public function testClassWithDocUnionType(): void
@@ -129,7 +129,7 @@ class ClassParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('int|string', $properties[0]->getPropertyType());
+        self::assertEquals('int|string', $properties[0]->getFieldType());
     }
 
     public function testClassWithAnnotations(): void
@@ -150,9 +150,9 @@ class ClassParserTest extends TestCase
         ');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('string', $properties[0]->getPropertyType());
-        self::assertEquals('abc def', $properties[0]->getPropertyDefault());
-        self::assertEquals('some doc bla bla', $properties[0]->getPropertyDoc());
+        self::assertEquals('string', $properties[0]->getFieldType());
+        self::assertEquals('abc def', $properties[0]->getFieldDefault());
+        self::assertEquals('some doc bla bla', $properties[0]->getFieldDoc());
 
     }
 
@@ -163,6 +163,6 @@ class ClassParserTest extends TestCase
         $parser->setCode('<?php class foo extends \RuntimeException {private $x;}');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));
-        self::assertEquals('string', $properties[0]->getPropertyType());
+        self::assertEquals('string', $properties[0]->getFieldType());
     }
 }

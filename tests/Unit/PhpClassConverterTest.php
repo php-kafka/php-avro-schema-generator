@@ -6,26 +6,26 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit;
 
 use PhpKafka\PhpAvroSchemaGenerator\Converter\PhpClassConverter;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParserInterface;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroRecordInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PHPUnit\Framework\TestCase;
 
 class PhpClassConverterTest extends TestCase
 {
     public function testConvert(): void
     {
-        $property1 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property1->expects(self::once())->method('getPropertyType')->willReturn(1);
-        $property2 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property2->expects(self::exactly(2))->method('getPropertyType')->willReturn('string|array|int[]|mixed[]');
-        $property3 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property3->expects(self::exactly(2))->method('getPropertyType')->willReturn('string');
-        $property4 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property4->expects(self::exactly(2))->method('getPropertyType')->willReturn('object|XYZ|UC');
-        $property5 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property5->expects(self::exactly(2))->method('getPropertyType')->willReturn('mixed');
-        $property6 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property6->expects(self::exactly(2))->method('getPropertyType')->willReturn('array|mixed[]');
+        $property1 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property1->expects(self::once())->method('getFieldType')->willReturn(1);
+        $property2 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property2->expects(self::exactly(2))->method('getFieldType')->willReturn('string|array|int[]|mixed[]');
+        $property3 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property3->expects(self::exactly(2))->method('getFieldType')->willReturn('string');
+        $property4 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property4->expects(self::exactly(2))->method('getFieldType')->willReturn('object|XYZ|UC');
+        $property5 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property5->expects(self::exactly(2))->method('getFieldType')->willReturn('mixed');
+        $property6 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property6->expects(self::exactly(2))->method('getFieldType')->willReturn('array|mixed[]');
 
 
         $parser = $this->getMockForAbstractClass(ClassParserInterface::class);
@@ -38,13 +38,13 @@ class PhpClassConverterTest extends TestCase
         $parser->expects(self::exactly(3))->method('getNamespace')->willReturn('x\\y');
 
         $converter = new PhpClassConverter($parser);
-        self::assertInstanceOf(PhpClassInterface::class, $converter->convert('some class stuff'));
+        self::assertInstanceOf(AvroRecordInterface::class, $converter->convert('some class stuff'));
     }
 
     public function testConvertWithNoNamesace(): void
     {
-        $property1 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property1->expects(self::exactly(2))->method('getPropertyType')->willReturn('ABC');
+        $property1 = $this->getMockForAbstractClass(AvroFieldInterface::class);
+        $property1->expects(self::exactly(2))->method('getFieldType')->willReturn('ABC');
 
 
         $parser = $this->getMockForAbstractClass(ClassParserInterface::class);
@@ -55,7 +55,7 @@ class PhpClassConverterTest extends TestCase
         $parser->expects(self::exactly(2))->method('getNamespace')->willReturn(null);
 
         $converter = new PhpClassConverter($parser);
-        self::assertInstanceOf(PhpClassInterface::class, $converter->convert('some class stuff'));
+        self::assertInstanceOf(AvroRecordInterface::class, $converter->convert('some class stuff'));
     }
 
     public function testConvertOfNonClass(): void

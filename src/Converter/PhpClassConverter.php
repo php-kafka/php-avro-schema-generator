@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Converter;
 
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroRecord;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroRecordInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroField;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParserInterface;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 
 final class PhpClassConverter implements PhpClassConverterInterface
 {
@@ -45,7 +45,7 @@ final class PhpClassConverter implements PhpClassConverterInterface
     }
 
 
-    public function convert(string $phpClass): ?PhpClassInterface
+    public function convert(string $phpClass): ?AvroRecordInterface
     {
         $this->parser->setCode($phpClass);
 
@@ -55,38 +55,37 @@ final class PhpClassConverter implements PhpClassConverterInterface
 
         $convertedProperties = $this->getConvertedProperties($this->parser->getProperties());
 
-        return new PhpClass(
+        return new AvroRecord(
             $this->parser->getClassName(),
             $this->parser->getNamespace(),
-            $phpClass,
             $convertedProperties
         );
     }
 
     /**
-     * @param PhpClassPropertyInterface[] $properties
-     * @return PhpClassPropertyInterface[]
+     * @param AvroFieldInterface[] $properties
+     * @return AvroFieldInterface[]
      */
     private function getConvertedProperties(array $properties): array
     {
         $convertedProperties = [];
         foreach ($properties as $property) {
-            if (false === is_string($property->getPropertyType())) {
+            if (false === is_string($property->getFieldType())) {
                 continue;
             }
 
-            $convertedType = $this->getConvertedType($property->getPropertyType());
+            $convertedType = $this->getConvertedType($property->getFieldType());
 
             if (null === $convertedType) {
                 continue;
             }
 
-            $convertedProperties[] = new PhpClassProperty(
-                $property->getPropertyName(),
+            $convertedProperties[] = new AvroField(
+                $property->getFieldName(),
                 $convertedType,
-                $property->getPropertyDefault(),
-                $property->getPropertyDoc(),
-                $property->getPropertyLogicalType()
+                $property->getFieldDefault(),
+                $property->getFieldDoc(),
+                $property->getFieldLogicalType()
             );
         }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroField;
 
 interface ClassParserInterface
 {
@@ -13,7 +13,7 @@ interface ClassParserInterface
     public function getNamespace(): ?string;
 
     /**
-     * @return PhpClassProperty[]
+     * @return AvroField[]
      */
     public function getProperties(): array;
 
