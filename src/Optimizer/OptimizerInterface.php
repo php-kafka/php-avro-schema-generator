@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Optimizer;
 
+use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
+
 interface OptimizerInterface
 {
-    public function optimize(string $definition): string;
+    /**
+     * @param SchemaTemplateInterface $schemaTemplate
+     * @return SchemaTemplateInterface
+     */
+    public function optimize(SchemaTemplateInterface $schemaTemplate): SchemaTemplateInterface;
 }

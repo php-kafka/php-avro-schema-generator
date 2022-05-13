@@ -4,7 +4,7 @@ checks:
     argument-count:
         enabled: true
         config:
-            threshold: 4
+            threshold: 5
     complex-logic:
         enabled: true
         config:
@@ -24,7 +24,7 @@ checks:
     method-lines:
         enabled: true
         config:
-            threshold: 25
+            threshold: 30
     nested-control-flow:
         enabled: true
         config:
@@ -32,7 +32,7 @@ checks:
     return-statements:
         enabled: true
         config:
-            threshold: 4
+            threshold: 5
     similar-code:
         enabled: true
         config:
@@ -42,8 +42,8 @@ checks:
         config:
             threshold: #language-specific defaults. overrides affect all languages.
 exclude_patterns:
-    - "src/Parser/TokenParser.php"
     - "src/Command"
+    - "src/Parser/ClassParser.php"
     - "tests/"
     - "**/vendor/"
     - "example/"

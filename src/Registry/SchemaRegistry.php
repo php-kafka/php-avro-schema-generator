@@ -135,7 +135,7 @@ final class SchemaRegistry implements SchemaRegistryInterface
         }
 
         $schemaData = json_decode($fileContent, true, JSON_THROW_ON_ERROR);
-        $namespace = $schemaData['namespace'] ?? '';
+        $namespace = (string) $schemaData['namespace'];
 
         if (null === $schemaData) {
             throw new SchemaRegistryException(sprintf(SchemaRegistryException::FILE_INVALID, $fileName));
@@ -150,7 +150,7 @@ final class SchemaRegistry implements SchemaRegistryInterface
         $this->schemas[$schemaId] = $template->withSchemaId($schemaId);
 
         if (true === isset($schemaData['name'])) {
-            $this->schemaNamesPerNamespace[$namespace][] = $schemaData['name'];
+            $this->schemaNamesPerNamespace[$namespace][] = (string) $schemaData['name'];
         }
     }
 

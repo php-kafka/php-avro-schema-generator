@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Registry;
 
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass;
+use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 
 interface ClassRegistryInterface
 {
-
     /**
      * @param  string $classDirectory
      * @return ClassRegistryInterface
@@ -26,7 +25,7 @@ interface ClassRegistryInterface
     public function load(): ClassRegistryInterface;
 
     /**
-     * @return PhpClass[]
+     * @return PhpClassInterface[]
      */
     public function getClasses(): array;
 }

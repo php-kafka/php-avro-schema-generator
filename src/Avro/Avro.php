@@ -20,4 +20,24 @@ class Avro
         'map' => self::LONELIEST_NUMBER,
         'fixed' => self::LONELIEST_NUMBER,
     ];
+
+    /**
+     * @var string[]
+     */
+    public const  MAPPED_TYPES = array(
+        'null' => 'null',
+        'bool' => 'boolean',
+        'boolean' => 'boolean',
+        'string' => 'string',
+        'int' => 'int',
+        'integer' => 'int',
+        'float' => 'float',
+        'double' => 'double',
+        'array' => 'array',
+        'object' => 'object',
+        'callable' => 'callable',
+        'resource' => 'resource',
+        'mixed' => 'mixed',
+        'Collection' => 'array',
+    );
 }

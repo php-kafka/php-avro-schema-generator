@@ -79,4 +79,6 @@ class SomeTestClass extends SomeBaseClass
      * @var array|SomeOtherTestClass[]
      */
     public $someOtherTestClasses;
+
+    public int|string $blaaaaaaaa;
 }
