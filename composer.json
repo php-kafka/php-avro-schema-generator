@@ -34,5 +34,10 @@
     "branch-alias": {
       "dev-main": "3.0-dev"
     }
+  },
+  "config": {
+    "allow-plugins": {
+      "infection/extension-installer": true
+    }
   }
 }
