@@ -192,7 +192,7 @@ final class SchemaMerger implements SchemaMergerInterface
         }
 
         /** @var string $fileContents */
-        $fileContents = json_encode($rootSchemaDefinition);
+        $fileContents = json_encode($rootSchemaDefinition, JSON_PRESERVE_ZERO_FRACTION);
 
         file_put_contents($this->getOutputDirectory() . '/' . $schemaFilename, $fileContents);
     }

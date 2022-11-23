@@ -20,7 +20,9 @@ class FullNameOptimizer extends AbstractOptimizer implements OptimizerInterface
         $currentNamespace = $data['namespace'] ?? '';
         $data = $this->processSchema($currentNamespace, $data, true);
 
-        return $schemaTemplate->withSchemaDefinition(json_encode($data, JSON_THROW_ON_ERROR));
+        return $schemaTemplate->withSchemaDefinition(
+            json_encode($data, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION)
+        );
     }
 
     /**

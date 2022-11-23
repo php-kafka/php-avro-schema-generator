@@ -48,6 +48,11 @@ class FullNameOptimizerTest extends TestCase
                     "default": []
                 },
                 {
+                    "name": "price",
+                    "type": "float",
+                    "default": 99.0
+                },
+                {
                     "name": "foreword",
                     "type": "array",
                     "items": ["null","com.example.Page"]
@@ -122,6 +127,11 @@ class FullNameOptimizerTest extends TestCase
                     "default": []
                 },
                 {
+                    "name": "price",
+                    "type": "float",
+                    "default": 99.0
+                },
+                {
                     "name": "foreword",
                     "type": "array",
                     "items": ["null","Page"]
@@ -159,7 +169,7 @@ class FullNameOptimizerTest extends TestCase
                 },
                 { "name": "backSide", "type": "com.example.other.Cover"}
             ]
-        }'));
+        }'), JSON_PRESERVE_ZERO_FRACTION);
 
 
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);

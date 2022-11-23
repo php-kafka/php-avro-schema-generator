@@ -89,7 +89,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 $namespace = $schema['namespace'] . '.' . $schema['name'];
             }
 
-            $schemas[$namespace] = json_encode($schema);
+            $schemas[$namespace] = json_encode($schema, JSON_PRESERVE_ZERO_FRACTION);
         }
 
         return $schemas;
