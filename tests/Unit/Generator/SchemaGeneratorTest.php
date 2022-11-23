@@ -109,6 +109,48 @@ class SchemaGeneratorTest extends TestCase
         self::assertCount(2, $result);
     }
 
+    public function testGeneratePreservesZeroFraction()
+    {
+        $expectedResult = [
+            'name.space.TestClass' => json_encode([
+                'type' => 'record',
+                'name' => 'TestClass',
+                'namespace' => 'name.space',
+                'fields' => [
+                    [
+                        'name' => 'name',
+                        'type' => 'double',
+                        'default' => 0.0,
+                        'doc' => 'test',
+                        'logicalType' => 'test'
+                    ]
+                ]
+            ], JSON_PRESERVE_ZERO_FRACTION)
+        ];
+
+        $property = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
+        $property->expects(self::exactly(1))->method('getPropertyType')->willReturn('double');
+        $property->expects(self::exactly(1))->method('getPropertyName')->willReturn('name');
+        $property->expects(self::exactly(2))->method('getPropertyDefault')->willReturn(0.0);
+        $property->expects(self::exactly(3))->method('getPropertyDoc')->willReturn('test');
+        $property->expects(self::exactly(2))->method('getPropertyLogicalType')->willReturn('test');
+
+
+        $class = $this->getMockForAbstractClass(PhpClassInterface::class);
+        $class->expects(self::once())->method('getClassName')->willReturn('TestClass');
+        $class->expects(self::exactly(2))->method('getClassNamespace')->willReturn('name\\space');
+        $class->expects(self::once())->method('getClassProperties')->willReturn([$property]);
+
+        $registry = $this->getMockForAbstractClass(ClassRegistryInterface::class);
+        $registry->expects(self::once())->method('getClasses')->willReturn([$class]);
+
+        $generator = new SchemaGenerator();
+        $generator->setClassRegistry($registry);
+        $result = $generator->generate();
+        self::assertEquals($expectedResult, $result);
+        self::assertCount(1, $result);
+    }
+
     public function testExportSchemas()
     {
         $schemas = [
