@@ -52,6 +52,11 @@ class FieldOrderOptimizerTest extends TestCase
                     "items": ["null", "com.example.Page"]
                 },
                 {
+                    "name": "price",
+                    "type": "float",
+                    "default": 99.0
+                },
+                {
                     "name": "defaultFont",
                     "type": "com.example.Font"
                 },
@@ -148,6 +153,11 @@ class FieldOrderOptimizerTest extends TestCase
                     "items": ["null", "com.example.Page"]
                 },
                 {
+                    "name": "price",
+                    "type": "float",
+                    "default": 99.0
+                },
+                {
                     "name": "defaultFont",
                     "type": "com.example.Font"
                 },
@@ -201,7 +211,7 @@ class FieldOrderOptimizerTest extends TestCase
                     ]
                 }
             ]
-        }'));
+        }'), JSON_PRESERVE_ZERO_FRACTION);
 
         $optimizer = new FieldOrderOptimizer();
 

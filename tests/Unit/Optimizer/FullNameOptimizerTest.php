@@ -52,6 +52,11 @@ class FullNameOptimizerTest extends TestCase
                     "items": ["null","com.example.Page"]
                 },
                 {
+                    "name": "price",
+                    "type": "float",
+                    "default": 99.0
+                },
+                {
                     "name": "appendix",
                     "type": "array",
                     "items": "com.example.Page"
@@ -126,6 +131,11 @@ class FullNameOptimizerTest extends TestCase
                     "items": ["null","Page"]
                 },
                 {
+                    "name": "price",
+                    "type": "float",
+                    "default": 99.0
+                },
+                {
                     "name": "appendix",
                     "type": "array",
                     "items": "Page"
@@ -158,7 +168,7 @@ class FullNameOptimizerTest extends TestCase
                 },
                 { "name": "backSide", "type": "com.example.other.Cover"}
             ]
-        }'));
+        }'), JSON_PRESERVE_ZERO_FRACTION);
 
         $optimizer = new FullNameOptimizer();
 
