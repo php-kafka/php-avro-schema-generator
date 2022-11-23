@@ -54,26 +54,26 @@ class SchemaGeneratorTest extends TestCase
                     ],
                     [
                         'name' => 'name',
-                        'type' => 'double',
-                        'default' => 0.0,
+                        'type' => 'string',
+                        'default' => 'test',
                         'doc' => 'test',
                         'logicalType' => 'test'
                     ]
                 ]
-            ], JSON_PRESERVE_ZERO_FRACTION),
+            ]),
             'Test2Class' => json_encode([
                 'type' => 'record',
                 'name' => 'Test2Class',
                 'fields' => [
                     [
                         'name' => 'name',
-                        'type' => 'double',
-                        'default' => 0.0,
+                        'type' => 'string',
+                        'default' => 'test',
                         'doc' => 'test',
                         'logicalType' => 'test'
                     ]
                 ]
-            ], JSON_PRESERVE_ZERO_FRACTION)
+            ])
         ];
 
         $property1 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
@@ -82,9 +82,9 @@ class SchemaGeneratorTest extends TestCase
         $property1->expects(self::exactly(1))->method('getPropertyDefault')->willReturn(PhpClassPropertyInterface::NO_DEFAULT);
 
         $property2 = $this->getMockForAbstractClass(PhpClassPropertyInterface::class);
-        $property2->expects(self::exactly(2))->method('getPropertyType')->willReturn('double');
+        $property2->expects(self::exactly(2))->method('getPropertyType')->willReturn('string');
         $property2->expects(self::exactly(2))->method('getPropertyName')->willReturn('name');
-        $property2->expects(self::exactly(4))->method('getPropertyDefault')->willReturn(0.0);
+        $property2->expects(self::exactly(4))->method('getPropertyDefault')->willReturn('test');
         $property2->expects(self::exactly(6))->method('getPropertyDoc')->willReturn('test');
         $property2->expects(self::exactly(4))->method('getPropertyLogicalType')->willReturn('test');
 
