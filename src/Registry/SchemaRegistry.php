@@ -135,11 +135,11 @@ final class SchemaRegistry implements SchemaRegistryInterface
         }
 
         $schemaData = json_decode($fileContent, true, JSON_THROW_ON_ERROR);
-	$namespace = '';
+        $namespace = '';
 
-	if (true === isset($schemaData['namespace'])) {
-	    $namespace = $schemaData['namespace'];
-	}
+        if (true === isset($schemaData['namespace'])) {
+            $namespace = $schemaData['namespace'];
+        }
 
         if (null === $schemaData) {
             throw new SchemaRegistryException(sprintf(SchemaRegistryException::FILE_INVALID, $fileName));
