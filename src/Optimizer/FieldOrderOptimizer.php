@@ -17,7 +17,7 @@ class FieldOrderOptimizer extends AbstractOptimizer implements OptimizerInterfac
 
         $data = $this->processSchema($data);
 
-        return json_encode($data, JSON_THROW_ON_ERROR);
+        return json_encode($data, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
     }
 
     /**
