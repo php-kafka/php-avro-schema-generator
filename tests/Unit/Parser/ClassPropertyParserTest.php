@@ -6,7 +6,7 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Parser;
 
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParserInterface;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\NullableType;
@@ -48,10 +48,10 @@ class ClassPropertyParserTest extends TestCase
         $property4->props = [$propertyProperty];
         $cpp = new ClassPropertyParser($docParser);
 
-        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property1));
-        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property2));
-        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property3));
-        self::assertInstanceOf(PhpClassPropertyInterface::class, $cpp->parseProperty($property4));
+        self::assertInstanceOf(AvroFieldInterface::class, $cpp->parseProperty($property1));
+        self::assertInstanceOf(AvroFieldInterface::class, $cpp->parseProperty($property2));
+        self::assertInstanceOf(AvroFieldInterface::class, $cpp->parseProperty($property3));
+        self::assertInstanceOf(AvroFieldInterface::class, $cpp->parseProperty($property4));
     }
 
     public function testParsePropertyExceptionOnNonProperty(): void

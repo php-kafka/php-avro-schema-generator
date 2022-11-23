@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace PhpKafka\PhpAvroSchemaGenerator\Generator;
 
 use PhpKafka\PhpAvroSchemaGenerator\Avro\Avro;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroRecordInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroFieldInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
 use RuntimeException;
 
@@ -67,18 +67,18 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             throw new RuntimeException('Please set a ClassRegistry for the generator');
         }
 
-        /** @var PhpClassInterface $class */
+        /** @var AvroRecordInterface $class */
         foreach ($this->getClassRegistry()->getClasses() as $class) {
             $schema = [];
             $schema['type'] = 'record';
-            $schema['name'] = $class->getClassName();
-            if (null !== $this->convertNamespace($class->getClassNamespace())) {
-                $schema['namespace'] = $this->convertNamespace($class->getClassNamespace());
+            $schema['name'] = $class->getRecordName();
+            if (null !== $this->convertNamespace($class->getRecordNamespace())) {
+                $schema['namespace'] = $this->convertNamespace($class->getRecordNamespace());
             }
             $schema['fields'] = [];
 
-            /** @var PhpClassPropertyInterface $property */
-            foreach ($class->getClassProperties() as $property) {
+            /** @var AvroFieldInterface $property */
+            foreach ($class->getRecordFields() as $property) {
                 $field = $this->getFieldForProperty($property);
                 $schema['fields'][] = $field;
             }
@@ -96,24 +96,24 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
-     * @param PhpClassPropertyInterface $property
+     * @param AvroFieldInterface $property
      * @return array<string, mixed>
      */
-    private function getFieldForProperty(PhpClassPropertyInterface $property): array
+    private function getFieldForProperty(AvroFieldInterface $property): array
     {
-        $field = ['name' => $property->getPropertyName()];
-        $field['type'] = $property->getPropertyType();
+        $field = ['name' => $property->getFieldName()];
+        $field['type'] = $property->getFieldType();
 
-        if (PhpClassPropertyInterface::NO_DEFAULT !== $property->getPropertyDefault()) {
-            $field['default'] = $property->getPropertyDefault();
+        if (AvroFieldInterface::NO_DEFAULT !== $property->getFieldDefault()) {
+            $field['default'] = $property->getFieldDefault();
         }
 
-        if (null !== $property->getPropertyDoc() && '' !== $property->getPropertyDoc()) {
-            $field['doc'] = $property->getPropertyDoc();
+        if (null !== $property->getFieldDoc() && '' !== $property->getFieldDoc()) {
+            $field['doc'] = $property->getFieldDoc();
         }
 
-        if (null !== $property->getPropertyLogicalType()) {
-            $field['logicalType'] = $property->getPropertyLogicalType();
+        if (null !== $property->getFieldLogicalType()) {
+            $field['logicalType'] = $property->getFieldLogicalType();
         }
 
         return $field;

@@ -8,7 +8,7 @@ use FilesystemIterator;
 use PhpKafka\PhpAvroSchemaGenerator\Converter\PhpClassConverterInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\ClassRegistryException;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\TokenParser;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
+use PhpKafka\PhpAvroSchemaGenerator\Avro\AvroRecordInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -21,7 +21,7 @@ final class ClassRegistry implements ClassRegistryInterface
     protected $classDirectories = [];
 
     /**
-     * @var PhpClassInterface[]
+     * @var AvroRecordInterface[]
      */
     protected $classes = [];
 
@@ -77,7 +77,7 @@ final class ClassRegistry implements ClassRegistryInterface
     }
 
     /**
-     * @return PhpClassInterface[]
+     * @return AvroRecordInterface[]
      */
     public function getClasses(): array
     {
