@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Parser;
 
+use PhpKafka\PhpAvroSchemaGenerator\Exception\SkipPropertyException;
 use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
@@ -17,13 +18,21 @@ use PhpParser\Parser;
 use ReflectionClass;
 use ReflectionException;
 
-final class ClassParser implements ClassParserInterface
+class ClassParser implements ClassParserInterface
 {
     private ClassPropertyParserInterface $propertyParser;
     private Parser $parser;
 
     /** @var Stmt[]|null  */
-    private ?array $statements;
+    protected ?array $statements;
+
+    /**
+     * @return Stmt[]|null
+     */
+    public function getStatements(): ?array
+    {
+        return $this->statements;
+    }
 
     public function __construct(Parser $parser, ClassPropertyParserInterface $propertyParser)
     {
@@ -53,6 +62,10 @@ final class ClassParser implements ClassParserInterface
                             return $nsStatement->name->name;
                         }
                     }
+                }
+            } elseif ($statement instanceof Class_){
+                if ($statement->name instanceof Identifier) {
+                    return $statement->name->name;
                 }
             }
         }
@@ -179,11 +192,14 @@ final class ClassParser implements ClassParserInterface
      * @param PhpClassPropertyInterface[] $properties
      * @return PhpClassPropertyInterface[]
      */
-    private function getAllClassProperties(Class_ $class, array $properties): array
+    public function getAllClassProperties(Class_ $class, array $properties): array
     {
         foreach ($class->stmts as $pStatement) {
             if ($pStatement instanceof Property) {
-                $properties[] = $this->propertyParser->parseProperty($pStatement);
+                try {
+                    $properties[] = $this->propertyParser->parseProperty($pStatement, $this);
+                }
+                catch(SkipPropertyException $skip){ }
             }
         }
 
@@ -196,20 +212,22 @@ final class ClassParser implements ClassParserInterface
      */
     private function getParentClassStatements(): ?array
     {
-        /** @var class-string[] $usedClasses */
-        $usedClasses = $this->getUsedClasses();
-        $parentClass = $this->getParentClassName();
-
+        $parentClass = $this->getParentClassName(); // Especially for speedup and tests! Do not use Reflection when parser show no any parents.
         if (null === $parentClass) {
             return [];
         }
 
-        if (null !== $usedClasses[$this->getParentClassName()]) {
-            $parentClass = $usedClasses[$this->getParentClassName()];
+        try {
+            $pc = (new ReflectionClass($this->getNamespace() . '\\' . $this->getClassName()))->getParentClass();
+        }
+        catch (\ReflectionException $e) {
+            throw new ReflectionException("Can't get parent class for [{$this->getNamespace()}\\{$this->getClassName()}]!", $e->getCode(), $e);
+        }
+        if (false === $pc) {
+            return [];
         }
 
-        $rc = new ReflectionClass($parentClass);
-        $filename = $rc->getFileName();
+        $filename = $pc->getFileName();
 
         if (false === $filename) {
             return [];

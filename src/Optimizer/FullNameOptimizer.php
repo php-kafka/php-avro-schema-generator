@@ -128,7 +128,7 @@ class FullNameOptimizer extends AbstractOptimizer implements OptimizerInterface
         $dataNameSpacePaths = explode('.', $data);
 
         foreach ($dataNameSpacePaths as $idx => $dataNameSpacePath) {
-            if ($currentNameSpacePaths[$idx] === $dataNameSpacePath) {
+            if ( isset($currentNameSpacePaths[$idx]) and $currentNameSpacePaths[$idx] === $dataNameSpacePath) {
                 unset($dataNameSpacePaths[$idx]);
             } else {
                 break;

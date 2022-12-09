@@ -6,6 +6,8 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Integration\Registry;
 
 use PhpKafka\PhpAvroSchemaGenerator\Converter\PhpClassConverter;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\ClassRegistryException;
+use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
+use PhpKafka\PhpAvroSchemaGenerator\Parser\AvroClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser;
@@ -47,7 +49,7 @@ class ClassRegistryTest extends TestCase
 
         $classes = $registry->getClasses();
 
-        self::assertCount(4, $classes);
+        self::assertCount(5, $classes);
 
         foreach ($classes as $class) {
             self::assertInstanceOf(PhpClassInterface::class, $class);

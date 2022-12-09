@@ -67,15 +67,14 @@ final class PhpClassConverter implements PhpClassConverterInterface
      * @param PhpClassPropertyInterface[] $properties
      * @return PhpClassPropertyInterface[]
      */
-    private function getConvertedProperties(array $properties): array
+    protected function getConvertedProperties(array $properties): array
     {
         $convertedProperties = [];
         foreach ($properties as $property) {
-            if (false === is_string($property->getPropertyType())) {
-                continue;
+            $convertedType = $property->getPropertyType();
+            if (is_string($convertedType)) {
+                $convertedType = $this->getConvertedType($property->getPropertyType());
             }
-
-            $convertedType = $this->getConvertedType($property->getPropertyType());
 
             if (null === $convertedType) {
                 continue;
@@ -97,7 +96,7 @@ final class PhpClassConverter implements PhpClassConverterInterface
      * @param string $type
      * @return string|string[]|null
      */
-    private function getConvertedType(string $type)
+    protected function getConvertedType(string $type)
     {
         $types = explode('|', $type);
 
@@ -143,7 +142,7 @@ final class PhpClassConverter implements PhpClassConverterInterface
      * @param string[] $types
      * @return array<int,mixed>
      */
-    private function getConvertedUnionType(array $types): array
+    protected function getConvertedUnionType(array $types): array
     {
         $convertedUnionType = [];
 
@@ -168,7 +167,7 @@ final class PhpClassConverter implements PhpClassConverterInterface
      * @param string[] $types
      * @return string[]
      */
-    private function getArrayType(array $types): array
+    protected function getArrayType(array $types): array
     {
         $itemPrefix = '[';
         $itemSuffix = ']';
@@ -200,7 +199,7 @@ final class PhpClassConverter implements PhpClassConverterInterface
      * @param string[] $types
      * @return string[]
      */
-    private function getArrayTypes(array $types): array
+    protected function getArrayTypes(array $types): array
     {
         $arrayTypes = [];
 
@@ -217,7 +216,7 @@ final class PhpClassConverter implements PhpClassConverterInterface
      * @param string[] $arrayTypes
      * @return string[]
      */
-    private function getCleanedArrayTypes(array $arrayTypes): array
+    protected function getCleanedArrayTypes(array $arrayTypes): array
     {
         foreach ($arrayTypes as $idx => $arrayType) {
             if ('array' === $arrayType) {
@@ -238,7 +237,7 @@ final class PhpClassConverter implements PhpClassConverterInterface
         return $arrayTypes;
     }
 
-    private function isArrayType(string $type): bool
+    protected function isArrayType(string $type): bool
     {
         if ('array' === $type || str_contains($type, '[]')) {
             return true;
@@ -247,7 +246,7 @@ final class PhpClassConverter implements PhpClassConverterInterface
         return false;
     }
 
-    private function convertNamespace(string $namespace): string
+    protected function convertNamespace(string $namespace): string
     {
         return str_replace('\\', '.', $namespace);
     }

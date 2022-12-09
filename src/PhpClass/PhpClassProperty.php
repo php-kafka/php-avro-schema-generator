@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\PhpClass;
 
-use PhpKafka\PhpAvroSchemaGenerator\Parser\PropertyAttributesInterface;
-
 final class PhpClassProperty implements PhpClassPropertyInterface
 {
     /** @var mixed */
@@ -13,20 +11,18 @@ final class PhpClassProperty implements PhpClassPropertyInterface
     private ?string $propertyDoc;
     private ?string $propertyLogicalType;
     private string $propertyName;
-
-    /** @var string|string[]  */
-    private $propertyType;
+    private PhpClassPropertyTypeInterface $propertyType;
 
     /**
      * @param string $propertyName
-     * @param string[]|string $propertyType
+     * @param PhpClassPropertyTypeInterface $propertyType
      * @param null|mixed $propertyDefault
      * @param null|string $propertyDoc
      * @param null|string $propertyLogicalType
      */
     public function __construct(
         string $propertyName,
-        $propertyType,
+        PhpClassPropertyTypeInterface $propertyType,
         $propertyDefault = self::NO_DEFAULT,
         ?string $propertyDoc = null,
         ?string $propertyLogicalType = null
@@ -61,10 +57,7 @@ final class PhpClassProperty implements PhpClassPropertyInterface
         return $this->propertyName;
     }
 
-    /**
-     * @return string[]|string
-     */
-    public function getPropertyType()
+    public function getPropertyType(): PhpClassPropertyTypeInterface
     {
         return $this->propertyType;
     }
