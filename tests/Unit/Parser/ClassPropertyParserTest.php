@@ -38,7 +38,7 @@ class ClassPropertyParserTest extends TestCase
         $property1->props = [$propertyProperty];
         $property1->type = $identifier;
         $property2 = $this->getMockBuilder(Property::class)->disableOriginalConstructor()->getMock();
-        $property2->type = 'string';
+        $property2->type = new Identifier('string');
         $property2->props = [$propertyProperty];
         $property3 = $this->getMockBuilder(Property::class)->disableOriginalConstructor()->getMock();
         $property3->type = $ut;

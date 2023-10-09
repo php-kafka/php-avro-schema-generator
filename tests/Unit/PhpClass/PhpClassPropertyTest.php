@@ -8,11 +8,11 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassProperty
  */
 class PhpClassPropertyTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $property = new PhpClassProperty('propertyName', 'array', 'default', 'doc', 'logicalType');
 

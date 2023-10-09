@@ -2,3 +2,10 @@ parameters:
     level: 8
     paths: [ src ]
     checkGenericClassInNonGenericObjectType: false
+    excludePaths:
+        - vendor
+    ignoreErrors:
+        # Disable error in class for example of generation
+        -
+            message: '#Property PhpKafka\\PhpAvroSchemaGenerator\\Example\\SomeTestClass::\$string is unused.#'
+            path: example/classes/SomeTestClass.php

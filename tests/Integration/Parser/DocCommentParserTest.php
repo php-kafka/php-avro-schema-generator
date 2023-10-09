@@ -8,7 +8,7 @@ use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser
  */
 class DocCommentParserTest extends TestCase
 {
@@ -23,7 +23,7 @@ class DocCommentParserTest extends TestCase
         self::assertEquals(
             [
                 'var' => 'string',
-                'function-description' =>''
+                'function-description' => ''
             ],
             $result
         );

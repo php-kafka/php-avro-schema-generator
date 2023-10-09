@@ -18,11 +18,11 @@ use ReflectionClass;
 use SplFileInfo;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistry
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistry
  */
 class ClassRegistryTest extends TestCase
 {
-    public function testClassDirectory()
+    public function testClassDirectory(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
@@ -34,7 +34,7 @@ class ClassRegistryTest extends TestCase
         self::assertEquals(['/tmp' => 1], $result->getClassDirectories());
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $classDir = __DIR__ . '/../../../example/classes';
 
@@ -54,7 +54,7 @@ class ClassRegistryTest extends TestCase
         }
     }
 
-    public function testRegisterSchemaFileThatDoesntExist()
+    public function testRegisterSchemaFileThatDoesntExist(): void
     {
         $fileInfo = new SplFileInfo('somenonexistingfile');
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
@@ -71,7 +71,7 @@ class ClassRegistryTest extends TestCase
         $method->invokeArgs($registry, [$fileInfo]);
     }
 
-    public function testRegisterSchemaFileThatIsNotReadable()
+    public function testRegisterSchemaFileThatIsNotReadable(): void
     {
         touch('testfile');
         chmod('testfile', 222);

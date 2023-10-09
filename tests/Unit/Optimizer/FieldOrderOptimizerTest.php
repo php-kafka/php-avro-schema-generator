@@ -212,7 +212,7 @@ class FieldOrderOptimizerTest extends TestCase
                     ]
                 }
             ]
-        }'),JSON_PRESERVE_ZERO_FRACTION);
+        }'), JSON_PRESERVE_ZERO_FRACTION);
 
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate

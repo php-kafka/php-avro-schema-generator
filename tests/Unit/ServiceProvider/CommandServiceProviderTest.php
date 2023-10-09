@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\CommandServiceProvider
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\CommandServiceProvider
  */
 class CommandServiceProviderTest extends TestCase
 {

@@ -11,11 +11,11 @@ use ReflectionClass;
 use SplFileInfo;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\Registry\SchemaRegistry
  */
 class SchemaRegistryTest extends TestCase
 {
-    public function testSchemaDirectories()
+    public function testSchemaDirectories(): void
     {
         $registry = new SchemaRegistry();
         $result = $registry->addSchemaTemplateDirectory('/tmp');
@@ -24,7 +24,7 @@ class SchemaRegistryTest extends TestCase
         self::assertEquals(['/tmp' => 1], $result->getSchemaDirectories());
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $schemaIds = [
             'Book',
@@ -49,10 +49,12 @@ class SchemaRegistryTest extends TestCase
 
         $expectedNames = ['CD', 'Collection', 'Page', 'Library'];
 
-        self::assertSame(sort($expectedNames), sort($registry->getSchemaNamesPerNamespace('com.example')));
+        $actualNamespaces = $registry->getSchemaNamesPerNamespace('com.example');
+
+        self::assertSame(sort($expectedNames), sort($actualNamespaces));
     }
 
-    public function testGetRootSchemas()
+    public function testGetRootSchemas(): void
     {
         $schemaDir = __DIR__ . '/../../../example/schemaTemplates';
         $registry = (new SchemaRegistry())->addSchemaTemplateDirectory($schemaDir)->load();
@@ -66,14 +68,14 @@ class SchemaRegistryTest extends TestCase
         }
     }
 
-    public function testGetSchemaByIdNotExisting()
+    public function testGetSchemaByIdNotExisting(): void
     {
         $registry = new SchemaRegistry();
 
         self::assertNull($registry->getSchemaById('test'));
     }
 
-    public function testGetSchemaById()
+    public function testGetSchemaById(): void
     {
         $template = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
 
@@ -87,7 +89,7 @@ class SchemaRegistryTest extends TestCase
         self::assertEquals($template, $registry->getSchemaById('test'));
     }
 
-    public function testRegisterSchemaFileThatDoesntExist()
+    public function testRegisterSchemaFileThatDoesntExist(): void
     {
         $fileInfo = new SplFileInfo('somenonexistingfile');
         $registry = new SchemaRegistry();
@@ -101,7 +103,7 @@ class SchemaRegistryTest extends TestCase
         $method->invokeArgs($registry, [$fileInfo]);
     }
 
-    public function testRegisterSchemaFileThatIsNotReadable()
+    public function testRegisterSchemaFileThatIsNotReadable(): void
     {
         touch('testfile');
         chmod('testfile', 222);
@@ -125,7 +127,7 @@ class SchemaRegistryTest extends TestCase
         }
     }
 
-    public function testRegisterSchemaWithInvalidContent()
+    public function testRegisterSchemaWithInvalidContent(): void
     {
         touch('testfile');
 

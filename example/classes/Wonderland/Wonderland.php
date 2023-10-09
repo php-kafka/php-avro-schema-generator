@@ -6,5 +6,4 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Example\Wonderland;
 
 class Wonderland
 {
-
 }

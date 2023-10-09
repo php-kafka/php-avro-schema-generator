@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\GeneratorServiceProvider
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\GeneratorServiceProvider
  */
 class GeneratorServiceProviderTest extends TestCase
 {

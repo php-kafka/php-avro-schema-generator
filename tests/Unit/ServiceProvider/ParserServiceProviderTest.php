@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\ParserServiceProvider
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\ParserServiceProvider
  */
 class ParserServiceProviderTest extends TestCase
 {

@@ -14,11 +14,11 @@ use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger
  */
 class SchemaMergerTest extends TestCase
 {
-    public function testGetSchemaRegistry()
+    public function testGetSchemaRegistry(): void
     {
         $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
         $merger = new SchemaMerger();
@@ -26,20 +26,20 @@ class SchemaMergerTest extends TestCase
         self::assertEquals($schemaRegistry, $merger->getSchemaRegistry());
     }
 
-    public function testGetOutputDirectoryDefault()
+    public function testGetOutputDirectoryDefault(): void
     {
         $merger = new SchemaMerger();
         self::assertEquals('/tmp', $merger->getOutputDirectory());
     }
 
-    public function testGetOutputDirectory()
+    public function testGetOutputDirectory(): void
     {
         $outputDirectory = '/root';
         $merger = new SchemaMerger($outputDirectory);
         self::assertEquals($outputDirectory, $merger->getOutputDirectory());
     }
 
-    public function testSetOutputDirectory()
+    public function testSetOutputDirectory(): void
     {
         $outputDirectory = '/root';
         $merger = new SchemaMerger();
@@ -47,7 +47,7 @@ class SchemaMergerTest extends TestCase
         self::assertEquals($outputDirectory, $merger->getOutputDirectory());
     }
 
-    public function testGetResolvedSchemaTemplateThrowsException()
+    public function testGetResolvedSchemaTemplateThrowsException(): void
     {
         self::expectException(\AvroSchemaParseException::class);
 
@@ -60,7 +60,7 @@ class SchemaMergerTest extends TestCase
         self::assertEquals([], $merger->getResolvedSchemaTemplate($schemaTemplate));
     }
 
-    public function testGetResolvedSchemaTemplateResolveEmbeddedException()
+    public function testGetResolvedSchemaTemplateResolveEmbeddedException(): void
     {
         self::expectException(SchemaMergerException::class);
         self::expectExceptionMessage(sprintf(SchemaMergerException::UNKNOWN_SCHEMA_TYPE_EXCEPTION_MESSAGE, 'com.example.Page'));
@@ -85,7 +85,7 @@ class SchemaMergerTest extends TestCase
         self::assertEquals([], $merger->getResolvedSchemaTemplate($schemaTemplate));
     }
 
-    public function testGetResolvedSchemaTemplate()
+    public function testGetResolvedSchemaTemplate(): void
     {
         $rootDefinition = '{
             "type": "record",
@@ -134,7 +134,7 @@ class SchemaMergerTest extends TestCase
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
 
-    public function testGetResolvedSchemaTemplateWithMultiEmbedd()
+    public function testGetResolvedSchemaTemplateWithMultiEmbedd(): void
     {
         $rootDefinition = $this->reformatJsonString('{
             "type": "record",
@@ -305,7 +305,7 @@ class SchemaMergerTest extends TestCase
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
 
-    public function testGetResolvedSchemaTemplateWithDifferentNamespaceForEmbeddedSchema()
+    public function testGetResolvedSchemaTemplateWithDifferentNamespaceForEmbeddedSchema(): void
     {
         $rootDefinition = '{
             "type": "record",
@@ -356,7 +356,7 @@ class SchemaMergerTest extends TestCase
         $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
     }
 
-    public function testMergeException()
+    public function testMergeException(): void
     {
         self::expectException(SchemaMergerException::class);
         self::expectExceptionMessage(sprintf(SchemaMergerException::UNKNOWN_SCHEMA_TYPE_EXCEPTION_MESSAGE, 'com.example.Page'));
@@ -386,7 +386,7 @@ class SchemaMergerTest extends TestCase
         $merger->merge();
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $definition = '{
             "type": "record",
@@ -426,7 +426,7 @@ class SchemaMergerTest extends TestCase
         rmdir('/tmp/foobar');
     }
 
-    public function testMergePrimitive()
+    public function testMergePrimitive(): void
     {
         $definition = '{
             "type": "string"
@@ -461,7 +461,7 @@ class SchemaMergerTest extends TestCase
         rmdir('/tmp/foobar');
     }
 
-    public function testMergePrimitiveWithOptimizerEnabled()
+    public function testMergePrimitiveWithOptimizerEnabled(): void
     {
         $definition = '{
             "type": "string"
@@ -503,7 +503,7 @@ class SchemaMergerTest extends TestCase
         rmdir('/tmp/foobar');
     }
 
-    public function testMergeWithFilenameOption()
+    public function testMergeWithFilenameOption(): void
     {
         $definition = '{
             "type": "record",
@@ -543,7 +543,7 @@ class SchemaMergerTest extends TestCase
         rmdir('/tmp/foobar');
     }
 
-    public function testExportSchema()
+    public function testExportSchema(): void
     {
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
@@ -560,7 +560,7 @@ class SchemaMergerTest extends TestCase
         unlink('/tmp/test.avsc');
     }
 
-    public function testExportSchemaPrimitiveWithWrongOptions()
+    public function testExportSchemaPrimitiveWithWrongOptions(): void
     {
         $schemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $schemaTemplate
@@ -586,27 +586,27 @@ class SchemaMergerTest extends TestCase
         unlink('/tmp/test.avsc');
     }
 
-    public function testMergeWithoutRegistry()
+    public function testMergeWithoutRegistry(): void
     {
         self::expectException(\RuntimeException::class);
         self::expectExceptionMessage('Please set a SchemaRegistery for the merger');
         $merger = new SchemaMerger();
         $refObject = new \ReflectionObject($merger);
         $refProperty = $refObject->getProperty('schemaRegistry');
-        $refProperty->setAccessible( true );
+        $refProperty->setAccessible(true);
         $refProperty->setValue($merger, null);
 
         $merger->merge();
     }
 
-    public function testGetResolvedSchemaTemplateWithoutRegistry()
+    public function testGetResolvedSchemaTemplateWithoutRegistry(): void
     {
         self::expectException(\RuntimeException::class);
         self::expectExceptionMessage('Please set a SchemaRegistery for the merger');
         $merger = new SchemaMerger();
         $refObject = new \ReflectionObject($merger);
         $refProperty = $refObject->getProperty('schemaRegistry');
-        $refProperty->setAccessible( true );
+        $refProperty->setAccessible(true);
         $refProperty->setValue($merger, null);
         $merger->getResolvedSchemaTemplate($this->getMockForAbstractClass(SchemaTemplateInterface::class));
     }

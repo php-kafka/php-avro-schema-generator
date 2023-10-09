@@ -9,11 +9,11 @@ use PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplateInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplate
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\Schema\SchemaTemplate
  */
 class SchemaTemplateTest extends TestCase
 {
-    public function testSchemaId()
+    public function testSchemaId(): void
     {
         $template = (new SchemaTemplate())->withSchemaId('test');
 
@@ -21,7 +21,7 @@ class SchemaTemplateTest extends TestCase
         self::assertEquals('test', $template->getSchemaId());
     }
 
-    public function testSchemaLevel()
+    public function testSchemaLevel(): void
     {
         $template = (new SchemaTemplate())->withSchemaLevel('root');
 
@@ -29,7 +29,7 @@ class SchemaTemplateTest extends TestCase
         self::assertEquals('root', $template->getSchemaLevel());
     }
 
-    public function testSchemaDefinition()
+    public function testSchemaDefinition(): void
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('test');
 
@@ -37,7 +37,7 @@ class SchemaTemplateTest extends TestCase
         self::assertEquals('test', $template->getSchemaDefinition());
     }
 
-    public function testFilename()
+    public function testFilename(): void
     {
         $template = (new SchemaTemplate())->withFilename('test');
 
@@ -45,35 +45,35 @@ class SchemaTemplateTest extends TestCase
         self::assertEquals('test', $template->getFilename());
     }
 
-    public function testIsPrimitiveTrue()
+    public function testIsPrimitiveTrue(): void
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('{"type":"string"}');
 
         self::assertTrue($template->isPrimitive());
     }
 
-    public function testIsPrimitiveFalse()
+    public function testIsPrimitiveFalse(): void
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('{"type":"record"}');
 
         self::assertFalse($template->isPrimitive());
     }
 
-    public function testIsPrimitiveTrueForOptimizedSchema()
+    public function testIsPrimitiveTrueForOptimizedSchema(): void
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('"string"');
 
         self::assertTrue($template->isPrimitive());
     }
 
-    public function testIsPrimitiveFalseForOptimizedSchema()
+    public function testIsPrimitiveFalseForOptimizedSchema(): void
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('"foo"');
 
         self::assertFalse($template->isPrimitive());
     }
 
-    public function testIsPrimitiveFalseOnMissingType()
+    public function testIsPrimitiveFalseOnMissingType(): void
     {
         $template = (new SchemaTemplate())->withSchemaDefinition('{"foo":"bar"}');
 
