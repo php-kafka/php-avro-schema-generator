@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\MergerServiceProvider
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\MergerServiceProvider
  */
 class MergerServiceProviderTest extends TestCase
 {

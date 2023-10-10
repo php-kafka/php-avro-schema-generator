@@ -6,5 +6,4 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Example;
 
 class SomeOtherTestClass
 {
-
 }

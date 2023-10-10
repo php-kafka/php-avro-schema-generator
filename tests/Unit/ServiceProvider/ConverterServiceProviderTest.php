@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\ConverterServiceProvider
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\ConverterServiceProvider
  */
 class ConverterServiceProviderTest extends TestCase
 {

@@ -12,45 +12,45 @@ use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser
  */
 class ClassParserTest extends TestCase
 {
-    public function testGetClassName()
+    public function testGetClassName(): void
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestClass.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
-        $parser->setCode(file_get_contents($filePath));
+        $parser->setCode((string) file_get_contents($filePath));
         self::assertEquals('SomeTestClass', $parser->getClassName());
         self::assertEquals('SomeTestClass', $parser->getClassName());
     }
 
-    public function testGetClassNameForInterface()
+    public function testGetClassNameForInterface(): void
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestInterface.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
-        $parser->setCode(file_get_contents($filePath));
+        $parser->setCode((string) file_get_contents($filePath));
         self::assertNull($parser->getClassName());
     }
 
-    public function testGetNamespace()
+    public function testGetNamespace(): void
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestClass.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
-        $parser->setCode(file_get_contents($filePath));
+        $parser->setCode((string) file_get_contents($filePath));
         self::assertEquals('PhpKafka\\PhpAvroSchemaGenerator\\Example', $parser->getNamespace());
         self::assertEquals('PhpKafka\\PhpAvroSchemaGenerator\\Example', $parser->getNamespace());
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestClass.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
-        $parser->setCode(file_get_contents($filePath));
+        $parser->setCode((string) file_get_contents($filePath));
         $properties = $parser->getProperties();
         self::assertCount(16, $properties);
 
@@ -65,7 +65,7 @@ class ClassParserTest extends TestCase
         $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
         $refObject = new \ReflectionObject($parser);
         $refProperty = $refObject->getProperty('statements');
-        $refProperty->setAccessible( true );
+        $refProperty->setAccessible(true);
         $refProperty->setValue($parser, null);
         self::assertNull($parser->getClassName());
         self::assertNull($parser->getNamespace());

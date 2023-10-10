@@ -8,11 +8,11 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClass
  */
 class PhpClassTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $phpClass = new PhpClass('TestClass', 'Test\\Space', 'some php code', []);
 

@@ -9,11 +9,11 @@ use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator
  */
 class SchemaGeneratorTest extends TestCase
 {
-    public function testDefaultOutputDirectory()
+    public function testDefaultOutputDirectory(): void
     {
         $registry = $this->getMockForAbstractClass(ClassRegistryInterface::class);
 
@@ -24,7 +24,7 @@ class SchemaGeneratorTest extends TestCase
         self::assertEquals('/tmp', $generator->getOutputDirectory());
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         $registry = $this->getMockForAbstractClass(ClassRegistryInterface::class);
         $directory = '/tmp/foo';
@@ -37,7 +37,7 @@ class SchemaGeneratorTest extends TestCase
         self::assertEquals($directory, $generator->getOutputDirectory());
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $expectedResult = [
             'name.space.TestClass' => json_encode([
@@ -109,7 +109,7 @@ class SchemaGeneratorTest extends TestCase
         self::assertCount(2, $result);
     }
 
-    public function testGeneratePreservesZeroFraction()
+    public function testGeneratePreservesZeroFraction(): void
     {
         $expectedResult = [
             'name.space.TestClass' => json_encode([
@@ -151,7 +151,7 @@ class SchemaGeneratorTest extends TestCase
         self::assertCount(1, $result);
     }
 
-    public function testExportSchemas()
+    public function testExportSchemas(): void
     {
         $schemas = [
             'filename' => 'test foo bar'
@@ -169,7 +169,7 @@ class SchemaGeneratorTest extends TestCase
         unlink('/tmp/filename.avsc');
     }
 
-    public function testGenerateWithoutRegistry()
+    public function testGenerateWithoutRegistry(): void
     {
         self::expectException(\RuntimeException::class);
         self::expectExceptionMessage('Please set a ClassRegistry for the generator');
@@ -177,7 +177,7 @@ class SchemaGeneratorTest extends TestCase
         $generator = new SchemaGenerator();
         $refObject = new \ReflectionObject($generator);
         $refProperty = $refObject->getProperty('classRegistry');
-        $refProperty->setAccessible( true );
+        $refProperty->setAccessible(true);
         $refProperty->setValue($generator, null);
         $generator->generate();
     }

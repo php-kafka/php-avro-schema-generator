@@ -9,7 +9,6 @@ use PhpKafka\PhpAvroSchemaGenerator\Example\SomeBaseClass;
 
 class SomeTestClass extends SomeBaseClass
 {
-
     /**
      * @var string
      */

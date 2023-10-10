@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
 /**
- * @covers PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\RegistryServiceProvider
+ * @covers \PhpKafka\PhpAvroSchemaGenerator\ServiceProvider\RegistryServiceProvider
  */
 class RegistryServiceProviderTest extends TestCase
 {

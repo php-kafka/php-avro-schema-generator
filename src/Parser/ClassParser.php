@@ -61,7 +61,7 @@ final class ClassParser implements ClassParserInterface
     }
 
     /**
-     * @return string|null
+     * @return class-string|null
      */
     public function getParentClassName(): ?string
     {
@@ -74,14 +74,14 @@ final class ClassParser implements ClassParserInterface
                 foreach ($statement->stmts as $nsStatement) {
                     if ($nsStatement instanceof Class_) {
                         if (null !== $nsStatement->extends) {
-                            return implode('\\', $nsStatement->extends->parts);
+                            return $this->buildClassName($nsStatement->extends->getParts());
                         }
                     }
                 }
             } else {
                 if ($statement instanceof Class_) {
                     if (null !== $statement->extends) {
-                        return implode('\\', $statement->extends->parts);
+                        return $this->buildClassName($statement->extends->getParts());
                     }
                 }
             }
@@ -90,6 +90,9 @@ final class ClassParser implements ClassParserInterface
         return null;
     }
 
+    /**
+     * @return class-string[]
+     */
     public function getUsedClasses(): array
     {
         $usedClasses = [];
@@ -104,8 +107,8 @@ final class ClassParser implements ClassParserInterface
                     if ($nStatement instanceof Use_) {
                         /** @var UseUse $use */
                         foreach ($nStatement->uses as $use) {
-                            $className = $use->name->parts[array_key_last($use->name->parts)];
-                            $usedClasses[$className] = implode('\\', $use->name->parts);
+                            $className = $use->name->getParts()[array_key_last($use->name->getParts())];
+                            $usedClasses[$className] = $this->buildClassName($use->name->getParts());
                         }
                     }
                 }
@@ -113,6 +116,18 @@ final class ClassParser implements ClassParserInterface
         }
 
         return $usedClasses;
+    }
+
+    /**
+     * @param string[] $parts
+     * @return class-string
+     */
+    public function buildClassName(array $parts): string
+    {
+        /** @var class-string $classname */
+        $classname = implode('\\', $parts);
+
+        return $classname;
     }
 
     /**
@@ -196,7 +211,6 @@ final class ClassParser implements ClassParserInterface
      */
     private function getParentClassStatements(): ?array
     {
-        /** @var class-string[] $usedClasses */
         $usedClasses = $this->getUsedClasses();
         $parentClass = $this->getParentClassName();
 
@@ -204,8 +218,8 @@ final class ClassParser implements ClassParserInterface
             return [];
         }
 
-        if (null !== $usedClasses[$this->getParentClassName()]) {
-            $parentClass = $usedClasses[$this->getParentClassName()];
+        if (array_key_exists($parentClass, $usedClasses) && null !== $usedClasses[$parentClass]) {
+            $parentClass = $usedClasses[$parentClass];
         }
 
         $rc = new ReflectionClass($parentClass);

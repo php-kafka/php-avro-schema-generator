@@ -135,11 +135,12 @@ final class SchemaRegistry implements SchemaRegistryInterface
         }
 
         $schemaData = json_decode($fileContent, true, JSON_THROW_ON_ERROR);
-        $namespace = (string) $schemaData['namespace'];
 
         if (null === $schemaData) {
             throw new SchemaRegistryException(sprintf(SchemaRegistryException::FILE_INVALID, $fileName));
         }
+
+        $namespace = array_key_exists('namespace', $schemaData) ? (string) $schemaData['namespace'] : '';
 
         $template = (new SchemaTemplate())
             ->withFilename($fileInfo->getBasename())
