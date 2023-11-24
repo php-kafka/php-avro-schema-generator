@@ -128,7 +128,7 @@ final class SchemaMerger implements SchemaMergerInterface
         $arraySchema = json_decode($embeddedDefinition, true);
         unset($arraySchema['schema_level']);
 
-        return json_encode($arraySchema) ?? '';
+        return json_encode($arraySchema, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
     }
 
     /**
