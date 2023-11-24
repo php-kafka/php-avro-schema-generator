@@ -59,7 +59,7 @@ class SchemaRegistryTest extends TestCase
 
         $rootSchemas = $registry->getRootSchemas();
 
-        self::assertCount(2, $rootSchemas);
+        self::assertCount(3, $rootSchemas);
 
         foreach ($rootSchemas as $rootSchema) {
             self::assertInstanceOf(SchemaTemplateInterface::class, $rootSchema);

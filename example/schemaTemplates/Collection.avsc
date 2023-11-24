@@ -1,6 +1,7 @@
 {
     "type": "record",
     "namespace": "com.example",
+    "schema_level": "root",
     "name": "Collection",
     "fields": [
         { "name": "name", "type": "string" },
