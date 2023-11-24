@@ -102,8 +102,17 @@ final class SchemaMerger implements SchemaMergerInterface
     ): string {
         $idString = '"' . $schemaId . '"';
         $pos = (int) strpos($rootDefinition, $idString);
+        $embeddedDefinitionWithoutLevel = $this->removeSchemaLevel($embeddedDefinition);
 
-        return substr_replace($rootDefinition, $embeddedDefinition, $pos, strlen($idString));
+        return substr_replace($rootDefinition, $embeddedDefinitionWithoutLevel, $pos, strlen($idString));
+    }
+
+    private function removeSchemaLevel(string $embeddedDefinition): string
+    {
+        $arraySchema = json_decode($embeddedDefinition, true);
+        unset($arraySchema['schema_level']);
+
+        return json_encode($arraySchema, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
     }
 
     /**

@@ -86,14 +86,14 @@ class SchemaMergerTest extends TestCase
                 { "name": "items", "type": {"type": "array", "items": "com.example.Page" }, "default": [] }
             ]
         }';
-        $subschemaDefinition = '{
+        $subschemaDefinition = json_encode(json_decode('{
             "type": "record",
             "namespace": "com.example",
             "name": "Page",
             "fields": [
                 { "name": "number", "type": "int" }
             ]
-        }';
+        }'));
 
         $expectedResult = str_replace('"com.example.Page"', $subschemaDefinition, $rootDefinition);
 
@@ -107,6 +107,104 @@ class SchemaMergerTest extends TestCase
             ->expects(self::once())
             ->method('getSchemaById')
             ->with('com.example.Page')
+            ->willReturn($subschemaTemplate);
+        $rootSchemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $rootSchemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($rootDefinition);
+        $rootSchemaTemplate
+            ->expects(self::once())
+            ->method('withSchemaDefinition')
+            ->with($expectedResult)
+            ->willReturn($rootSchemaTemplate);
+
+        $merger = new SchemaMerger($schemaRegistry);
+
+        $merger->getResolvedSchemaTemplate($rootSchemaTemplate);
+    }
+
+    public function testGetResolvedSchemaTemplateWithEmbeddedRoot(): void
+    {
+        $rootDefinition = '{
+          "type": "record",
+          "namespace": "com.example",
+          "schema_level": "root",
+          "name": "Library",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "foundingYear",
+              "type": [
+                "null",
+                "int"
+              ],
+              "default": null
+            },
+            {
+              "name": "type",
+              "type": [
+                "null",
+                {
+                  "name": "type",
+                  "type": "enum",
+                  "symbols": [
+                    "PUBLIC",
+                    "PRIVATE"
+                  ]
+                }
+              ],
+              "default": null
+            },
+            {
+              "name": "collection",
+              "type": {
+                "type": "array",
+                "items": "com.example.Collection"
+              },
+              "default": []
+            },
+            {
+              "name": "archive",
+              "type": {
+                "type": "array",
+                "items": "com.example.Collection"
+              },
+              "default": []
+            }
+          ]
+        }';
+        $subschemaDefinition = json_encode(json_decode('{
+            "type": "record",
+            "namespace": "com.example",
+            "schema_level": "root",
+            "name": "Collection",
+            "fields": [
+                { "name": "name", "type": "string" }
+            ]
+        }'));
+
+        $subschemaDefinitionArray = \Safe\json_decode($subschemaDefinition, true);
+        unset($subschemaDefinitionArray['schema_level']);
+        $subschemaDefinitionWithoutLevel = json_encode($subschemaDefinitionArray);
+
+        $subschemaId = '"com.example.Collection"';
+        $pos = strpos($rootDefinition, $subschemaId);
+        $expectedResult = substr_replace($rootDefinition, $subschemaDefinitionWithoutLevel, $pos, strlen($subschemaId));
+
+        $subschemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
+        $subschemaTemplate
+            ->expects(self::once())
+            ->method('getSchemaDefinition')
+            ->willReturn($subschemaDefinition);
+        $schemaRegistry = $this->getMockForAbstractClass(SchemaRegistryInterface::class);
+        $schemaRegistry
+            ->expects(self::once())
+            ->method('getSchemaById')
+            ->with('com.example.Collection')
             ->willReturn($subschemaTemplate);
         $rootSchemaTemplate = $this->getMockForAbstractClass(SchemaTemplateInterface::class);
         $rootSchemaTemplate
@@ -304,14 +402,14 @@ class SchemaMergerTest extends TestCase
                 { "name": "items", "type": {"type": "array", "items": "com.example.other.Page" }, "default": [] }
             ]
         }';
-        $subschemaDefinition = '{
+        $subschemaDefinition = json_encode(json_decode('{
             "type": "record",
             "namespace": "com.example.other",
             "name": "Page",
             "fields": [
                 { "name": "number", "type": "int" }
             ]
-        }';
+        }'));
 
         $expectedResult = str_replace('"com.example.other.Page"', $subschemaDefinition, $rootDefinition);
 
