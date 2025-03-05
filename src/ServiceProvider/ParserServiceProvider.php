@@ -24,7 +24,7 @@ class ParserServiceProvider implements ServiceProviderInterface
         };
 
         $container[Parser::class] = static function (Container $container): Parser {
-            return $container[ParserFactory::class]->create(ParserFactory::PREFER_PHP7);
+            return $container[ParserFactory::class]->createForNewestSupportedVersion();
         };
 
         $container[DocCommentParserInterface::class] = static function (): DocCommentParserInterface {

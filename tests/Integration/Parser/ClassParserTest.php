@@ -20,7 +20,7 @@ class ClassParserTest extends TestCase
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestClass.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode((string) file_get_contents($filePath));
         self::assertEquals('SomeTestClass', $parser->getClassName());
         self::assertEquals('SomeTestClass', $parser->getClassName());
@@ -30,7 +30,7 @@ class ClassParserTest extends TestCase
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestInterface.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode((string) file_get_contents($filePath));
         self::assertNull($parser->getClassName());
     }
@@ -39,7 +39,7 @@ class ClassParserTest extends TestCase
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestClass.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode((string) file_get_contents($filePath));
         self::assertEquals('PhpKafka\\PhpAvroSchemaGenerator\\Example', $parser->getNamespace());
         self::assertEquals('PhpKafka\\PhpAvroSchemaGenerator\\Example', $parser->getNamespace());
@@ -49,7 +49,7 @@ class ClassParserTest extends TestCase
     {
         $filePath = __DIR__ . '/../../../example/classes/SomeTestClass.php';
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode((string) file_get_contents($filePath));
         $properties = $parser->getProperties();
         self::assertCount(16, $properties);
@@ -62,7 +62,7 @@ class ClassParserTest extends TestCase
     public function testClassAndNamespaceAreNullWithNoCode(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $refObject = new \ReflectionObject($parser);
         $refProperty = $refObject->getProperty('statements');
         $refProperty->setAccessible(true);
@@ -76,7 +76,7 @@ class ClassParserTest extends TestCase
     public function testClassWithNoParent(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode('<?php class foo {}');
         self::assertNull($parser->getNamespace());
         self::assertNull($parser->getParentClassName());
@@ -87,7 +87,7 @@ class ClassParserTest extends TestCase
     public function testClassWithNullableType(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode('
             <?php
                 class foo {
@@ -102,7 +102,7 @@ class ClassParserTest extends TestCase
     public function testClassWithUnionType(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode('
             <?php
                 class foo {
@@ -117,7 +117,7 @@ class ClassParserTest extends TestCase
     public function testClassWithDocUnionType(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode('
             <?php
                 class foo {
@@ -135,7 +135,7 @@ class ClassParserTest extends TestCase
     public function testClassWithAnnotations(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode('
             <?php
                 class foo {
@@ -159,7 +159,7 @@ class ClassParserTest extends TestCase
     public function testClassWithNoParentFile(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForNewestSupportedVersion(), $propertyParser);
         $parser->setCode('<?php class foo extends \RuntimeException {private $x;}');
         $properties = $parser->getProperties();
         self::assertEquals(1, count($properties));

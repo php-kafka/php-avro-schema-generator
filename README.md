@@ -2,7 +2,7 @@
 [![Actions Status](https://github.com/php-kafka/php-avro-schema-generator/workflows/CI/badge.svg)](https://github.com/php-kafka/php-avro-schema-generator/workflows/CI/badge.svg)
 [![Maintainability](https://api.codeclimate.com/v1/badges/41aecf21566d7e9bfb69/maintainability)](https://codeclimate.com/github/php-kafka/php-avro-schema-generator/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/41aecf21566d7e9bfb69/test_coverage)](https://codeclimate.com/github/php-kafka/php-avro-schema-generator/test_coverage)
-![Supported PHP versions: 7.4 .. 8.x](https://img.shields.io/badge/php-7.4%20..%208.x-blue.svg)
+![Supported PHP versions: ^8.2](https://img.shields.io/badge/php-%5E8.2-blue.svg)
 [![Latest Stable Version](https://poser.pugx.org/php-kafka/php-avro-schema-generator/v/stable)](https://packagist.org/packages/php-kafka/php-avro-schema-generator)
 
 ## Installation
@@ -53,7 +53,7 @@ How to enable optimizer:
 
 **Console example**
 ```bash
-./vendor/bin/avro-cli --optimizeFullNames --optimizeFieldOrder --optimizePrimitiveSchemas avro:subschema:merge ./example/schemaTemplates ./example/schema
+./bin/avro-cli  --optimizeFullNames --optimizeFieldOrder --optimizePrimitiveSchemas avro:subschema:merge ./example/schemaTemplates ./example/schema
 ```
 **PHP Example**
 ```php
@@ -87,7 +87,7 @@ After you have reviewed and adjusted your templates you will need to merge them 
 
 **Console example**
 ```bash
-./vendor/bin/avro-cli avro:schema:generate ./example/classes ./example/schemaTemplates
+./bin/avro-cli  avro:schema:generate ./example/classes ./example/schemaTemplates
 ```
 
 **PHP Example**

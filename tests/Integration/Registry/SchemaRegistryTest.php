@@ -105,11 +105,11 @@ class SchemaRegistryTest extends TestCase
 
     public function testRegisterSchemaFileThatIsNotReadable(): void
     {
-        touch('testfile');
-        chmod('testfile', 222);
+        $filePath = '/tmp/test/testfile';
+        touch($filePath);
+        chmod($filePath, 222);
 
-        $fileInfo = new SplFileInfo('testfile');
-
+        $fileInfo = new SplFileInfo($filePath);
         $registry = new SchemaRegistry();
 
         self::expectException(SchemaRegistryException::class);
@@ -123,15 +123,16 @@ class SchemaRegistryTest extends TestCase
         try {
             $method->invokeArgs($registry, [$fileInfo]);
         } finally {
-            unlink('testfile');
+            @unlink($filePath);
         }
     }
 
     public function testRegisterSchemaWithInvalidContent(): void
     {
-        touch('testfile');
+        $filePath = '/tmp/test/testfile';
+        touch($filePath);
 
-        $fileInfo = new SplFileInfo('testfile');
+        $fileInfo = new SplFileInfo($filePath);
 
         $registry = new SchemaRegistry();
 
@@ -146,7 +147,7 @@ class SchemaRegistryTest extends TestCase
         try {
             $method->invokeArgs($registry, [$fileInfo]);
         } finally {
-            unlink('testfile');
+            @unlink($filePath);
         }
     }
 }

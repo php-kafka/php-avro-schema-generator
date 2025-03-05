@@ -12,7 +12,7 @@ use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
 use PhpParser\ParserFactory;
 
-$parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+$parser = (new ParserFactory())->createForNewestSupportedVersion();
 $classPropertyParser = new ClassPropertyParser(new DocCommentParser());
 $classParser = new ClassParser($parser, $classPropertyParser);
 
