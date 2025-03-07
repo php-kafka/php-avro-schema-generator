@@ -9,6 +9,7 @@
 ```
 composer require php-kafka/php-avro-schema-generator "^3.0"
 ```
+Note: For PHP7.x please use the 2.x version.
 
 ## Description
 This library enables you to:
