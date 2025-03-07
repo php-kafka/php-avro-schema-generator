@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Unit\Merger;
 
-use AvroSchema;
 use PhpKafka\PhpAvroSchemaGenerator\Exception\SchemaMergerException;
 use PhpKafka\PhpAvroSchemaGenerator\Merger\SchemaMerger;
 use PhpKafka\PhpAvroSchemaGenerator\Optimizer\OptimizerInterface;
@@ -522,7 +521,7 @@ class SchemaMergerTest extends TestCase
         self::assertEquals(1, $mergedFiles);
         self::assertFileExists('/tmp/foobar/com.example.Book.avsc');
         unlink('/tmp/foobar/com.example.Book.avsc');
-        rmdir('/tmp/foobar');
+        $this->cleanupDirectory('/tmp/foobar');
     }
 
     public function testMergePrimitive(): void
@@ -557,7 +556,7 @@ class SchemaMergerTest extends TestCase
 
         self::assertFileExists('/tmp/foobar/primitive-type.avsc');
         unlink('/tmp/foobar/primitive-type.avsc');
-        rmdir('/tmp/foobar');
+        $this->cleanupDirectory('/tmp/foobar');
     }
 
     public function testMergePrimitiveWithOptimizerEnabled(): void
@@ -599,7 +598,7 @@ class SchemaMergerTest extends TestCase
 
         self::assertFileExists('/tmp/foobar/primitive-type.avsc');
         unlink('/tmp/foobar/primitive-type.avsc');
-        rmdir('/tmp/foobar');
+        $this->cleanupDirectory('/tmp/foobar');
     }
 
     public function testMergeWithFilenameOption(): void
@@ -639,7 +638,7 @@ class SchemaMergerTest extends TestCase
 
         self::assertFileExists('/tmp/foobar/bla.avsc');
         unlink('/tmp/foobar/bla.avsc');
-        rmdir('/tmp/foobar');
+        $this->cleanupDirectory('/tmp/foobar');
     }
 
     public function testExportSchema(): void
@@ -713,5 +712,23 @@ class SchemaMergerTest extends TestCase
     private function reformatJsonString(string $jsonString): string
     {
         return json_encode(json_decode($jsonString, false, JSON_THROW_ON_ERROR), JSON_THROW_ON_ERROR);
+    }
+
+    private function cleanupDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = scandir($dir);
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..') {
+                $path = $dir . '/' . $file;
+                if (is_file($path)) {
+                    unlink($path);
+                }
+            }
+        }
+        rmdir($dir);
     }
 }

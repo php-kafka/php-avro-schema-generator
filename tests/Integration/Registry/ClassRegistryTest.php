@@ -13,6 +13,7 @@ use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassInterface;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistry;
 use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistryInterface;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SplFileInfo;
@@ -25,7 +26,7 @@ class ClassRegistryTest extends TestCase
     public function testClassDirectory(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2)), $propertyParser);
         $converter = new PhpClassConverter($parser);
         $registry = new ClassRegistry($converter);
         $result = $registry->addClassDirectory('/tmp');
@@ -39,7 +40,7 @@ class ClassRegistryTest extends TestCase
         $classDir = __DIR__ . '/../../../example/classes';
 
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2)), $propertyParser);
         $converter = new PhpClassConverter($parser);
         $registry = (new ClassRegistry($converter))->addClassDirectory($classDir)->load();
 
@@ -58,7 +59,7 @@ class ClassRegistryTest extends TestCase
     {
         $fileInfo = new SplFileInfo('somenonexistingfile');
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2)), $propertyParser);
         $converter = new PhpClassConverter($parser);
         $registry = new ClassRegistry($converter);
 
@@ -73,13 +74,14 @@ class ClassRegistryTest extends TestCase
 
     public function testRegisterSchemaFileThatIsNotReadable(): void
     {
-        touch('testfile');
-        chmod('testfile', 222);
+        $filePath = '/tmp/test/testfile';
+        touch($filePath);
+        chmod($filePath, 222);
 
-        $fileInfo = new SplFileInfo('testfile');
+        $fileInfo = new SplFileInfo($filePath);
 
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2)), $propertyParser);
         $converter = new PhpClassConverter($parser);
         $registry = new ClassRegistry($converter);
 
@@ -94,7 +96,7 @@ class ClassRegistryTest extends TestCase
         try {
             $method->invokeArgs($registry, [$fileInfo]);
         } finally {
-            unlink('testfile');
+            @unlink($filePath);
         }
     }
 }

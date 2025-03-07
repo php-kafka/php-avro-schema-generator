@@ -142,7 +142,7 @@ final class ClassParser implements ClassParserInterface
         foreach ($this->statements as $statement) {
             if ($statement instanceof Namespace_) {
                 if ($statement->name instanceof Name) {
-                    return implode('\\', $statement->name->parts);
+                    return $statement->name->toString();
                 }
             }
         }

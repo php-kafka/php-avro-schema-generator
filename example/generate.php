@@ -11,8 +11,9 @@ use PhpKafka\PhpAvroSchemaGenerator\Registry\ClassRegistry;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Generator\SchemaGenerator;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 
-$parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+$parser = (new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2));
 $classPropertyParser = new ClassPropertyParser(new DocCommentParser());
 $classParser = new ClassParser($parser, $classPropertyParser);
 

@@ -12,6 +12,7 @@ use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParserInterface;
 use PhpParser\ParserFactory;
 use PhpParser\Parser;
+use PhpParser\PhpVersion;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -24,7 +25,7 @@ class ParserServiceProvider implements ServiceProviderInterface
         };
 
         $container[Parser::class] = static function (Container $container): Parser {
-            return $container[ParserFactory::class]->create(ParserFactory::PREFER_PHP7);
+            return $container[ParserFactory::class]->createForVersion(PhpVersion::fromComponents(8, 2));
         };
 
         $container[DocCommentParserInterface::class] = static function (): DocCommentParserInterface {

@@ -7,8 +7,8 @@ namespace PhpKafka\PhpAvroSchemaGenerator\Tests\Integration\Parser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\ClassPropertyParser;
 use PhpKafka\PhpAvroSchemaGenerator\Parser\DocCommentParser;
-use PhpKafka\PhpAvroSchemaGenerator\PhpClass\PhpClassPropertyInterface;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,7 +19,7 @@ class ClassPropertyParserTest extends TestCase
     public function testNullDefaultProperty(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2)), $propertyParser);
         $parser->setCode('
             <?php
                 class foo {
@@ -37,7 +37,7 @@ class ClassPropertyParserTest extends TestCase
     public function testIntDefaultProperty(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2)), $propertyParser);
         $parser->setCode('
             <?php
                 class foo {
@@ -55,7 +55,7 @@ class ClassPropertyParserTest extends TestCase
     public function testFloatDefaultProperty(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2)), $propertyParser);
         $parser->setCode('
             <?php
                 class foo {
@@ -73,7 +73,7 @@ class ClassPropertyParserTest extends TestCase
     public function testEmptyStringDefaultProperty(): void
     {
         $propertyParser = new ClassPropertyParser(new DocCommentParser());
-        $parser = new ClassParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7), $propertyParser);
+        $parser = new ClassParser((new ParserFactory())->createForVersion(PhpVersion::fromComponents(8,2)), $propertyParser);
         $parser->setCode('
             <?php
                 class foo {
