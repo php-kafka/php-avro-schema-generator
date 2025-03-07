@@ -19,11 +19,11 @@ jobs:
       - name: Start docker containers
         env:
           USER_ID: 1001
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose up -d
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose up -d
       - name: Install dependencies
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make update-dependencies
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose exec -T php make update-dependencies
       - name: Run coverage
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make coverage
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose exec -T php make coverage
       - name: Upload coverage results to Code Climate
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
@@ -36,11 +36,11 @@ jobs:
       - name: Start docker containers
         env:
           USER_ID: 1001
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose up -d
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose up -d
       - name: Install dependencies
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make update-dependencies
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose exec -T php make update-dependencies
       - name: Run infection testing
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make infection-testing
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose exec -T php make infection-testing
   static-analysis:
     runs-on: ubuntu-latest
     steps:
@@ -48,11 +48,11 @@ jobs:
       - name: Start docker containers
         env:
           USER_ID: 1001
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose up -d
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose up -d
       - name: Install dependencies
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make update-dependencies
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose exec -T php make update-dependencies
       - name: Run static analysis
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make static-analysis
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose exec -T php make static-analysis
   code-style:
     runs-on: ubuntu-latest
     steps:
@@ -60,8 +60,8 @@ jobs:
       - name: Start docker containers
         env:
           USER_ID: 1001
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose up -d
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose up -d
       - name: Install dependencies
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make update-dependencies
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose exec -T php make update-dependencies
       - name: Check code style
-        run: cd ${GITHUB_WORKSPACE}/docker && docker-compose exec -T php make code-style
+        run: cd ${GITHUB_WORKSPACE}/docker && docker compose exec -T php make code-style
